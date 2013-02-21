@@ -7,7 +7,21 @@
 
 
 
+/*
+// オブジェクトからjsonへ変換テスト
+var obj = {
+	ary:[0,1,2],
+	obj:{
+		a:0,
+		b:1,
+		c:2
+	}
+};
+var str = JSON.stringify(obj);
 
+// テスト出力
+console.log(str);
+*/
 
 
 /*
