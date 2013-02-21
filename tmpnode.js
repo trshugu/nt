@@ -9,6 +9,17 @@
 
 
 
+
+/*
+// jsonからオブジェクトへ変換テスト
+var str = '{"ary":[0,1,2],"obj":{"a":0,"b":1,"c":2}}';
+var obj = JSON.parse(str);
+
+// テスト出力
+console.log(obj.ary);
+console.log(obj.obj);
+*/
+
 /*
 // もっともシンプルなhttpサーバー
 var http = require('http');
