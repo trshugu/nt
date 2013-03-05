@@ -7,6 +7,27 @@
 
 
 
+
+
+/*
+// mongojsでテスト
+var mon = require("mongojs");
+var db = mon.connect("mongodb://localhost/jss")
+*/
+
+/*
+// mongooseでmongoDBテスト
+var mongoose = require('mongoose');
+var db = mongoose.connect('mongodb://localhost/goosedb');
+*/
+
+
+/*
+// nodejsが見るパス。これに加えてNODE_PATHを見に行く。
+global.module.paths
+*/
+
+
 /*
 // オブジェクトからjsonへ変換テスト
 var obj = {
