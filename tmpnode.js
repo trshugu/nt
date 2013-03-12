@@ -1,6 +1,14 @@
 /*
 */
 
+
+
+
+
+
+
+
+/*
 // node-couchdbでテスト
 var couch =  require("node-couchdb");
 couch.insert("mokkai", {"_id": "ccc3","field":"test"});
@@ -9,8 +17,7 @@ couch.insert("mokkai", {"_id": "ddd3","field":"test"});
 // 連続して行うと早すぎて検索されない
 couch.get("mokkai","ccc3",function(err,resData){return console.dir(resData["data"])})
 couch.get("mokkai","ddd3",function(err,resData){return console.dir(resData["data"])})
-
-
+*/
 
 
 /*
