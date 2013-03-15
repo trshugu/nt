@@ -8,6 +8,12 @@
 
 
 
+###
+# これでなんとかできた
+couchbase = require "couchbase"
+couchbase.connect({"hosts":["localhost:8091"],"user":"suzuki","password":"suzuki","bucket":"default"}, (err,rb)-> rb.get("Aaron0",(e,d,m)-> console.log e+d+m.id))
+###
+
 
 
 ###

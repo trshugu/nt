@@ -6,6 +6,31 @@
 
 
 
+/*
+// couchnodeでテスト
+var couchbase = require("couchbase")
+// ここまでやってやっとできた・・・
+couchbase.connect(
+  {"hosts":["localhost:8091"],"user":"suzuki","password":"suzuki","bucket":"gamesim-sample"},
+  function(err,rb)
+  {
+    if(err)
+    {
+      console.log("eerere")
+    }
+    else
+    {
+      rb.get(
+        "Aaron0",
+        function(e,d,m)
+        {
+          console.log(e+d+m.id)
+        }
+      )
+    }
+  }
+);
+*/
 
 
 /*
