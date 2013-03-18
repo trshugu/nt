@@ -8,6 +8,21 @@
 
 
 
+aa = 44 
+if aa
+  console.log aa
+
+# 後置のifが使える
+aa if console.log aa
+
+# 1行でif else も書ける
+if aa == 44 then console.log "if" else console.log "else"
+if aa == 22 then console.log "if" else console.log "else"
+
+# 値の有無(null,undefined以外なら真)
+console.log "aaari" if aa?
+console.log "bbari" if bb?
+
 ###
 # これでなんとかできた
 couchbase = require "couchbase"
