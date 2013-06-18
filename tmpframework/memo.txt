@@ -1,0 +1,7 @@
+‚Ü‚¸‚Ícapybara‚©‚çEEE
+
+Phantomjs { Jasmine
+QUnit
+JsTestDriver
+Capybara-webkit {Sinon.JS
+http://www.atmarkit.co.jp/ait/articles/1210/04/news113_3.html
