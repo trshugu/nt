@@ -1,7 +1,15 @@
-まずはcapybaraから・・・
+http://appkitbox.com/knowledge/javascript/2013/03/15/backbone-1
+http://blog.asial.co.jp/1145
 
+
+
+
+
+
+
+＊まずはcapybaraから→うまくいかなかった
 Phantomjs ＋ Jasmine
 QUnit
 JsTestDriver
 Capybara-webkit ＋Sinon.JS
-http://www.atmarkit.co.jp/ait/articles/1210/04/news113_3.html
+→さぱーり
