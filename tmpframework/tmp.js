@@ -4,7 +4,60 @@ $(document).ready(function() {
   $("#tmp");
 });
 
+/*
+*/
+// knockout でTodoリスト
+$(function(){
+  //Modelを定義
+  function TodoModel(value){
+    var self = this;
+    self.todoText = ko.observable(value);
+  }
+  
+  //ViewModelを定義
+  function TestappViewModel(){
+    var self = this;
+    
+    self.todoList = ko.observableArray(); //todoリスト
+    self.todoInputValue = ko.observable(''); //追加todoテキスト
+    
+    //追加
+    self.addTodo = function(obj, e)
+    {
+      if( !self.todoInputValue() ) return; //空文字の場合は処理しない
+      
+      //入力されたテキストでTodoModelを作りTodoリストに挿入
+      self.todoList.unshift( new TodoModel( self.todoInputValue() ) ); 
+      self.todoInputValue('');
+    };
+    
+    //削除
+    self.removeTodo = function(obj, e)
+    {
+      //イベントバインディングで実行される関数の第1引数にはModel、第2引数にはイベントオブジェクトが渡される
+      self.todoList.remove(obj);
+    };
+  }
+  
+  //bindingスタート
+  ko.applyBindings( new TestappViewModel() );
+});
 
+
+
+/*
+// knockout data-bind
+$(function(){
+  //ViewModelを定義
+  function TestappViewModel(){
+    var self = this;
+    self.message = ko.observable(''); //初期値は空文字列を指定
+  }
+  
+  //bindingスタート
+  ko.applyBindings( new TestappViewModel() );
+});
+*/
 
 
 
