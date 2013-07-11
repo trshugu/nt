@@ -1,2 +1,0 @@
-# tmpsails
-### a Sails application
