@@ -7,6 +7,146 @@
 
 
 
+/*
+// 並列化試験
+var async = require('async');
+console.log("start")
+
+function Sleep( T ){ 
+   var d1 = new Date().getTime(); 
+   var d2 = new Date().getTime(); 
+   while( d2 < d1+1000*T ){    //T秒待つ 
+       d2=new Date().getTime(); 
+   } 
+   return; 
+}
+
+async.parallel([
+  function(callback){
+    console.log("wait1");
+    Sleep(10);
+    setTimeout(callback,1000)
+  },
+  function(callback){
+    console.log("wait2");
+    Sleep(10);
+    setTimeout(callback,1000)
+  },
+  function(callback){
+    console.log("wait3");
+    Sleep(10);
+    setTimeout(callback,1000)
+  }
+],function(err,result)
+{
+  if (err) { throw err; }
+  console.log('all done.' + result);
+})
+
+console.log("end")
+*/
+
+
+
+/*
+// async.jsによるフロー制御
+var async = require('async');
+
+
+// 前の関数から引数を受け取ることができる
+async.waterfall([
+  function (callback)
+  {
+    console.log('waterfall 1');
+    setTimeout(function () {
+      console.log('waterfall 1 done.');
+      callback(null, 1);
+    }, 500);
+  },
+  function (arg, callback) {
+    console.log('waterfall 2');
+    setTimeout(function () {
+      console.log('waterfall 2 done.');
+      callback(null, arg + 1);
+    }, 300);
+  },
+  function (arg, callback) {
+    console.log('waterfall 3');
+    setTimeout(function () {
+      console.log('waterfall 3 done.');
+      callback(null, arg + 1);
+    }, 100);
+  }
+],
+function (err,result) {
+  if (err) { throw err; }
+  console.log('waterfall all done.' + result);
+});
+
+// 順番に実行。callbackが呼ばれると次が呼ばれる
+async.series([
+  function (callback) {
+    console.log('series 1');
+    setTimeout(function () {
+      console.log('series 1 done.');
+      callback(null, 1);
+    }, 500);
+  },
+  function (callback) {
+    console.log('series 2');
+    setTimeout(function () {
+      console.log('series 2 done.');
+      callback(null, 2);
+    }, 300);
+  },
+  function (callback) {
+    console.log('series 3');
+    setTimeout(function () {
+      console.log('series 3 done.');
+      callback(null, 3);
+    }, 100);
+  }
+],
+function (err, results)
+{
+  if (err) { throw err; }
+  console.log('series all done. ' + results);
+});
+
+// 渡されたものを平行で走らせる
+async.parallel([
+  function (callback) {
+    console.log('parallel 1');
+    setTimeout(function () {
+      console.log('parallel 1 done.');
+      callback(null, 1);
+    }, 500);
+  },
+  function (callback) {
+    console.log('parallel 2');
+    setTimeout(function () {
+      console.log('parallel 2 done.');
+      callback(null, 2);
+    }, 300);
+  },
+  function (callback) {
+    console.log('parallel 3');
+    setTimeout(function () {
+      console.log('parallel 3 done.');
+      callback(null, 3);
+    }, 100);
+  }
+],
+function (err, results)
+{
+  if (err) { throw err; }
+  console.log('parallel all done. ' + results);
+});
+
+console.log('done.');
+*/
+
+
 
 
 /*
