@@ -12,7 +12,7 @@ console.log parseInt('010') is 10
 
 console.log parseInt('010',8) is 8
 console.log parseInt('010',8) is 10
-##
+###
 
 ###
 # やってはいけません
