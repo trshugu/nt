@@ -7,6 +7,31 @@
 
 
 
+
+
+/*
+// Clusterの利用
+var cluster = require('cluster');
+var cpuCount = require('os').cpus().length;
+
+// クラスタを利用して処理を分散（CPUの数だけ）
+if (cluster.isMaster)
+{
+  console.log(cpuCount);
+  console.log(cluster.isMaster);
+  for (var i=0; i<cpuCount; i+=1 )
+  {
+    cluster.fork();
+  }
+}
+else
+{
+  console.log("imamade")
+  return;
+}
+*/
+
+
 /*
 // 並列化試験
 var async = require('async');
@@ -24,18 +49,27 @@ function Sleep( T ){
 async.parallel([
   function(callback){
     console.log("wait1");
-    Sleep(10);
-    setTimeout(callback,1000)
+    setTimeout(function () {
+      console.log('parallel 1 done.');
+      Sleep(10);
+      callback(null, 1);
+    }, 1000);
   },
   function(callback){
     console.log("wait2");
-    Sleep(10);
-    setTimeout(callback,1000)
+    setTimeout(function () {
+      console.log('parallel 2 done.');
+      Sleep(10);
+      callback(null, 1);
+    }, 1000);
   },
   function(callback){
     console.log("wait3");
-    Sleep(10);
-    setTimeout(callback,1000)
+    setTimeout(function () {
+      console.log('parallel 3 done.');
+      Sleep(10);
+      callback(null, 1);
+    }, 1000);
   }
 ],function(err,result)
 {
