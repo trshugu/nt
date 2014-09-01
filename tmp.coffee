@@ -5,6 +5,12 @@
 
 
 
+# for in
+arrs = ["tsafi", "masdya", "ydeathzu"]
+
+for item in arrs
+  console.log item
+
 
 ###
 # ヒアドキュメント
