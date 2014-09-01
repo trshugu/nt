@@ -26,8 +26,8 @@ if (cluster.isMaster)
 }
 else
 {
-  console.log("imamade")
-  return;
+  console.log("imamade");
+  process.exit();
 }
 */
 

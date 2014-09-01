@@ -5,12 +5,247 @@
 
 
 
+###
+# イテレーションと改行
+console.log item for item in ["wata","chiha","bai"]
+
+for item in ["wata","chiha","bai"]
+  console.log item
+###
+
+
+###
+# ハッシュの条件付き
+hash = {"key1": "value1", "key2": "value2"}
+ 
+for key, val of hash when key is "key1"
+  console.log "key = #{key}, value = #{val}"
+###
+
+###
+# keyのみ
+for key of {"key1": "value1", "key2": "value2"}
+  console.log key
+###
+
+
+###
+# ハッシュ
+for key, val of {"key1": "value1", "key2": "value2"}
+  console.log "key = #{key}, value = #{val}"
+###
+
+###
+# 条件付き
+eat = (food) ->
+  console.log "eat " + food
+
+for food in ['toast', 'cheese', 'wine'] when food is 'toast' or food is 'cheese'
+  eat(food)
+###
+
+
+###
+# インデックス付き
+eat = (food) ->
+  console.log "eat " + food
+ 
+evaluate = (food) ->
+  console.log food + " is very delicious."
+ 
+for food, i in ['toast', 'cheese', 'wine']
+  console.log "looping #{i} times"
+  eat(food)
+  evaluate(food)
+###
+
+
+###
+eat = (food) ->
+  console.log "eat " + food
+ 
+evaluate = (food) ->
+  console.log food + " is very delicious."
+
+for food in ['toast', 'cheese', 'wine']
+  eat(food)
+  evaluate(food)
+###
+
+###
+# 配列
+arrl=(item) ->
+  console.log "at:" + item
+
+arrl(i) for i in ["asdxfs", "bad", "c"]
+###
+
+###
+# nextTickの順番
+process.nextTick ->
+  setTimeout ->
+    console.log "4"
+  ,0
+  process.nextTick -> console.log "3"
+  console.log "2"
+console.log "1"
+###
+
+###
+# イベントループ
+http = require('http')
+server = http.createServer((req,res) ->
+  res.writeHead( 200, {'Content-Type': 'text/plain'} )
+  res.end( 'イベントループ\n' )
+
+  # console.log(res)
+  # console.log(req)
+  server.close()
+)
+
+server.listen(1337)
+###
+
+
+###
+# Clusterの利用
+cluster = require("cluster")
+cpuCount = require("os").cpus().length
+
+HeavySleep = (T) ->
+  d1 = new Date().getTime()
+  d2 = new Date().getTime()
+  # T秒待つ 
+  d2 = new Date().getTime()  while d2 < d1 + 1000 * T
+
+# クラスタを利用して処理を分散（CPUの数だけ）
+if cluster.isMaster
+  console.log cpuCount
+  console.log cluster.isMaster
+  i = 0
+
+  while i < cpuCount
+    cluster.fork()
+    i += 1
+else
+  console.log "imamade"
+  HeavySleep 10
+  console.log "hell..."
+  process.exit()
+###
+
+
+
+###
+# 並列化試験2
+HeavySleep = (T) ->
+  d1 = new Date().getTime()
+  d2 = new Date().getTime()
+  # T秒待つ 
+  d2 = new Date().getTime()  while d2 < d1 + 1000 * T
+
+async = require("async")
+console.log "start"
+
+async.parallel [
+  (callback) ->
+    console.log "wait1"
+    setTimeout (->
+      console.log "parallel 1 done."
+      HeavySleep 10
+      callback(null, 1)
+    ), 1000
+  (callback) ->
+    console.log "wait2"
+    setTimeout (->
+      console.log "parallel 2 done."
+      HeavySleep 10
+      callback(null, 2)
+    ), 1000
+  (callback) ->
+    console.log "wait3"
+    setTimeout (->
+      console.log "parallel 3 done."
+      HeavySleep 10
+      callback(null, 3)
+    ), 1000
+], (err, result) ->
+  throw err if err
+  console.log "all done." + result
+
+console.log "end"
+###
+
+
+
+###
+n=5
+for i in [0..n-1] by 1
+  for j in [i+1..n-1] by 1
+    console.log i, j, n
+###
+
+###
+n=5
+for i in [0..n-1]
+  for j in [i+1..n-1]
+    console.log i, j, n
+###
+
+
+###
+# 要素のスキップ
+numbers = [0..30]
+
+for number in numbers by 5
+  console.log number
+###
+
+
+###
+# switch
+targetName = "World"
+
+# 結果は hell
+switch targetName
+  when 'World' then console.log 'hell'
+  when 'under' then console.log 'rondo'
+  else console.log 'Cant find'
+###
+
+
+###
+# loop
+count = 0
+loop
+  if ++count >= 15
+    break
+console.log count
+###
+
+###
+# until
+count = 0
+count++ until count >= 10
+console.log count
+###
+
+###
+# while
+count = 0
+while count < 15
+ count++
+
+console.log count
+###
+
+###
 # for in
 arrs = ["tsafi", "masdya", "ydeathzu"]
 
 for item in arrs
   console.log item
-
+###
 
 ###
 # ヒアドキュメント
