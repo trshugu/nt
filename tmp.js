@@ -4,23 +4,58 @@
  */
 
 (function() {
-  var e, th;
+  var fs, http, io, listen, server;
 
-  try {
-    console.log("try");
-    throw "morenmore";
-    th = (function() {
-      throw "anoutar";
-    })();
-    th();
-    a();
-  } catch (_error) {
-    e = _error;
-    console.log("catch");
-    console.log(e);
-  } finally {
-    console.log("final");
-  }
+  http = require('http');
+
+  io = require('socket.io');
+
+  fs = require("fs");
+
+  server = http.createServer(function(req, res) {
+    var output;
+    res.writeHead(200, {
+      "Content-Type": "text/html"
+    });
+    output = fs.readFileSync("./index.html", "utf-8");
+    return res.end(output);
+  }).listen(process.env.VMC_APP_PORT || 3000);
+
+  listen = io.listen(server);
+
+  listen.sockets.on("connection", function(socket) {
+    socket.on("C_to_S_message", function(data) {
+      return listen.sockets.emit("S_to_C_message", {
+        value: data.value
+      });
+    });
+    socket.on("C_to_S_broadcast", function(data) {
+      return socket.broadcast.emit("S_to_C_message", {
+        value: data.value
+      });
+    });
+    return socket.on("disconnect", function() {
+      return listen.sockets.emit("S_to_C_message", {
+        value: "user disconnected"
+      });
+    });
+  });
+
+
+  /*
+   * 例外処理
+  try
+    console.log("try")
+    throw("morenmore")
+    th = throw("anoutar")
+    th()
+    a()
+  catch e
+    console.log("catch")
+    console.log(e)
+  finally
+    console.log("final")
+   */
 
 
   /*

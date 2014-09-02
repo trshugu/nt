@@ -4,6 +4,39 @@
 
 
 
+
+###
+# socket.io
+http = require('http')
+io = require('socket.io')
+fs = require("fs")
+
+server = http.createServer((req, res)-> 
+  res.writeHead(200, {"Content-Type":"text/html"});
+  output = fs.readFileSync("./index.html", "utf-8");
+  res.end(output);
+).listen(process.env.VMC_APP_PORT || 3000);
+
+listen = io.listen(server);
+
+listen.sockets.on("connection", (socket)->
+  # メッセージ送信（送信者にも送られる）
+  socket.on("C_to_S_message", (data)->
+    listen.sockets.emit("S_to_C_message", {value:data.value})
+  )
+  
+  # ブロードキャスト（送信者以外の全員に送信）
+  socket.on("C_to_S_broadcast", (data)->
+    socket.broadcast.emit("S_to_C_message", {value:data.value})
+  )
+ 
+  # 切断したときに送信
+  socket.on("disconnect", ->
+    # listen.sockets.emit("S_to_C_message", {value:"user disconnected"});
+  );
+);
+###
+
 ###
 # 例外処理
 try
