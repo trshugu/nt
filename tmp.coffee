@@ -4,6 +4,107 @@
 
 
 
+###
+# 例外処理
+try
+  console.log("try")
+  throw("morenmore")
+  th = throw("anoutar")
+  th()
+  a()
+catch e
+  console.log("catch")
+  console.log(e)
+finally
+  console.log("final")
+###
+
+
+###
+# 受け手がいないと配列を返さない
+t=10
+while t-=1
+  t*2
+###
+
+###
+# whileは配列を返す
+f = ->
+  t = 10
+  while t-=1
+    t*2
+
+console.log(f())
+###
+
+
+###
+# while
+c=0
+while c < 5
+  ++c
+  console.log(c)
+
+c=0
+(++c;console.log(c)) while c < 5
+###
+
+
+###
+# switch文
+val = "c"
+switch val
+  when "a","b"
+    console.log "kase"
+  else
+    console.log "nothing"
+###
+
+
+###
+# 三項演算子は存在しない
+a = if b? then 1 else 2
+console.log a
+###
+
+
+
+###
+# アクセス演算子
+a?.undi()
+###
+
+
+
+###
+# 存在演算子
+if a?
+  console.log "a is"
+else
+  console.log "a noching"
+
+b = "anokutara"
+console.log a ? b
+
+a="death"
+if a?
+  console.log "a is"
+else
+  console.log "a noching"
+
+console.log a ? b
+###
+
+###
+# 改行できないパターン
+for food in ['toast', 'cheese', 'wine'] 
+  when food is 'cheese'
+  console.log(food)
+
+for food 
+  in ['toast', 'cheese', 'wine'] when food is 'cheese'
+  console.log(food)
+###
 
 ###
 # イテレーションと改行

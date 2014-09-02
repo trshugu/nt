@@ -1,0 +1,3 @@
+# テスト
+task 'ttt',(options)->
+  console.log "start"
