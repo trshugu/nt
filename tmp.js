@@ -3,6 +3,10 @@
 /*
  */
 
+
+/*
+ */
+
 (function() {
   var fs, http, io, listen, server;
 
@@ -34,11 +38,7 @@
         value: data.value
       });
     });
-    return socket.on("disconnect", function() {
-      return listen.sockets.emit("S_to_C_message", {
-        value: "user disconnected"
-      });
-    });
+    return socket.on("disconnect", function() {});
   });
 
 

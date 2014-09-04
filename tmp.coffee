@@ -6,6 +6,7 @@
 
 
 ###
+###
 # socket.io
 http = require('http')
 io = require('socket.io')
@@ -35,7 +36,7 @@ listen.sockets.on("connection", (socket)->
     # listen.sockets.emit("S_to_C_message", {value:"user disconnected"});
   );
 );
-###
+
 
 ###
 # 例外処理
