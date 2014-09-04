@@ -1,5 +1,5 @@
 @echo off
-coffee -c tmp.coffee && ^
-node tmp.js
-
+rem coffee -c tmp.coffee && ^
+rem node tmp.js
+coffee tmp.coffee
 

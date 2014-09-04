@@ -5,7 +5,36 @@
 
 
 
+
+
+
 ###
+# coffeeの状態で
+hoka = require("./gaibu")
+
+# hoka.soto()
+
+console.log hoka
+ho = new hoka("namae")
+console.log ho.name
+console.log ho.pubFun()
+###
+
+
+
+###
+# module.exports = 
+hoka = require("./gaibu.js")
+hoka.soto()
+
+console.log hoka
+ho = new hoka("namae")
+console.log ho.name
+console.log ho.pubFun()
+###
+
+
+
 ###
 # socket.io
 http = require('http')
@@ -36,6 +65,7 @@ listen.sockets.on("connection", (socket)->
     # listen.sockets.emit("S_to_C_message", {value:"user disconnected"});
   );
 );
+###
 
 
 ###
