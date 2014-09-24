@@ -1,0 +1,105 @@
+例外 Net/httpがヘッダの折り畳みに対応していないとか
+http://easypianoscore.mad.buttobi.net/
+
+なぜか404
+http://www.maesei.co.jp/new07/index_kani.html
+http://diverse.jp/cd-bemani/taq.shtml
+http://www.neesk.com/software/download-software-ABC2_Tab.html
+
+http://bukupe.com/summary/951
+
+web171
+https://www.web171.jp/
+
+gese
+http://www.nikkei.com/tech/personal/article/g=96958A90889DE1E6E5E7EBE4E4E2E3E1E2EBE0E2E3E3E2E2E2E2E2E2;p=9694E3EAE3E0E0E2E2EBE0E4E2E7
+yahoo
+http://yahoo.co.jp
+aaa
+http://www.yahoo.co.jp
+erer
+http://google.co.jp
+sadfsd
+・rack この順番でチェック
+http://gihyo.jp/dev/serial/01/ruby/0023
+sdfsdf
+http://blog.designrecipe.jp/2009/7/5/ruby-rack/
+sdfsdf
+http://d.hatena.ne.jp/seiunsky/20120213/1329152534
+・rbenv 再導入
+http://ksauzz.github.com/blog/2012/03/23/rbenv-ruby-build-rbenv-gemset/
+・capistrano　デプロイツール(参考URL参照)
+http://builder.japan.zdnet.com/virtualization/sp_open-source-software-moonlinx-2009/20396188/
+・Apacheでruby
+http://redmine.jp/tech_note/apache-passenger/
+○capistrano参考サイト
+http://doruby.kbmj.com/trinityt_on_rails/20080325/__Capistrano___1
+sdfsdf
+http://builder.japan.zdnet.com/virtualization/sp_open-source-software-moonlinx-2009/20396188/
+sdfsdf
+http://www.slideshare.net/T2J/capistrano-tips-tips
+開発環境にデプロイ
+http://d.hatena.ne.jp/dkfj/20120228/1330434467
+ssh-agent
+http://www.oiax.jp/rails/capistrano/ssh_public_key.html
+●home
+http://d.hatena.ne.jp/d4-1977/20120729/1343558654
+・zabbixVM
+http://www.zabbix.com/download.php
+sdfsdf
+http://www.zabbix.com/jp/
+
+sdfsdf
+http://builder.japan.zdnet.com/virtualization/sp_open-source-software-moonlinx-2009/20396188/
+ウェブメディア「moonlinx」では、moonlinx Membership Centerと呼ばれるクリエイター向けの登録制会員サービスを
+http://moonlinx.jp/
+
+vikomad
+http://hp.vector.co.jp/authors/VA016670/unix/vi_reference.html
+
+
+yahoo
+http://yahoo.co.jp
+aaa
+http://www.yahoo.co.jp
+erer
+http://google.co.jp
+sadfsd
+・rack この順番でチェック
+http://gihyo.jp/dev/serial/01/ruby/0023
+sdfsdf
+http://blog.designrecipe.jp/2009/7/5/ruby-rack/
+sdfsdf
+http://d.hatena.ne.jp/seiunsky/20120213/1329152534
+・rbenv 再導入
+http://ksauzz.github.com/blog/2012/03/23/rbenv-ruby-build-rbenv-gemset/
+・capistrano　デプロイツール(参考URL参照)
+http://builder.japan.zdnet.com/virtualization/sp_open-source-software-moonlinx-2009/20396188/
+・Apacheでruby
+http://redmine.jp/tech_note/apache-passenger/
+○capistrano参考サイト
+http://doruby.kbmj.com/trinityt_on_rails/20080325/__Capistrano___1
+sdfsdf
+http://builder.japan.zdnet.com/virtualization/sp_open-source-software-moonlinx-2009/20396188/
+sdfsdf
+http://www.slideshare.net/T2J/capistrano-tips-tips
+開発環境にデプロイ
+http://d.hatena.ne.jp/dkfj/20120228/1330434467
+ssh-agent
+http://www.oiax.jp/rails/capistrano/ssh_public_key.html
+●home
+http://d.hatena.ne.jp/d4-1977/20120729/1343558654
+・zabbixVM
+http://www.zabbix.com/download.php
+sdfsdf
+http://www.zabbix.com/jp/
+
+sdfsdf
+http://builder.japan.zdnet.com/virtualization/sp_open-source-software-moonlinx-2009/20396188/
+ウェブメディア「moonlinx」では、moonlinx Membership Centerと呼ばれるクリエイター向けの登録制会員サービスを
+http://moonlinx.jp/
+
+vikomad
+http://hp.vector.co.jp/authors/VA016670/unix/vi_reference.html
+
+
