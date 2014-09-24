@@ -4,7 +4,7 @@
 
 
 
-# 
+
 
 # ListDelete
 
@@ -30,10 +30,59 @@
 
 # body取得
 
-# http通信 レスポンス取得
+# http通信 レスポンス取得2
 
+
+
+
+
+###
+# ステータスコード一覧
+a = "4"
+o = require('http').STATUS_CODES
+
+console.log(o)
+
+for k in o
+  if !a || !k.indexOf(a) || o[k].indexOf(a) > -1
+    console.log(k, o[k])
+
+# console.log process.argv
+###
+
+###
+# http通信 レスポンス取得1
+http = require('http')
+url = "http://yahoo.co.jp"
+http.get((url),(res)->
+  body = ''
+  res.on('data', (c)->
+    body += c
+  )
+  
+  res.on('end',(res)->
+    ret = body
+    console.log(ret)
+  )
+  console.log("test")
+)
+###
+
+###
 # nodeストップウォッチ
+# require('date-utils')
 
+HeavySleep = (T) ->
+  d1 = new Date().getTime()
+  d2 = new Date().getTime()
+  # T秒待つ 
+  d2 = new Date().getTime()  while d2 < d1 + 1000 * T
+
+stdt = new Date()
+HeavySleep 3
+eddt = new Date()
+console.log(eddt - stdt)
+###
 
 ###
 # coffeeの状態で
