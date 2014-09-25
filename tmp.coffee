@@ -19,21 +19,271 @@
 # ファイル読み込み
 
 # ファイル存在確認
+fs = require('fs')
 
+fs.open('./log.txt', 'ax+', 384, (err, fd)->
+  if err
+    console.log("nothing")
+    console.log(err)
+  
+  fd && fs.close(fd, (err)->
+    console.log('ari')
+    console.log(err)
+  )
+)
+
+###
 # 引数取得
+console.log(process.argv)
+console.log(process.argv[0])
+console.log(process.argv[1])
+console.log(process.argv[2]) # 引数
+###
 
-# log出力
 
+###
+# log出力3(log)
+Log = require('log')
+fs = require('fs')
+stream = fs.createWriteStream(__dirname + '/log.txt')
+
+# log = new Log(Log.INFO)
+log = new Log(Log.WARNING, stream);
+
+log.debug('preparing email')
+log.info('sending email')
+log.error('failed to send email')
+
+# 読み込み
+stream = fs.createReadStream(__dirname + '/log.txt')
+log = new Log(Log.DEBUG, stream);
+
+
+log.on('line',(l)->
+  console.log(l)
+  console.log(l.date)
+).on('end',->
+  console.log('owari')
+)
+###
+
+
+###
+# log出力2(winston)
+winston = require('winston')
+logger = new (winston.Logger)({
+  transports: [
+    # 使う出力方法を transports で宣言する
+    new (winston.transports.Console)({
+      level: 'silly', # level は silly 以上
+      colorize: true, # 色付き
+      timestamp: true # 時間つき
+    }),
+    new (winston.transports.File)({
+      level: 'silly', # level は silly 以上
+      colorize: true, # 色付き
+      timestamp: false, # 時間つき
+      filename: 'log.txt',
+      json: false
+    })
+  ]
+})
+
+logger.silly('ばかばかしいこと')
+logger.debug('とてもどうでもいいこと')
+logger.verbose('どうでもいいこと')
+logger.info('じょうほう')
+logger.warn('やばい')
+logger.error('すごくやばい')
+###
+
+
+###
+# log出力(winston)
+winston = require('winston')
+
+winston.add(winston.transports.File, { filename: 'log.txt', json: false });
+winston.silly('ばかばかしいこと')
+winston.debug('かいはつのこと')
+winston.verbose('どうでもいいこと')
+winston.info('じょうほう')
+winston.warn('やばい')
+winston.error('すごくやばい')
+###
+
+
+
+###
+# 並行処理2
+cluster = require("cluster")
+cpuCount = require("os").cpus().length
+
+# クラスタを利用して処理を分散（CPUの数だけ）
+if cluster.isMaster
+  # console.log('CPU: ' + cpuCount)
+  # console.log('isMaster?: ' + cluster.isMaster)
+  
+  for i in [1..cpuCount]
+    w = cluster.fork()
+    w.on('message',(msg)->
+      console.log('Mmsg:' + msg)
+    )
+    w.send('sensen')
+  
+  cluster.on('exit',(worker, code, signal)->
+    console.log('worker_id:' + worker.id)
+    # console.log('worker_pid:' + worker.process.pid)
+    # console.log('code:' + code)
+    # console.log('signal:' + signal)
+  )
+  
+  
+else
+  console.log process.pid + " hell..."
+  process.on('message',(msg)->
+    console.log('Wmsg:' + msg)
+    
+    process.send(msg)
+  )
+  
+  process.send("deathhh")
+  #process.exit()
+###
+
+
+
+
+###
 # 並行処理(cluster)
+cluster = require("cluster")
+cpuCount = require("os").cpus().length
 
+# クラスタを利用して処理を分散（CPUの数だけ）
+if cluster.isMaster
+  console.log('CPU: ' + cpuCount)
+  console.log('isMaster?: ' + cluster.isMaster)
+  
+  for i in [1..cpuCount]
+    cluster.fork().send('sensen')
+  
+  cluster.on('message',(msg)->
+    console.log('Mmsg:' + msg)
+  )
+  
+  cluster.on('exit',(worker, code, signal)->
+    console.log('worker_id:' + worker.id)
+    console.log('worker_pid:' + worker.process.pid)
+    console.log('code:' + code)
+    console.log('signal:' + signal)
+  )
+  
+else
+  console.log "hell..."
+  process.on('message',(msg)->
+    console.log('Wmsg:' + msg)
+    
+    process.send(msg)
+  )
+  
+  process.send("deathhh")
+  process.exit()
+###
+
+###
+# parse2
+url = require('url')
+
+ssl_check = (uri)->
+  u = url.parse(uri)
+  switch u.protocol
+    when 'http:'
+      console.log("http")
+    when 'https:'
+      console.log("https")
+    else
+      console.log("other")
+
+ssl_check("http://www.yahoo.co.jp")
+ssl_check("https://www.youtube.com/")
+ssl_check("ftp://www.youtube.com/")
+###
+
+###
+# parse
+url = require('url')
+
+ssl_check = (uri)->
+  u = url.parse(uri)
+  if u.protocol == "http:" 
+    console.log("http")
+  else
+    console.log("https")
+
+ssl_check("http://www.yahoo.co.jp")
+ssl_check("https://www.youtube.com/")
+###
+
+
+###
 # https通信 レスポンス取得
+http = require('https')
 
+http.get("https://www.youtube.com/",(res)->
+  console.log(res.statusCode)
+  location = res.headers["location"]
+  console.log(location)
+  body = ''
+  res.on('data', (c)->
+    body += c
+  )
+  
+  res.on('end',(res)->
+    console.log(body)
+  )
+  console.log("test")
+)
+###
+
+###
 # body取得
+http = require('http')
 
+http.get("http://yahoo.co.jp",(res)->
+  console.log(res.statusCode)
+  location = res.headers["location"]
+  console.log(location)
+  http.get(location,(res)->
+    console.log(res.statusCode)
+    body = ''
+    res.on('data', (c)->
+      body += c
+    )
+    
+    res.on('end',(res)->
+      console.log(body)
+    )
+    console.log("test")
+  )
+)
+###
+
+###
 # http通信 レスポンス取得2
+http = require('http')
+# optional = require('./lib/optional')
+# https = optional('https')
 
-
-
+http.get("http://yahoo.co.jp",(res)->
+  console.log(res.statusCode)
+  location = res.headers["location"]
+  console.log(location)
+  http.get(location,(res)->
+    console.log(res.statusCode)
+    location = res.headers["location"]
+    console.log(location)
+  )
+)
+###
 
 
 ###
