@@ -13,17 +13,28 @@
 http = require('http')
 url = "http://yahoo.co.jp"
 
-http.get((url),(res)->
-  console.log(res.statusCode)
-  
-  res.on('end',(res)->
+f = (url)->(
+  bi = null
+  a = http.get((url),(res)->
     console.log(res.statusCode)
+    bi = res.statusCode
+    
+    res.on('end',(res)->
+      console.log("end")
+      return "dead"
+    )
+    
+    console.log("test")
   )
-  console.log("test")
+  return a
 )
 
-
-
+a = f(url)
+console.log "kofrekore"
+a.on('response',(i)->
+  console.log "naika"
+  console.log i
+)
 
 
 ###
