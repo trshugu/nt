@@ -6,18 +6,17 @@
 
 
 
-
+###
 # 非同期getのコード取得2
 async = require('async')
 http = require('http')
 
-f = (i, callback)->
-  console.log i + "parallel done."
-  callback(null, i)
-
 c = (i,callback) ->
+    # 並行処理開始
     console.log "parallel" + i
+    
     setTimeout( ()->
+        # 処理の内部
         console.log i + "parallel done."
         callback(null, i)
       , 1000)
@@ -36,9 +35,7 @@ async.parallel [
   return
 
 console.log "done."
-
-
-
+###
 
 
 ###
