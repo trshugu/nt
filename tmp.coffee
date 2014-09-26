@@ -7,35 +7,57 @@
 
 
 
+# 非同期getのコード取得2
+async = require('async')
+http = require('http')
+
+f = (i, callback)->
+  console.log i + "parallel done."
+  callback(null, i)
+
+c = (i,callback) ->
+    console.log "parallel" + i
+    setTimeout( ()->
+        console.log i + "parallel done."
+        callback(null, i)
+      , 1000)
 
 
+async.parallel [
+  (callback) ->
+    c(1,callback)
+  (callback) ->
+    c(2,callback)
+  (callback) ->
+    c(3,callback)
+], (err, results) ->
+  throw err if err
+  console.log "parallel all done. " + results
+  return
+
+console.log "done."
+
+
+
+
+
+###
 # 非同期getのコード取得
 http = require('http')
 url = "http://yahoo.co.jp"
 
 f = (url)->(
   bi = null
-  a = http.get((url),(res)->
-    console.log(res.statusCode)
-    bi = res.statusCode
-    
-    res.on('end',(res)->
-      console.log("end")
-      return "dead"
-    )
-    
-    console.log("test")
-  )
-  return a
+  return http.get(url)
 )
 
 a = f(url)
 console.log "kofrekore"
 a.on('response',(i)->
   console.log "naika"
-  console.log i
+  console.log i.statusCode
 )
-
+###
 
 ###
 # underscore
