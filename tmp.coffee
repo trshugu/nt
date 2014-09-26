@@ -7,6 +7,34 @@
 
 
 
+# underscore
+_ = require('underscore')
+
+console.log(_)
+
+# underscore.js用共通データ
+numbers = [1,2,3,4,5]
+persons = [
+  {
+    name: "jonny"
+    age: 24
+    birth_month: 8
+    gender: 0 # 0 : male, 1, female
+  }
+  {
+    name: "paul"
+    age: 52
+    birth_month: 7
+    gender: 1
+  }
+  {
+    name: "under score"
+    age: 32
+    birth_month: 8
+    gender: 0
+  }
+]
+
 
 
 ###
