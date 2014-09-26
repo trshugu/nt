@@ -6,31 +6,171 @@
 
 
 
+
+
+
+###
 # ListDelete
+arr = [1,2,3,6,7,677,6766,22,11,3,89,987]
+console.log arr.indexOf(2) if arr.indexOf(2) != -1
+console.log arr.indexOf(5) if arr.indexOf(5) != -1
 
+
+f = (i,a,b)->
+  console.log this
+  i != this.ignore
+
+r = arr.filter(f,{ignore: 3})
+
+console.log arr
+console.log r
+###
+
+
+###
 # List操作
+async = require('async')
 
+arr = [1,2,3]
+console.log Array.isArray(arr)
+
+console.log("sync")
+arr.forEach (i) ->
+  console.log i
+
+
+console.log("async")
+async.each( arr, ((i,c)->
+  console.log i
+),(err)->
+  throw err if err
+  console.log "eerreeeooo"
+)
+###
+
+
+
+###
 # uriを抽出
+url = "http://yahooo"
 
+if url.match(/^http/)
+  console.log("is url")
+else
+  console.log("is not url")
+
+console.log("  sadlkfj  ".trim())
+###
+
+###
 # ファイルに追記
-
-# 同じファイルが存在していたら削除
-
-# ファイル読み込み
-
-# ファイル存在確認
 fs = require('fs')
 
-fs.open('./log.txt', 'ax+', 384, (err, fd)->
+fs.appendFile('res.txt', "app\n")
+###
+
+
+###
+# 同じファイルが存在していたら削除(同期)
+fs = require('fs')
+
+fs.unlinkSync('./log2.txt') if fs.existsSync('./log2.txt')
+
+console.log("continue")
+###
+
+
+
+###
+# readlineの利用
+fs = require('fs')
+readline = require('readline')
+
+rs = fs.ReadStream('log.txt')
+
+rl = readline.createInterface({
+  input: rs,
+  output: {}
+})
+
+
+i = 1
+rl.on('line', (line)->
+  console.log( i++ + ': ' + line.trim() )
+)
+console.log("kaisi")
+rl.resume()
+console.log("owaari")
+
+# rl.close()
+# console.log("close")
+###
+
+
+###
+# ignoreファイルなどの読み込み
+
+list = fs.readFileSync( './log.txt', 'utf8')
+console.log list
+
+lines = list.trim().split('\n')
+console.log lines
+
+for s in lines
+  console.log s
+###
+
+###
+# ログ追記スタイル 同期
+fs = require('fs')
+
+# fd = fs.openSync('./log.txt', 'a+')
+fs.appendFileSync( './log2.txt' , 'kani\n' )
+# fs.writeFileSync( './log2.txt' , 'kani\n' )
+###
+
+
+###
+# ログ追記スタイル
+fs = require('fs')
+
+fs.open('./log.txt', 'a+', (err, fd)->
   if err
-    console.log("nothing")
+    console.log("hairanai")
     console.log(err)
+    console.log(err.code)
+  
+  fs.write(fd, "beni\n", 0, "ascii")
   
   fd && fs.close(fd, (err)->
-    console.log('ari')
+    console.log('append!')
+    console.log(fd)
+    
     console.log(err)
   )
 )
+###
+
+
+
+###
+# ファイル存在確認→existsはオワコンらしい
+fs = require('fs')
+
+# 読み込んで、なければエラー、など
+fs.open('./log.txt', 'ax+', (err, fd)->
+  if err
+    console.log("exist!")
+    console.log(err)
+    console.log(err.code)
+  
+  fd && fs.close(fd, (err)->
+    console.log('open')
+    console.log(err)
+  )
+)
+###
+
 
 ###
 # 引数取得
