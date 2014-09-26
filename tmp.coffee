@@ -7,10 +7,29 @@
 
 
 
-# underscore
-_ = require('underscore')
 
-console.log(_)
+
+# 非同期getのコード取得
+http = require('http')
+url = "http://yahoo.co.jp"
+
+http.get((url),(res)->
+  console.log(res.statusCode)
+  
+  res.on('end',(res)->
+    console.log(res.statusCode)
+  )
+  console.log("test")
+)
+
+
+
+
+
+###
+# underscore
+# _ = require('underscore')
+# _ = require('lodash')
 
 # underscore.js用共通データ
 numbers = [1,2,3,4,5]
@@ -35,6 +54,21 @@ persons = [
   }
 ]
 
+# arrays
+console.log _.first([5, 4, 3, 2, 1])
+console.log _.rest([5, 4, 3, 2, 1])
+console.log _.rest([5, 4, 3, 2, 1], 3)
+console.log _.last([5, 4, 3, 2, 1])
+console.log _.compact([0, 1, false, 2, '', 3])
+console.log _.flatten([1, [2], [3, [[[4]]]]])
+console.log _.without([1, 2, 1, 0, 3, 1, 4], 0, 1)
+console.log _.uniq([1, 2, 1, 3, 1, 4])
+# console.log _.intersect([1, 2, 3], [101, 2, 1, 10], [2, 1]); できなかった
+console.log _.indexOf([1, 2, 3], 2)
+console.log _.lastIndexOf([1, 2, 3, 1, 2, 3], 2)
+console.log _.range(0, 30, 5)
+
+###
 
 
 ###
