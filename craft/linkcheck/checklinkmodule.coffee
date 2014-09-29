@@ -16,7 +16,7 @@ check_uri = (uri) ->
         throw("not url")
     
     console.log("get")
-    http.get(uri,(res)->
+    return http.get(uri,(res)->
       res.on('end',(res)->
         console.log("check")
         if res.statusCode == 301 || res.statusCode == 302
