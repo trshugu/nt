@@ -4,6 +4,72 @@
 
 
 
+###
+# 非同期getのコード取得4
+async = require('async')
+http = require('http')
+
+stdt = new Date()
+
+v = (c,callback)->
+  setTimeout (->
+    console.log c
+    callback(null, "ccc")
+  ), c * c
+#  ), Math.floor(Math.random() * 2000 )
+
+console.log v
+
+# async.map([1000,2000,3000],v,(e,r)->
+async.map([0..100],v,(e,r)->
+  eddt = new Date()
+  console.log r
+  console.log(eddt - stdt)
+)
+
+console.log "done."
+
+###
+
+
+
+
+
+###
+# 非同期getのコード取得3 NG
+async = require('async')
+http = require('http')
+
+c = (i,callback) ->
+    # 並行処理開始
+    console.log "parallel" + i
+    
+    setTimeout( ()->
+        # 処理の内部
+        console.log i + "parallel done."
+        callback("", i)
+      , 1000)
+
+
+arr = [1,2,3]
+b = []
+arr.forEach (i) ->
+  b.push((callback) ->
+    c(i,callback))
+
+console.log b
+
+async.parallel [
+  b.forEach (f) ->
+    console.log("asfsd")
+    f()
+], (err, results) ->
+  throw err if err
+  console.log "parallel all done. " + results
+  return
+
+console.log "done."
+###
 
 
 ###

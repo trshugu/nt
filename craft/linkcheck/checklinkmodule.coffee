@@ -1,42 +1,50 @@
 url = require('url')
+fs = require('fs')
 
 
 # URIチェック
-check_uri = (uri) ->
-  try
-    parsed_uri = url.parse(uri)
-    
-    http = null
-    switch parsed_uri.protocol
-      when 'http:'
-        http = require('http')
-      when 'https:'
-        http = require('https')
-      else
-        throw("not url")
-    
-    console.log("get")
-    return http.get(uri,(res)->
-      res.on('end',(res)->
-        console.log("check")
+check_uri = (uri,callback) ->
+  setTimeout (->
+    try
+      parsed_uri = url.parse(uri)
+      
+      http = null
+      switch parsed_uri.protocol
+        when 'http:'
+          http = require('http')
+        when 'https:'
+          http = require('https')
+        else
+          throw("not url")
+      
+      t = http.get(uri,(res)->)
+      
+      t.on('response',(res)->
         if res.statusCode == 301 || res.statusCode == 302
-          console.log("redirect")
-          return uri + " " + res.statusCode + "\n"
+          # console.log("redirect")
+          # console.log uri + " " + res.statusCode + "\n"
+          # console.log res.headers["location"] + "\n"
+          fs.appendFile( './res.txt' , uri  + ' ' + res.statusCode + '\n' )
         else if res.statusCode == 200
-          console.log("OK")
-          return null
+          # console.log("OK")
+          # console.log uri
         else
           console.log("notfound")
-          return uri + " " + res.statusCode + "\n"
+          # console.log uri  + " " + res.statusCode + "\n"
+          fs.appendFile( './res.txt' , uri  + ' ' + res.statusCode + '\n' )
+      )
+
+      t.on('error',(err)->
+        # console.log err
       )
       
-    )
+    catch e
+      # console.log e
+      # return uri + ' 例外\n'
     
-    console.log("getend")
-  catch e
-    console.log e
-    return uri + ' 例外\n'
-  
+
+    callback(null, null)
+  ), 0
 
 
 module.exports = check_uri
