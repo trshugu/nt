@@ -1,68 +1,55 @@
 logger = require('winston')
 fs = require('fs')
-
 check_uri = require("./checklinkmodule")
 async = require('async')
 
-# loggerì¬
+# loggerä½œæˆ
 logger.add(logger.transports.File, { filename: './log.txt', json: false })
 
-# URLƒŠƒXƒg‚ð“Ç‚Ýž‚Þ
-if !process.argv[2]
+# URLãƒªã‚¹ãƒˆã‚’èª­ã¿è¾¼ã‚€
+file = process.argv[2]
+if !file
   logger.error('argv nothing')
-  throw ""
+  process.exit(1)
+
+unless fs.existsSync(file)
+  logger.error('file nothing')
+  process.exit(1)
 
 
+# çµæžœãƒ•ã‚¡ã‚¤ãƒ«å(åŒã˜ãƒ•ã‚¡ã‚¤ãƒ«åãŒå­˜åœ¨ã—ã¦ã„ãŸã‚‰å‰Šé™¤)
+resultfile = "zzresult_" + file
+fs.unlinkSync(resultfile) if fs.existsSync(resultfile)
 
-# Œ‹‰Êƒtƒ@ƒCƒ‹–¼(“¯‚¶ƒtƒ@ƒCƒ‹–¼‚ª‘¶Ý‚µ‚Ä‚¢‚½‚çíœ)
-# uri‚ð’Šo‚µƒŠƒXƒg‚ÉŠi”[
-# –³Ž‹ƒŠƒXƒg‘Î‰ž
-# ‘Œ”
+# uriã‚’æŠ½å‡ºã—ãƒªã‚¹ãƒˆã«æ ¼ç´
+urilist = []
+list = fs.readFileSync( file, 'utf8')
+lines = list.trim().split('\n')
+for line in lines
+  if line.match(/^http/)
+    urilist.push(line.trim())
 
+# ç„¡è¦–ãƒªã‚¹ãƒˆå¯¾å¿œ
+ignorefile = "ignore.txt"
+if fs.existsSync(ignorefile)
+  ilist = fs.readFileSync(ignorefile, 'utf8')
+  ilines = ilist.trim().split('\n')
+  for s in ilines
+    urilist = urilist.filter(((i)->i != this.ignore),{ignore: s})
+
+# ç·ä»¶æ•°
+logger.info(urilist.length + 'ä»¶\n')
+fs.writeFileSync(resultfile, urilist.length + 'ä»¶\n')
 
 # -----------------------------------------------------------------------------
-# URIƒ`ƒFƒbƒN
+# URIãƒã‚§ãƒƒã‚¯
 # -----------------------------------------------------------------------------
-
-# Œv‘ªI—¹
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# process.argv[2]
-
-# uri = "http://yahoo.co.jp"
-# ret = check_uri(uri)
-
-arr = [
-  "http://yahoo.co.jp"
-  "http://www.yahoo.co.jp"
-  "http://yahoocojp"
-  "sdfl;kjsd;lkj"
-]
-
 stdt = new Date()
-async.map(arr,check_uri,(e,r)->
-  console.log "done"
+async.map(urilist,check_uri,(e,r)->
+  # è¨ˆæ¸¬çµ‚äº†
   eddt = new Date()
-  # console.log r
-  console.log(eddt - stdt)
+  time = eddt - stdt
+  logger.info('done ' + time)
 )
-
-
 
 

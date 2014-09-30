@@ -1,6 +1,9 @@
 url = require('url')
 fs = require('fs')
 
+# ファイル名の渡し方が微妙
+# 再帰に対応できない
+resultfile = "zzresult_" + process.argv[2]
 
 # URIチェック
 check_uri = (uri,callback) ->
@@ -20,20 +23,21 @@ check_uri = (uri,callback) ->
       t = http.get(uri,(res)->)
       
       t.on('response',(res)->
+        console.log uri
         if res.statusCode == 301 || res.statusCode == 302
-          # console.log("redirect")
+          console.log("redirect")
           # console.log uri + " " + res.statusCode + "\n"
           # console.log res.headers["location"] + "\n"
-          fs.appendFile( './res.txt' , uri  + ' ' + res.statusCode + '\n' )
+          fs.appendFile(resultfile , uri  + ' ' + res.statusCode + '\n' )
         else if res.statusCode == 200
           # console.log("OK")
           # console.log uri
         else
           console.log("notfound")
           # console.log uri  + " " + res.statusCode + "\n"
-          fs.appendFile( './res.txt' , uri  + ' ' + res.statusCode + '\n' )
+          fs.appendFile(resultfile , uri  + ' ' + res.statusCode + '\n' )
       )
-
+      
       t.on('error',(err)->
         # console.log err
       )

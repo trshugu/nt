@@ -4,6 +4,43 @@
 
 
 
+
+
+
+
+###
+# exitするとlog出力されない
+winston = require('winston')
+
+winston.add(winston.transports.File, { filename: 'log.txt', json: false });
+winston.info('あああ')
+winston.warn('いいい')
+winston.error('ううう')
+
+process.exit()
+
+fs = require('fs')
+stream = fs.createWriteStream('delme.txt', { flags: 'a' })
+
+
+process.on('uncaughtException', ->
+  console.log "ueueue"
+  stream.write('\n')
+  stream.on('drain', ->
+    # process.exit(1)
+  )
+)
+
+console.log "somdomse"
+stream.write('Something bad happened\n')
+throw "eee"
+
+console.log("end")
+###
+
+
+
+
 ###
 # 非同期getのコード取得4
 async = require('async')
