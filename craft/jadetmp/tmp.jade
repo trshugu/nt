@@ -3,23 +3,63 @@ extends layout
 
 
 block content
-  - var testes = "testes"
-  p てすと
-  p(style="") てすと２
-  p(style="")
-    てすと３
-  // コメントアウト１
-  p.aaa てすと４
-  // コメントアウト２
-  #anokutara sdfsadf
-  //
-    div#suni.
-      <a href="">lin</a>
-  h1= title
-  // コメントアウト３
-  .aaa てすと５
-  p= bobbob
-  div= testes
-  div= obje
+
+
+  //-
+    - var str = '<script href="sample.js"></script>'
+    // エスケープ
+    = str
+    // 非エスケープ
+    != str
+  
+  
+  
+  //-
+    - var testes = "testes"
+    p てす
+    p(style="") てすと２
+    p(style="")
+    p てすと３
+    // コメントアウト１
+    p.aaa てすと4４
+    // コメントアウト２
+    #anokutara sdfsadf
+    //
+      div#suni.
+        <a href="">lin</a>
+    h1= title
+    p
+      | buntou
+    p.
+      bunto
+    // コ メントアウト３
+    //- コメントアウト４
+    //-
+      コメントアウト５
+      コメントアウト５
+      コメントアウト５
+      コメントアウト５
+    .aaa てすと５
+    p= bobbob
+    div= testes
+    div= obje
+    p tmptmp
+    // jijiji
+      .aa tmptmp
+    .cc.
+      ttt
+      mmm
+      pppp
+
+
+//- 
+  block tmp
+    p tmptmp
+    .aa tmptmp
+    .cc.
+      ttt
+      mm
+      ppp
+
 
 

@@ -1,0 +1,17 @@
+{
+  "name": "jadetmp",
+  "version": "0.0.1",
+  "private": true,
+  "description": "aaa",
+  "main": "Gruntfile.coffee",
+  "dependencies": {
+    "coffee-script":"*",
+    "express":"*",
+    "jade":"*",
+    "stylus":"*",
+    "socket.io":"*"
+  },
+  "devDependencies": {
+    "coffee-script": "*"
+  }
+}
