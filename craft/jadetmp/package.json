@@ -3,15 +3,19 @@
   "version": "0.0.1",
   "private": true,
   "description": "aaa",
-  "main": "Gruntfile.coffee",
+  "main": "",
   "dependencies": {
-    "coffee-script":"*",
-    "express":"*",
-    "jade":"*",
-    "stylus":"*",
-    "socket.io":"*"
+    "coffee-script": "*",
+    "express": "*",
+    "jade": "*",
+    "stylus": "*",
+    "socket.io": "*"
   },
   "devDependencies": {
-    "coffee-script": "*"
+    "grunt": "^0.4.5",
+    "grunt-contrib-coffee": "^0.11.1",
+    "grunt-contrib-jade": "^0.13.0",
+    "grunt-contrib-stylus": "^0.20.0",
+    "grunt-contrib-watch": "^0.6.1"
   }
 }
