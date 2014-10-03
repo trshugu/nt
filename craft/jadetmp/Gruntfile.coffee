@@ -9,14 +9,14 @@ module.exports = (grunt)->
         expand: true
         cwd: './'
         src: '*.jade'
-        dest: './'
+        dest: './dest'
         ext: '.html'
     coffee:
       compile:
         expand: true
         cwd: './'
         src: '*.coffee'
-        dest: './'
+        dest: './dest'
         ext: '.js'
     stylus:
       compile:
@@ -25,7 +25,7 @@ module.exports = (grunt)->
         expand: true
         cwd: './'
         src: '*.styl'
-        dest: './'
+        dest: './dest'
         ext: '.css'
     watch:
       jade:
@@ -43,4 +43,5 @@ module.exports = (grunt)->
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   
+  grunt.registerTask 'build', ['jade', 'coffee', 'stylus']
   grunt.registerTask 'default', ['watch']
