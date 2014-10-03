@@ -1,0 +1,28 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    script(type="text/javascript", src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+    
+    script(src="/socket.io/socket.io.js")
+    script(type='text/javascript').
+      var s = io.connect('localhost');
+      s.on('cast', function(data){
+        console.log("cast")
+        $('#tmp').prepend("<div>" + data + "</div>")
+      });
+      
+      function add(data){
+        console.log("add");
+        console.log(data);
+        $('#tmp').css({color:"#983"});
+        $('#tmp').prepend("<div>" + data + "</div>")
+      };
+  body
+    p#tmp tmp
+    input(type='button',value="pus",onClick="s.emit('mes','botobot')")
+    p.
+      kjdｓｆ
+      ｌｋｊｓｄい
+    #list
+    

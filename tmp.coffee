@@ -5,6 +5,54 @@
 
 
 
+###
+# render jade
+http = require('http')
+jade = require('jade')
+fs = require("fs")
+
+server = http.createServer((req, res)-> 
+  res.writeHead(200, {"Content-Type":"text/html"})
+  output = fs.readFileSync("./index.jade", "utf-8")
+  res.end(jade.compile(output)())
+).listen(process.env.VMC_APP_PORT || 3000)
+
+socketio = require('socket.io')
+io = socketio.listen(server)
+io.sockets.on('connection', (soc) ->
+  console.log 'con'
+  soc.on('mes', (data)->
+    console.log data
+  )
+)
+###
+
+
+###
+# socket.io 2
+http = require('http')
+sio = require('socket.io')
+
+server = http.createServer( (req, res) -> 
+  res.writeHead( 200, {'Content-Type': 'text/html'} )
+  res.end( '<html><head><script src="/socket.io/socket.io.js"></script></head>\n<body>socsoc\n</body></html>' )
+)
+.listen(3000)
+
+io = sio.listen(server)
+
+io.sockets.on('connection', (soc) ->
+  console.log 'concon'
+  console.log soc
+  
+  soc.on('mes', (data)->
+    console.log data
+  )
+)
+
+
+io.sockets.emit('mes', "sadf")
+###
 
 
 
