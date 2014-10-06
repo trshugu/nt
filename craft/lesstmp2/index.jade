@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    script(type="text/javascript", src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+    script(type='text/javascript', src="//cdnjs.cloudflare.com/ajax/libs/coffee-script/1.7.1/coffee-script.min.js")
+    
+    script(type='text/coffeescript').
+      $ ->
+        $("#tmp").css({color:"#f00"})
+    
+    style(type="text/less").
+      @color: #00f;
+      div#less {
+        color: @color;
+      }
+    script(type='text/javascript', src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js")
+  body
+    #less less
+    #tmp tmp
+    
