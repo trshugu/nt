@@ -5,9 +5,12 @@ html
     script(src="/socket.io/socket.io.js")
     script(type='text/javascript').
       var s = io.connect('localhost')
+      s.on('mes',function(o){
+        console.log("asdf")
+      })
+      s.emit('mes','botobot')
   body
     p tmp
-    input(type='button',value="pus",onClick="s.emit('mes','botobot')")
     p.
       kjdｓｆ
       ｌｋｊｓｄい

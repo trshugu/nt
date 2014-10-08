@@ -1,0 +1,9 @@
+{
+    "name" : "bowertmp",
+    "version" : "1.0.0",
+    "dependencies" : {
+        "lodash" : null,
+        "modernizr" : null,
+        "mustache" : null
+    }
+}
