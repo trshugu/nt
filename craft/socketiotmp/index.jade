@@ -1,0 +1,18 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    script(type="text/javascript", src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+    script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/coffee-script/1.7.1/coffee-script.min.js')
+    script(src="/socket.io/socket.io.js")
+    
+    script(type='text/coffeescript').
+      @s = io.connect('localhost')
+      s.on('cast', (data)->
+        console.log("cast")
+        $('#tmp').append("<div>" + data + "</div>")
+      )
+  body
+    input(type='button',value="pus",onClick="s.emit('mes','botobot')")
+    p#tmp
+    

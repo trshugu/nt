@@ -5,8 +5,717 @@
 
 
 
+###
+# render jade
+http = require('http')
+jade = require('jade')
+fs = require("fs")
+
+server = http.createServer((req, res)-> 
+  res.writeHead(200, {"Content-Type":"text/html"})
+  output = fs.readFileSync("./index.jade", "utf-8")
+  res.end(jade.compile(output)())
+).listen(process.env.VMC_APP_PORT || 3000)
+
+socketio = require('socket.io')
+io = socketio.listen(server)
+io.sockets.on('connection', (soc) ->
+  console.log 'con'
+  soc.on('mes', (data)->
+    console.log data
+  )
+)
+###
 
 
+###
+# socket.io 2
+http = require('http')
+sio = require('socket.io')
+
+server = http.createServer( (req, res) -> 
+  res.writeHead( 200, {'Content-Type': 'text/html'} )
+  res.end( '<html><head><script src="/socket.io/socket.io.js"></script></head>\n<body>socsoc\n</body></html>' )
+)
+.listen(3000)
+
+io = sio.listen(server)
+
+io.sockets.on('connection', (soc) ->
+  console.log 'concon'
+  console.log soc
+  
+  soc.on('mes', (data)->
+    console.log data
+  )
+)
+
+
+io.sockets.emit('mes', "sadf")
+###
+
+
+
+###
+# exitするとlog出力されない
+winston = require('winston')
+
+winston.add(winston.transports.File, { filename: 'log.txt', json: false });
+winston.info('あああ')
+winston.warn('いいい')
+winston.error('ううう')
+
+process.exit()
+
+fs = require('fs')
+stream = fs.createWriteStream('delme.txt', { flags: 'a' })
+
+
+process.on('uncaughtException', ->
+  console.log "ueueue"
+  stream.write('\n')
+  stream.on('drain', ->
+    # process.exit(1)
+  )
+)
+
+console.log "somdomse"
+stream.write('Something bad happened\n')
+throw "eee"
+
+console.log("end")
+###
+
+
+
+
+###
+# 非同期getのコード取得4
+async = require('async')
+http = require('http')
+
+stdt = new Date()
+
+v = (c,callback)->
+  setTimeout (->
+    console.log c
+    callback(null, "ccc")
+  ), c * c
+#  ), Math.floor(Math.random() * 2000 )
+
+console.log v
+
+# async.map([1000,2000,3000],v,(e,r)->
+async.map([0..100],v,(e,r)->
+  eddt = new Date()
+  console.log r
+  console.log(eddt - stdt)
+)
+
+console.log "done."
+
+###
+
+
+
+
+
+###
+# 非同期getのコード取得3 NG
+async = require('async')
+http = require('http')
+
+c = (i,callback) ->
+    # 並行処理開始
+    console.log "parallel" + i
+    
+    setTimeout( ()->
+        # 処理の内部
+        console.log i + "parallel done."
+        callback("", i)
+      , 1000)
+
+
+arr = [1,2,3]
+b = []
+arr.forEach (i) ->
+  b.push((callback) ->
+    c(i,callback))
+
+console.log b
+
+async.parallel [
+  b.forEach (f) ->
+    console.log("asfsd")
+    f()
+], (err, results) ->
+  throw err if err
+  console.log "parallel all done. " + results
+  return
+
+console.log "done."
+###
+
+
+###
+# 非同期getのコード取得2
+async = require('async')
+http = require('http')
+
+c = (i,callback) ->
+    # 並行処理開始
+    console.log "parallel" + i
+    
+    setTimeout( ()->
+        # 処理の内部
+        console.log i + "parallel done."
+        callback(null, i)
+      , 1000)
+
+
+async.parallel [
+  (callback) ->
+    c(1,callback)
+  (callback) ->
+    c(2,callback)
+  (callback) ->
+    c(3,callback)
+], (err, results) ->
+  throw err if err
+  console.log "parallel all done. " + results
+  return
+
+console.log "done."
+###
+
+
+###
+# 非同期getのコード取得
+http = require('http')
+url = "http://yahoo.co.jp"
+
+f = (url)->(
+  bi = null
+  return http.get(url)
+)
+
+a = f(url)
+console.log "kofrekore"
+a.on('response',(i)->
+  console.log "naika"
+  console.log i.statusCode
+)
+###
+
+###
+# underscore
+# _ = require('underscore')
+# _ = require('lodash')
+
+# underscore.js用共通データ
+numbers = [1,2,3,4,5]
+persons = [
+  {
+    name: "jonny"
+    age: 24
+    birth_month: 8
+    gender: 0 # 0 : male, 1, female
+  }
+  {
+    name: "paul"
+    age: 52
+    birth_month: 7
+    gender: 1
+  }
+  {
+    name: "under score"
+    age: 32
+    birth_month: 8
+    gender: 0
+  }
+]
+
+# arrays
+console.log _.first([5, 4, 3, 2, 1])
+console.log _.rest([5, 4, 3, 2, 1])
+console.log _.rest([5, 4, 3, 2, 1], 3)
+console.log _.last([5, 4, 3, 2, 1])
+console.log _.compact([0, 1, false, 2, '', 3])
+console.log _.flatten([1, [2], [3, [[[4]]]]])
+console.log _.without([1, 2, 1, 0, 3, 1, 4], 0, 1)
+console.log _.uniq([1, 2, 1, 3, 1, 4])
+# console.log _.intersect([1, 2, 3], [101, 2, 1, 10], [2, 1]); できなかった
+console.log _.indexOf([1, 2, 3], 2)
+console.log _.lastIndexOf([1, 2, 3, 1, 2, 3], 2)
+console.log _.range(0, 30, 5)
+
+###
+
+
+###
+# ListDelete
+arr = [1,2,3,6,7,677,6766,22,11,3,89,987]
+console.log arr.indexOf(2) if arr.indexOf(2) != -1
+console.log arr.indexOf(5) if arr.indexOf(5) != -1
+
+
+f = (i,a,b)->
+  console.log this
+  i != this.ignore
+
+r = arr.filter(f,{ignore: 3})
+
+console.log arr
+console.log r
+###
+
+
+###
+# List操作
+async = require('async')
+
+arr = [1,2,3]
+console.log Array.isArray(arr)
+
+console.log("sync")
+arr.forEach (i) ->
+  console.log i
+
+
+console.log("async")
+async.each( arr, ((i,c)->
+  console.log i
+),(err)->
+  throw err if err
+  console.log "eerreeeooo"
+)
+###
+
+
+
+###
+# uriを抽出
+url = "http://yahooo"
+
+if url.match(/^http/)
+  console.log("is url")
+else
+  console.log("is not url")
+
+console.log("  sadlkfj  ".trim())
+###
+
+###
+# ファイルに追記
+fs = require('fs')
+
+fs.appendFile('res.txt', "app\n")
+###
+
+
+###
+# 同じファイルが存在していたら削除(同期)
+fs = require('fs')
+
+fs.unlinkSync('./log2.txt') if fs.existsSync('./log2.txt')
+
+console.log("continue")
+###
+
+
+
+###
+# readlineの利用
+fs = require('fs')
+readline = require('readline')
+
+rs = fs.ReadStream('log.txt')
+
+rl = readline.createInterface({
+  input: rs,
+  output: {}
+})
+
+
+i = 1
+rl.on('line', (line)->
+  console.log( i++ + ': ' + line.trim() )
+)
+console.log("kaisi")
+rl.resume()
+console.log("owaari")
+
+# rl.close()
+# console.log("close")
+###
+
+
+###
+# ignoreファイルなどの読み込み
+
+list = fs.readFileSync( './log.txt', 'utf8')
+console.log list
+
+lines = list.trim().split('\n')
+console.log lines
+
+for s in lines
+  console.log s
+###
+
+###
+# ログ追記スタイル 同期
+fs = require('fs')
+
+# fd = fs.openSync('./log.txt', 'a+')
+fs.appendFileSync( './log2.txt' , 'kani\n' )
+# fs.writeFileSync( './log2.txt' , 'kani\n' )
+###
+
+
+###
+# ログ追記スタイル
+fs = require('fs')
+
+fs.open('./log.txt', 'a+', (err, fd)->
+  if err
+    console.log("hairanai")
+    console.log(err)
+    console.log(err.code)
+  
+  fs.write(fd, "beni\n", 0, "ascii")
+  
+  fd && fs.close(fd, (err)->
+    console.log('append!')
+    console.log(fd)
+    
+    console.log(err)
+  )
+)
+###
+
+
+
+###
+# ファイル存在確認→existsはオワコンらしい
+fs = require('fs')
+
+# 読み込んで、なければエラー、など
+fs.open('./log.txt', 'ax+', (err, fd)->
+  if err
+    console.log("exist!")
+    console.log(err)
+    console.log(err.code)
+  
+  fd && fs.close(fd, (err)->
+    console.log('open')
+    console.log(err)
+  )
+)
+###
+
+
+###
+# 引数取得
+console.log(process.argv)
+console.log(process.argv[0])
+console.log(process.argv[1])
+console.log(process.argv[2]) # 引数
+###
+
+
+###
+# log出力3(log)
+Log = require('log')
+fs = require('fs')
+stream = fs.createWriteStream(__dirname + '/log.txt')
+
+# log = new Log(Log.INFO)
+log = new Log(Log.WARNING, stream);
+
+log.debug('preparing email')
+log.info('sending email')
+log.error('failed to send email')
+
+# 読み込み
+stream = fs.createReadStream(__dirname + '/log.txt')
+log = new Log(Log.DEBUG, stream);
+
+
+log.on('line',(l)->
+  console.log(l)
+  console.log(l.date)
+).on('end',->
+  console.log('owari')
+)
+###
+
+
+###
+# log出力2(winston)
+winston = require('winston')
+logger = new (winston.Logger)({
+  transports: [
+    # 使う出力方法を transports で宣言する
+    new (winston.transports.Console)({
+      level: 'silly', # level は silly 以上
+      colorize: true, # 色付き
+      timestamp: true # 時間つき
+    }),
+    new (winston.transports.File)({
+      level: 'silly', # level は silly 以上
+      colorize: true, # 色付き
+      timestamp: false, # 時間つき
+      filename: 'log.txt',
+      json: false
+    })
+  ]
+})
+
+logger.silly('ばかばかしいこと')
+logger.debug('とてもどうでもいいこと')
+logger.verbose('どうでもいいこと')
+logger.info('じょうほう')
+logger.warn('やばい')
+logger.error('すごくやばい')
+###
+
+
+###
+# log出力(winston)
+winston = require('winston')
+
+winston.add(winston.transports.File, { filename: 'log.txt', json: false });
+winston.silly('ばかばかしいこと')
+winston.debug('かいはつのこと')
+winston.verbose('どうでもいいこと')
+winston.info('じょうほう')
+winston.warn('やばい')
+winston.error('すごくやばい')
+###
+
+
+
+###
+# 並行処理2
+cluster = require("cluster")
+cpuCount = require("os").cpus().length
+
+# クラスタを利用して処理を分散（CPUの数だけ）
+if cluster.isMaster
+  # console.log('CPU: ' + cpuCount)
+  # console.log('isMaster?: ' + cluster.isMaster)
+  
+  for i in [1..cpuCount]
+    w = cluster.fork()
+    w.on('message',(msg)->
+      console.log('Mmsg:' + msg)
+    )
+    w.send('sensen')
+  
+  cluster.on('exit',(worker, code, signal)->
+    console.log('worker_id:' + worker.id)
+    # console.log('worker_pid:' + worker.process.pid)
+    # console.log('code:' + code)
+    # console.log('signal:' + signal)
+  )
+  
+  
+else
+  console.log process.pid + " hell..."
+  process.on('message',(msg)->
+    console.log('Wmsg:' + msg)
+    
+    process.send(msg)
+  )
+  
+  process.send("deathhh")
+  #process.exit()
+###
+
+
+
+
+###
+# 並行処理(cluster)
+cluster = require("cluster")
+cpuCount = require("os").cpus().length
+
+# クラスタを利用して処理を分散（CPUの数だけ）
+if cluster.isMaster
+  console.log('CPU: ' + cpuCount)
+  console.log('isMaster?: ' + cluster.isMaster)
+  
+  for i in [1..cpuCount]
+    cluster.fork().send('sensen')
+  
+  cluster.on('message',(msg)->
+    console.log('Mmsg:' + msg)
+  )
+  
+  cluster.on('exit',(worker, code, signal)->
+    console.log('worker_id:' + worker.id)
+    console.log('worker_pid:' + worker.process.pid)
+    console.log('code:' + code)
+    console.log('signal:' + signal)
+  )
+  
+else
+  console.log "hell..."
+  process.on('message',(msg)->
+    console.log('Wmsg:' + msg)
+    
+    process.send(msg)
+  )
+  
+  process.send("deathhh")
+  process.exit()
+###
+
+###
+# parse2
+url = require('url')
+
+ssl_check = (uri)->
+  u = url.parse(uri)
+  switch u.protocol
+    when 'http:'
+      console.log("http")
+    when 'https:'
+      console.log("https")
+    else
+      console.log("other")
+
+ssl_check("http://www.yahoo.co.jp")
+ssl_check("https://www.youtube.com/")
+ssl_check("ftp://www.youtube.com/")
+###
+
+###
+# parse
+url = require('url')
+
+ssl_check = (uri)->
+  u = url.parse(uri)
+  if u.protocol == "http:" 
+    console.log("http")
+  else
+    console.log("https")
+
+ssl_check("http://www.yahoo.co.jp")
+ssl_check("https://www.youtube.com/")
+###
+
+
+###
+# https通信 レスポンス取得
+http = require('https')
+
+http.get("https://www.youtube.com/",(res)->
+  console.log(res.statusCode)
+  location = res.headers["location"]
+  console.log(location)
+  body = ''
+  res.on('data', (c)->
+    body += c
+  )
+  
+  res.on('end',(res)->
+    console.log(body)
+  )
+  console.log("test")
+)
+###
+
+###
+# body取得
+http = require('http')
+
+http.get("http://yahoo.co.jp",(res)->
+  console.log(res.statusCode)
+  location = res.headers["location"]
+  console.log(location)
+  http.get(location,(res)->
+    console.log(res.statusCode)
+    body = ''
+    res.on('data', (c)->
+      body += c
+    )
+    
+    res.on('end',(res)->
+      console.log(body)
+    )
+    console.log("test")
+  )
+)
+###
+
+###
+# http通信 レスポンス取得2
+http = require('http')
+# optional = require('./lib/optional')
+# https = optional('https')
+
+http.get("http://yahoo.co.jp",(res)->
+  console.log(res.statusCode)
+  location = res.headers["location"]
+  console.log(location)
+  http.get(location,(res)->
+    console.log(res.statusCode)
+    location = res.headers["location"]
+    console.log(location)
+  )
+)
+###
+
+
+###
+# ステータスコード一覧
+a = "4"
+o = require('http').STATUS_CODES
+
+console.log(o)
+
+for k in o
+  if !a || !k.indexOf(a) || o[k].indexOf(a) > -1
+    console.log(k, o[k])
+
+# console.log process.argv
+###
+
+###
+# http通信 レスポンス取得1
+http = require('http')
+url = "http://yahoo.co.jp"
+http.get((url),(res)->
+  body = ''
+  res.on('data', (c)->
+    body += c
+  )
+  
+  res.on('end',(res)->
+    ret = body
+    console.log(ret)
+  )
+  console.log("test")
+)
+###
+
+###
+# nodeストップウォッチ
+# require('date-utils')
+
+HeavySleep = (T) ->
+  d1 = new Date().getTime()
+  d2 = new Date().getTime()
+  # T秒待つ 
+  d2 = new Date().getTime()  while d2 < d1 + 1000 * T
+
+stdt = new Date()
+HeavySleep 3
+eddt = new Date()
+console.log(eddt - stdt)
+###
 
 ###
 # coffeeの状態で
