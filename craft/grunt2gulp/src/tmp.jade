@@ -1,0 +1,106 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    title tmp
+    script(type="text/javascript", src="bower_components/jquery/dist/jquery.min.js")
+    script(type="text/javascript", src="bower_components/knockout/dist/knockout.js")
+    
+    script(type="text/javascript", src="tmp.js")
+    link(href="", rel="stylesheet")
+    link(href="tmp.css", rel="stylesheet")
+    
+    style(type="text/css")
+    script(type="text/javascript")
+  body
+    #tmp tmp
+    
+    
+    //- knockout 解析
+      input(type="text" value="" placeholder="入力" data-bind="value: inputValue")
+      button(data-bind="click: add")
+        | add
+
+      div(data-bind="foreach: list, visible: list().length > 0")
+        div
+          span(data-bind="text: text")
+            | Todo
+          button(data-bind="click: $root.remove")
+            | delete
+    
+    //- knockout でTodoリスト
+      p
+        input(type="text" value="" placeholder="TODOを入力" data-bind="value: todoInputValue")
+        button(data-bind="click: addTodo")
+          | 追加
+
+      ul(data-bind="foreach: todoList, visible: todoList().length > 0")
+        li
+          span(data-bind="text: todoText")
+            | Todo
+          |  - 
+          button(data-bind="click: $root.removeTodo")
+            | 削除
+    
+    
+    //- knockout タスクリストサンプル
+      div(data-bind="foreach: tasks")
+        div(class="task")
+          div(data-bind="visible: !editing()")
+            | 通常表示するビュー。
+            input(type="checkbox" data-bind="checked: completed")
+            span(data-bind="if: !completed()")
+              span(data-bind="text: name")
+            del(data-bind="if: completed()")
+              span(data-bind="text: name")
+            a(href="javascript:void(0);" data-bind="event: { click: toggleEdit }")
+              | [edit]
+          
+          div(data-bind="visible: editing()")
+            | 編集時に表示するビュー
+            input(type="text" data-bind="value: name")
+            input(type="button" data-bind="event: { click: toggleEdit }" value="編集終了")
+            input(type="button" data-bind="event: { click: destroy }" value="削除")
+      br
+      | form の submit イベントと、appViewModel の addTask メソッドをバインドする
+      form(data-bind="event: { submit: addTask }")
+        | keyup が発生するたびに、appViewModel.newTaskName の値を更新する
+        input(type="text" data-bind="value: newTaskName, valueUpdate: 'keyup'")
+        br
+        | appViewModel.newTaskName が空のときはボタンを無効にする
+        input(type="submit" data-bind="enable: newTaskName().length > 0" value="登録")
+      
+      
+    //- knockout data-bindの試し書き
+      input(type="text" data-bind="value: message, valueUpdate: 'afterkeydown'")
+      p(id="result" data-bind="text: message") ここに入力されたテキストと同じものが入る
+
+    //- knockout wiki曰く
+      p First name:
+        input(data-bind="value: firstName, valueUpdate: 'afterkeydown'")
+      p Last name: 
+        input(data-bind="value: lastName, valueUpdate: 'afterkeydown'")
+      h2 Hello, 
+        span(data-bind="text: fullName") !
+  
+    
+    //- knockout Modelのテスト用
+      span(data-bind="text: value")
+      input(id="btn" type="button" value="btn" data-bind="click: btn")
+
+      input(id="btn" type="button" value="btn2" onclick="ddd()")
+    
+    
+    //- 
+      | // knockout ViewはViewModelを知っているべきでViewModelはViewを知らなくてもよい
+      span(data-bind="text: pN1")
+      br
+      span(data-bind="text: pN2")
+      br
+      span(data-bind="text: pN3")
+    
+    
+    //-
+    
+    
+    

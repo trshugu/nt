@@ -5,6 +5,26 @@
 
 
 
+
+###
+# orchestrator
+Orchestrator = require('orchestrator')
+orchestrator = new Orchestrator
+
+orchestrator.add('thing1', ->
+  console.log "thingu1"
+)
+orchestrator.add('thing2', ->
+  console.log "thingu2"
+)
+
+orchestrator.start('thing1', 'thing2', (err) ->
+  console.log "alldone"
+)
+###
+
+
+
 ###
 # render jade
 http = require('http')
