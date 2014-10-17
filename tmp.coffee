@@ -7,6 +7,14 @@
 
 
 ###
+f = require('fluent-logger-node')
+l = f.createLogger()
+
+l.post("fluentest", {hell: "jigoku!"})
+###
+
+
+###
 # orchestrator
 Orchestrator = require('orchestrator')
 orchestrator = new Orchestrator
