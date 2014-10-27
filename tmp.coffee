@@ -4,6 +4,56 @@
 
 
 
+###
+# 日付のみ抽出
+fs = require('fs')
+readline = require('readline')
+
+rs = fs.ReadStream(__dirname + '/memo.txt')
+ws = fs.WriteStream(__dirname + '/find.txt')
+
+rl = readline.createInterface({
+  input: rs,
+  output: {}
+})
+
+
+reg = /^\d{4,4}\/\d{2,2}\/\d{2,2}\s\d{1,2}:\d{2,2}$/
+
+i = 1
+rl.on('line', (line)->
+  # console.log( i++ + ': ' + line.trim() )
+  # console.log( line.trim() )
+  # console.log( reg.exec(line.trim())[0] ) if reg.test(line.trim())
+  ws.write(reg.exec(line.trim())[0] + "\n") if reg.test(line.trim())
+)
+
+console.log("kaisi")
+rl.resume()
+console.log("owaari")
+###
+
+
+
+###
+# 正規表現.test
+reg = /^\d{4,4}\/\d{2,2}\/\d{2,2}\s\d{1,2}:\d{2,2}$/
+
+txt1 = "2014/10/27 9:15"
+txt2 = "2014/10/27 10:15"
+
+if reg.test(txt1)
+  console.log "1 find"
+else
+  console.log "1 nothing"
+
+if reg.test(txt2)
+  console.log "2 find"
+else
+  console.log "2 nothing"
+###
+
+
 
 
 ###
