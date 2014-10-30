@@ -4,6 +4,20 @@
 
 
 
+
+
+
+
+###
+fun = ->
+  console.log("ffff")
+  return "death"
+
+module.exports.fun = fun
+###
+
+
+
 ###
 # 日付のみ抽出
 fs = require('fs')
