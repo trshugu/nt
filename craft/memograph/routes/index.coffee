@@ -1,15 +1,14 @@
 express = require("express")
 router = express.Router()
 
+index = (serie) ->
+  router.get "/", (req, res) ->
+    res.render "index",
+      title: "Express"
+      serie: serie
+    return
 
-data = require("../maro")()
-
-# GET home page. 
-router.get "/", (req, res) ->
-  res.render "index",
-    title: "Express"
-    data: data
-
-  return
+# data formatting
+require("../Extract")(index)
 
 module.exports = router
