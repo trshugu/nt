@@ -1,0 +1,34 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/rickshaw/rickshaw.min.css')
+    script(type="text/javascript", src="/jquery/dist/jquery.min.js")
+    script(type="text/javascript", src="/coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="/flotr2/flotr2.min.js")
+    script(type="text/javascript", src="/javascripts/flotr.js")
+    style(type="text/css").
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+      #graph {
+        width : 600px;
+        height: 400px;
+        margin: 20px auto;
+      }
+      .graph-title {
+        font-size:16px;
+        font-weight:bold;
+        text-align:center;
+        margin:50px 0 0;
+      }
+    script(type="text/coffeescript").
+      @rick(#{serie})
+
+  body
+    h1= maro
+    p Welcome to #{title}
+
+    #graph

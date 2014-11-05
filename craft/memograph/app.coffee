@@ -6,6 +6,7 @@ cookieParser = require("cookie-parser")
 bodyParser = require("body-parser")
 routes = require("./routes/index")
 users = require("./routes/users")
+flotr = require("./routes/flotr")
 app = express()
 
 # view engine setup
@@ -32,6 +33,7 @@ app.use express.static(path.join(__dirname, "public"))
 app.use express.static(path.join(__dirname, "bower_components"))
 app.use "/", routes
 app.use "/users", users
+app.use "/flotr", flotr
 
 # catch 404 and forward to error handler
 app.use (req, res, next) ->

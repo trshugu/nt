@@ -3,12 +3,12 @@ router = express.Router()
 
 index = (serie) ->
   router.get "/", (req, res) ->
-    res.render "index",
+    res.render "flotr",
       title: "Express"
       serie: serie
     return
 
 # data formatting
-require("../extract")(index)
+require("../flotr")(index)
 
 module.exports = router
