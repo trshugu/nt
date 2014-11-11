@@ -1,39 +1,38 @@
 express = require("express")
-path = require("path")
-favicon = require("serve-favicon")
-logger = require("morgan")
-cookieParser = require("cookie-parser")
-bodyParser = require("body-parser")
-routes = require("./routes/index")
-users = require("./routes/users")
-flotr = require("./routes/flotr")
 app = express()
 
 # view engine setup
+path = require("path")
 app.set "views", path.join(__dirname, "views")
 app.set "view engine", "jade"
 
 # use coffeescript
-coffeeMiddleware = require('coffee-middleware')
-
-app.use coffeeMiddleware(
+app.use require('coffee-middleware')(
   src: path.join(__dirname, "/public")
   compress: true
   bare: true
 )
 
-# uncomment after placing your favicon in /public
-#app.use(favicon(__dirname + '/public/favicon.ico'));
+# use stylus
+app.use require("stylus").middleware(path.join(__dirname, "public"))
+
+logger = require("morgan")
 app.use logger("dev")
+
+bodyParser = require("body-parser")
 app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: false)
+
+cookieParser = require("cookie-parser")
 app.use cookieParser()
-app.use require("stylus").middleware(path.join(__dirname, "public"))
+
 app.use express.static(path.join(__dirname, "public"))
 app.use express.static(path.join(__dirname, "bower_components"))
-app.use "/", routes
-app.use "/users", users
-app.use "/flotr", flotr
+
+# routes
+app.use "/", require("./routes/index")
+app.use "/users", require("./routes/users")
+app.use "/flotr", require("./routes/flotr")
 
 # catch 404 and forward to error handler
 app.use (req, res, next) ->
@@ -55,7 +54,6 @@ if app.get("env") is "development"
       error: err
 
     return
-
 
 # production error handler
 # no stacktraces leaked to user

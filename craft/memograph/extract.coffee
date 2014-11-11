@@ -1,4 +1,4 @@
-fun = (callback) ->
+module.exports = (callback) ->
   fs = require('fs')
   readline = require('readline')
   
@@ -12,23 +12,16 @@ fun = (callback) ->
   reg = /^\d{4,4}\/\d{2,2}\/\d{2,2}\s\d{1,2}:\d{2,2}$/
   reg24 = /^\d{4,4}\/\d{2,2}\/\d{2,2}\s(\d{1,2}):\d{2,2}$/
   
-  dairy = {}
+  daily = {}
   for i in [0..23]
-    dairy[i] = 0
+    daily[i] = 0
   
-  rl.on('line', (line)->
-    ++dairy[reg24.exec(line.trim())[1]] if reg.test(line.trim())
-  )
+  rl.on 'line', (line)->
+    ++daily[reg24.exec(line.trim())[1]] if reg.test(line.trim())
   
-  rs.on('close', ->
-    res = []
-    for i in [0..23]
-      res.push("{x:" + i + ", y:" + dairy[i] + "}")
-    
-    callback( "[" + res.join() + "]")
-  )
+  rs.on 'close', ->
+    callback(daily)
   
   rl.resume()
   
 
-module.exports = fun

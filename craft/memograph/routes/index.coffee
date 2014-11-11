@@ -1,14 +1,15 @@
-express = require("express")
-router = express.Router()
+router = require("express").Router()
 
-index = (serie) ->
+# data formatting
+require("../extract") (daily) ->
+  serie = []
+  for i in [0..23]
+    serie.push("{x:" + i + ", y:" + daily[i] + "}")
+  
   router.get "/", (req, res) ->
     res.render "index",
       title: "Express"
-      serie: serie
+      serie: "[" + serie.join() + "]"
     return
-
-# data formatting
-require("../extract")(index)
 
 module.exports = router
