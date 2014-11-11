@@ -6,6 +6,23 @@
 
 
 
+###
+# インスタンスに動的にメソッド追加
+str = new String("bbb")
+str.fun = -> this.toString()
+
+console.log str
+console.log str.fun()
+###
+
+
+
+###
+# 拡張メソッド
+String.prototype.ichi=->this + "ichi"
+String.prototype.ni=->this + "ni"
+console.log "zero".ichi().ni()
+###
 
 
 ###

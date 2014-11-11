@@ -1,0 +1,23 @@
+{
+  "name": "karmatmp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "hell.coffee",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "coffee-script": "^1.8.0",
+    "karma": "^0.12.24",
+    "gulp-karma": "^0.0.4",
+    "karma-chrome-launcher": "^0.1.5",
+    "karma-coffee-preprocessor": "^0.2.1",
+    "karma-mocha": "^0.1.9",
+    "mocha": "^2.0.1"
+  },
+  "scripts": {
+    "test": "node_modules\\karma\\bin\\karma start"
+  },
+  "author": "",
+  "license": "ISC"
+}
