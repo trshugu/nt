@@ -3,6 +3,29 @@
 
 
 
+
+###
+# express2
+require('coffee-script/register')
+debug = require('debug')('expresstmp')
+express = require("express")
+path = require("path")
+app = express()
+app.set "view engine", "jade"
+
+app.get '/', (req, res) ->
+  # res.render('index', { title: 'kani' })
+  res.send('Hell World!')
+
+
+app.set('port', process.env.PORT || 3000)
+
+server = app.listen(app.get('port'), ->
+  debug('Express server listening on port ' + server.address().port)
+)
+###
+
+
 ###
 # express
 cont = (app) ->
