@@ -3,6 +3,15 @@
 
 
 
+###
+# express
+cont = (app) ->
+  app.get '/', (req, res) -> res.send('Hell World!')
+
+app = require('express')()
+cont(app)
+app.listen 3000
+###
 
 
 
