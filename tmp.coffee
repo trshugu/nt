@@ -3,7 +3,358 @@
 
 
 
+
+###
+console.log "Mstart"
+fs = require('fs')
+file = 'memo.txt'
+readline = require('readline')
+
+rs = fs.ReadStream(file)
+
+rl = readline.createInterface({
+  input: rs,
+  output: {}
+})
+
+rl.on("pause",->console.log "pause")
+rl.on("resume",->console.log "resume")
+rl.on("line",(l)->console.log l)
+rl.on("close",->console.log "close")
+
+rl.resume()
+# rl.close()
+
+
+console.log "Mend"
+###
+
+
+###
+# memograph再考
+fs = require('fs')
+file = 'memo.txt'
+wf = "kaki.txt"
+
+console.log "Mstart"
+
+# readFile 非同期
+fs.readFile(file, "utf-8", (e,d)->
+  console.log d
+)
+# readFileSync 同期
+console.log fs.readFileSync(file, "utf-8")
+
+# createReadStream 非同期
+r = fs.createReadStream(file, {encoding:"utf-8"})
+r.on("open", (d)->console.log "open")
+r.on("data", (d)->console.log d)
+r.on("end", ->console.log "end")
+r.on("close", ->console.log "close")
+
+# ReadStream 非同期
+r = fs.ReadStream(file, {encoding:"utf-8"})
+r.on("open", (d)->console.log "open")
+r.on("data", (d)->console.log d)
+r.on("end", ->console.log "end")
+r.on("close", ->console.log "close")
+
+# FileReadStream
+r = fs.FileReadStream(file, {encoding:"utf-8"})
+r.on("open", (d)->console.log "open")
+r.on("data", (d)->console.log d)
+r.on("end", ->console.log "end")
+r.on("close", ->console.log "close")
+
+# writeFile 非同期
+fs.writeFile(wf,"writeFile", (e)->console.log e)
+
+# writeFileSync 同期
+fs.writeFileSync(wf, "writeFileSync")
+
+# createWriteStream
+w = fs.createWriteStream(wf)
+w.on("open", ->console.log "open")
+w.on("drain", ->console.log "drain")
+w.on("close", ->console.log "close")
+w.on("pipe", (s)->console.log s)
+w.write("death")
+w.end()
+
+# WriteStream
+w = fs.WriteStream(wf)
+w.on("open", ->console.log "open")
+w.on("drain", ->console.log "drain")
+w.on("close", ->console.log "close")
+w.on("pipe", (s)->console.log s)
+w.write("death")
+w.end()
+
+# FileWriteStream
+w = fs.FileWriteStream(wf)
+w.on("open", ->console.log "open")
+w.on("drain", ->console.log "drain")
+w.on("close", ->console.log "close")
+w.on("pipe", (s)->console.log s)
+w.write("death")
+w.end()
+
+# SyncWriteStream ?
+w = fs.SyncWriteStream(wf)
+
+
+
+console.log "Mend"
+###
+
+
+
+###
+# 関数風us
+_ = require "lodash"
+
+console.log _.first([2,3,5,3], (x)->
+  console.log x
+  return x + x)
+###
+
+
+###
+# us check
+console.log "sdfd"
+console.log _
+_ = require "lodash"
+# console.log _
+console.log _.first([3,2,4])
+"asf"
+# console.log _
+console.log _.first([3,2,4])
+###
+
+###
+# 全部足す
+data = [1,3,5,7,4,2]
+
+# 一行で
+console.log data.reduce((a,b)->a+b)
+###
+
+
+###
+# 関数型風
+plus = (a,b)->a+b
+
+s = data.reduce(plus)
+console.log s
+###
+
+###
+# coffee風
+s = 0
+data.forEach (n) ->
+  s = s + n
+
+console.log s
+###
+
+###
+# node風
+s = 0
+for n in data
+  s = s + n
+
+console.log s
+###
+
+###
+# 手続風
+s = 0
+i = 0
+while i < data.length
+  s = s + data[i]
+  i++
+
+console.log s
+###
+
+
+
+###
+# クロージャ
+c = ->
+  vvv = "asf"
+  i = 0
+  return ->
+    console.log i
+    i = i + 1
+
+c.c = ->
+  vvv = "cyenje"
+
+d = c()
+d()
+
+c.c()
+
+d()
+
+d.c = ->
+  vvv = "cyenje"
+
+d.c()
+d()
+d()
+d()
+d()
+###
+
+
+
+###
+# frp7
+_ = require("lodash")
+bulk = [1,3,5,6]
+
+# 収集
+data = (b) -> b
+
+# 抽出(model)
+extract = (d) -> d
+
+# 加工 treat
+treat = (t) -> t  + 2
+
+# 出力 void(view)
+output = (t) -> console.log t
+
+
+c = _.compose(output)
+c(bulk)
+###
+
+# bulk.map(data).output
+
+# bulk.map(data).map(extract).map(treat).map(output)
+# [2,4,6].map(data).map(extract).map(treat).map(output)
+
+# bulk.data.extract.treat.output
+
+
+###
+# frp6 並べ替え
+bulk = [1,3,5,6]
+
+# 収集
+data = (b) -> b
+
+# 抽出(model)
+extract = (d) -> d
+
+# 加工 treat
+treat = (t) -> t  + 2
+
+# 出力 void(view)
+output = (t) -> console.log t
+
+bulk.map(data).map(extract).map(treat).map(output)
+[2,4,6].map(data).map(extract).map(treat).map(output)
+###
+
+
+###
+# frp6
+# 出力 void(view)
+output = (t) -> console.log t
+
+# 加工 treat
+treat = (t) -> t  + 2
+
+# 抽出
+extract = (d) -> d
+
+# 収集
+data = (b) -> b
+
+bulk = [1,3,5,6]
+bulk.map(data).map(extract).map(treat).map(output)
+
+[2,4,6].map(data).map(extract).map(treat).map(output)
+###
+
+
+###
+# FRP5
+# 出力(view)
+output = (t) -> console.log t
+
+# 加工
+treat = (e) -> output(e)
+
+# 抽出
+extract = (d) -> treat(d + 2)
+
+# 収集
+data = (b) -> extract(b)
+
+bulk = [1,3,5,6]
+bulk.map(data)
+
+[2,4,6].map(data)
+###
+
+
+
+###
+# FRP4
+data=[]
+datapush = (b) -> data.push(b)
+
+bulk = [1,3,5,6]
+bulk.map(-> datapush)
+
+
+
+data.map(-> extract)
+
+pone = (i) -> i+1
+
+console.log data
+console.log data.map(pone)
+###
+
+
+###
+# FRP3
+a = 1
+b = -> a + 2
+console.log a
+console.log b()
+a = 3
+console.log b()
+###
+
+
+###
+# FRP2
+a = 1
+b = a + 2
+console.log a
+console.log b
+a = 3
+console.log b
+###
+
+
+###
 # FRP
+data = [1,3,5,6]
+
+pone = (i) -> i+1
+
+console.log data
+console.log data.map(pone)
+###
+
 
 
 ###
