@@ -5,6 +5,638 @@
 
 
 ###
+# データパイプライン9(失敗)
+stdt = new Date()
+fs = require('fs')
+firstFile = 'output.txt'
+secondFile = 'result.txt'
+readline = require('readline')
+
+console.log "-- start --"
+
+ws = fs.WriteStream firstFile
+
+writeFile = (i,stm) ->
+  stm.write(i.toString())
+
+for i in [0..100000]
+  writeFile(i,ws)
+
+ws.end()
+
+readFile =(name) ->
+  r = fs.ReadStream(firstFile, {encoding:"utf-8"})
+  return r
+
+rs = readFile firstFile
+bf = ""
+rs.on "data",(d)->
+  bf = bf + d
+
+rs.on "close",->
+  writeFile(bf,fs.WriteStream secondFile)
+
+console.log "-- end --"
+###
+
+
+###
+# counter
+counter =->
+  i = 0
+  return -> ++i
+
+c = counter()
+###
+
+###
+# データパイプライン8 アクターモデル(失敗)
+stdt = new Date()
+fs = require('fs')
+firstFile = 'output.txt'
+secondFile = 'result.txt'
+readline = require('readline')
+
+console.log "-- start --"
+
+# 書き込み
+writeStart = (filename, message)->
+  ws = fs.WriteStream filename
+  ws.on "open", ->
+    console.log "fopen"
+    for i in [0..0]
+      ws.write(message + i + "\n")
+    ws.end()
+  
+  return ws
+
+readStart = (filename) ->
+  r = fs.ReadStream(firstFile, {encoding:"utf-8"})
+  data = ""
+  r.on "data", (d) -> 
+    data = data.concat( treat2( d.toString() ) )
+  
+  return r
+
+
+# ・加工
+treat = (buffer)->
+  console.log "treated!"
+  return buffer.substr(5,5)
+
+treat2 = (buffer)->
+  console.log "treated2!"
+  return buffer.toUpperCase()
+
+# tmp削除
+fileDelete = (filename) ->
+  fs.unlinkSync(filename) if fs.existsSync(filename)
+
+# fileDelete firstFile
+# fileDelete secondFile
+
+ws = writeStart firstFile, "amppo"
+ws.on "close",->
+  r = readStart firstFile
+  r.on "close",-> 
+    ss = writeStart secondFile, "sedonc"
+
+
+console.log "-- end --"
+###
+
+
+###
+# データパイプライン7 using風
+stdt = new Date()
+fs = require('fs')
+firstFile = 'output.txt'
+secondFile = 'result.txt'
+readline = require('readline')
+
+console.log "-- start --"
+# ・加工
+treat = (buffer)->
+  console.log "treated!"
+  return buffer.substr(5,5)
+
+treat2 = (buffer)->
+  console.log "treated2!"
+  return buffer.toUpperCase()
+
+# tmp削除
+fileDelete = (filename) ->
+  fs.unlinkSync(filename) if fs.existsSync(filename)
+
+# fileDelete firstFile
+# fileDelete secondFile
+
+
+firstFileWs = fs.WriteStream(firstFile)
+secondFileWs = fs.WriteStream(secondFile)
+
+firstFileWs.on "open", ->
+  console.log "1Ws:open"
+  # console.log "testete"
+  for i in [0..150000]
+    firstFileWs.write("testete" + i + "\n")
+    # console.log i
+  firstFileWs.end()
+  
+
+firstFileWs.on "close", ->
+  console.log "1Ws:close"
+  # bufferString = ""
+  
+  fs.readFile(firstFile, "utf-8", (e,d)->
+    console.log d.toString().length
+    # bufferString = bufferString.concat( treat2( d.toString() ) )
+    # bufferString = bufferString + treat2( d.toString() )
+    secondFileWs.write(treat2( d.toString() ))
+    secondFileWs.end()
+  )
+  
+
+firstFileWs.on "end", -> console.log "1Ws:end"
+
+secondFileWs.on "open", -> console.log "2Ws:open"
+secondFileWs.on "end", -> console.log "2Ws:end"
+secondFileWs.on "close", -> 
+  console.log "2Ws:close"
+  eddt = new Date()
+  console.log(eddt - stdt)
+
+
+
+
+console.log "-- end --"
+###
+
+
+
+###
+# データパイプライン6
+stdt = new Date()
+fs = require('fs')
+firstFile = 'output.txt'
+secondFile = 'result.txt'
+readline = require('readline')
+
+console.log "-- start --"
+
+firstFileWs = fs.WriteStream(firstFile)
+secondFileWs = fs.WriteStream(secondFile)
+
+firstFileWs.on "open", ->
+  console.log "1Ws:open"
+  # console.log "testete"
+  for i in [0..150000]
+    firstFileWs.write("testete" + i + "\n")
+    # console.log i
+  firstFileWs.end()
+  
+
+firstFileWs.on "close", ->
+  console.log "1Ws:close"
+  # bufferString = ""
+  
+  firstFileRs = fs.ReadStream(firstFile, {encoding:"utf-8"})
+  firstFileRs.on "open", -> 
+    console.log "1Rs:open"
+  
+  firstFileRs.on "data", (d) -> 
+    console.log d.toString().length
+    # bufferString = bufferString.concat( treat2( d.toString() ) )
+    # bufferString = bufferString + treat2( d.toString() )
+    secondFileWs.write(treat2( d.toString() ))
+  
+  firstFileRs.on "close", ->
+    console.log "1Rs:close"
+    # console.log bufferString
+    # secondFileWs.write(bufferString)
+    secondFileWs.end()
+  
+  firstFileRs.on "end", -> console.log "1Rs:end"
+
+
+
+firstFileWs.on "end", -> console.log "1Ws:end"
+
+secondFileWs.on "open", -> console.log "2Ws:open"
+secondFileWs.on "end", -> console.log "2Ws:end"
+secondFileWs.on "close", -> 
+  console.log "2Ws:close"
+  eddt = new Date()
+  console.log(eddt - stdt)
+
+
+
+# ・加工
+treat = (buffer)->
+  console.log "treated!"
+  return buffer.substr(5,5)
+
+treat2 = (buffer)->
+  console.log "treated2!"
+  return buffer.toUpperCase()
+
+# tmp削除
+fileDelete = (filename) ->
+  fs.unlinkSync(filename) if fs.existsSync(filename)
+
+# fileDelete firstFile
+# fileDelete secondFile
+
+
+console.log "-- end --"
+###
+
+
+###
+# データパイプライン5 buffer作成(成功)
+fs = require('fs')
+firstFile = 'output.txt'
+bufferString = ""
+secondFile = 'result.txt'
+readline = require('readline')
+
+console.log "-- start --"
+
+firstFileWs = fs.WriteStream(firstFile)
+secondFileWs = fs.WriteStream(secondFile)
+
+firstFileWs.on "open", ->
+  console.log "1Ws:open"
+  # console.log "testete"
+  for i in [0..100000]
+    firstFileWs.write("testete" + i + "\n")
+    # console.log i
+  firstFileWs.end()
+  
+
+firstFileWs.on "close", ->
+  console.log "1Ws:close"
+  
+  firstFileRs = fs.ReadStream(firstFile, {encoding:"utf-8"})
+  firstFileRs.on "open", -> 
+    console.log "1Rs:open"
+  
+  firstFileRs.on "data", (d) -> 
+    console.log d.toString().length
+    bufferString = bufferString.concat( treat2( d.toString() ) )
+  
+  firstFileRs.on "close", ->
+    console.log "1Rs:close"
+    # console.log bufferString
+    secondFileWs.write(bufferString)
+    secondFileWs.end()
+  
+  firstFileRs.on "end", -> console.log "1Rs:end"
+
+
+
+firstFileWs.on "end", -> console.log "1Ws:end"
+
+secondFileWs.on "open", -> console.log "2Ws:open"
+secondFileWs.on "end", -> console.log "2Ws:end"
+secondFileWs.on "close", -> console.log "2Ws:close"
+
+
+
+# ・加工
+treat = (buffer)->
+  console.log "treated!"
+  return buffer.substr(5,5)
+
+treat2 = (buffer)->
+  console.log "treated2!"
+  return buffer.toUpperCase()
+
+# tmp削除
+fileDelete = (filename) ->
+  fs.unlinkSync(filename) if fs.existsSync(filename)
+
+# fileDelete firstFile
+# fileDelete secondFile
+
+
+console.log "-- end --"
+###
+
+
+
+###
+# データパイプライン4 フルオープン
+fs = require('fs')
+firstFile = 'output.txt'
+secondFile = 'result.txt'
+readline = require('readline')
+
+console.log "-- start --"
+
+# ・出力
+firstFileWs = fs.WriteStream(firstFile)
+secondFileWs = fs.WriteStream(secondFile)
+
+# first Write
+firstFileWs.on "open", ->
+  console.log "firstFileWs:" + "open"
+  for i in [0..100000]
+    firstFileWs.write("message"+ i + "aaaa\n")
+  
+  firstFileRs = fs.ReadStream(firstFile, {encoding:"utf-8"})
+  
+  # first Read
+  firstFileRs.on "open",->console.log "firstFileRs:open"
+  firstFileRs.on "end",->
+    console.log "firstFileRs:end"
+  
+  data = ""
+  firstFileRs.on "data", (d)->
+    console.log d
+    data = data + d
+    
+  
+  firstFileRs.on "close", ->
+    console.log "firstFileRs:close"
+    secondFileWs.write(treat2(data.toString()))
+  
+
+
+firstFileWs.on "close", ->
+  console.log "firstFileWs:close"
+
+
+
+
+firstFileWs.on "end", -> console.log "firstFileWs:end"
+
+
+secondFileWs.on "open", -> console.log "secondFileWs:open"
+secondFileWs.on "end", -> console.log "secondFileWs:end"
+secondFileWs.on "close", -> console.log "secondFileWs:close"
+
+
+# ・加工
+treat = (buffer)->
+  console.log "treated!"
+  return buffer.substr(5,5)
+
+treat2 = (buffer)->
+  console.log "treated2!"
+  return buffer.toUpperCase()
+
+# tmp削除
+fileDelete = (filename) ->
+  fs.unlinkSync(filename) if fs.existsSync(filename)
+
+# fileDelete firstFile
+# fileDelete secondFile
+
+
+console.log "-- end --"
+###
+
+
+###
+# データパイプライン3 戻り値を返す
+fs = require('fs')
+firstFile = 'output.txt'
+secondFile = 'result.txt'
+readline = require('readline')
+
+console.log "-- start --"
+
+# ・出力
+Output = (filename, message)->
+  Ws = fs.WriteStream(filename)
+  Ws.on("open", ->
+    console.log "Oopen:" + message
+    for i in [0..100]
+      Ws.write(message + "\n")
+    Ws.end()
+  )
+  Ws.on("drain", ->console.log "Odrain:" + message)
+  Ws.on("end", ->console.log "Oend:" + message)
+  Ws.on("close", ->
+    console.log "Oclose:" + message
+  )
+  Ws.on("pipe", (s)->console.log "Opipe:" + s)
+  
+  return Ws
+
+# ・入力
+fileInput = (filename) ->
+  stringBuffer = ""
+  r = fs.FileReadStream(filename, {encoding:"utf-8"})
+  r.on("open", (d)->console.log "iopen")
+  r.on("data", (d)->
+    # console.log d
+    stringBuffer = d
+  )
+  r.on("end", ->console.log "iend")
+  r.on("close", -> 
+    console.log "iclose"
+    # iclose(stringBuffer)
+  )
+  
+  return r
+  
+
+# 入力終了時の処理
+iclose = (stringBuffer) ->
+  console.log "ic:"+stringBuffer
+  # console.log treat(stringBuffer)
+  treated = Output secondFile, treat2(treat(stringBuffer))
+  treated.on("close",->
+    console.log "LAZYLAZYfclose"
+  )
+
+# ・加工
+treat = (buffer)->
+  console.log "treated!"
+  return buffer.substr(2,4)
+
+treat2 = (buffer)->
+  console.log "treated2!"
+  return buffer.toUpperCase()
+
+# tmp削除
+fileDelete = (filename) ->
+  fs.unlinkSync(filename) if fs.existsSync(filename)
+
+
+# 遅延処理
+firstRs = Output firstFile, "anokutara"
+firstRs.on("close",->
+  console.log "LAZYfclose"
+)
+
+Input = fileInput firstFile
+stringBuffer = ""
+Input.on("data", (d)-> 
+  # console.log "LAZYdata:" + d
+  stringBuffer = d
+)
+Input.on("close",->
+  console.log "LAZYiclose"
+  iclose(stringBuffer)
+)
+
+
+
+
+fileDelete firstFile
+fileDelete secondFile
+
+console.log "-- end --"
+###
+
+
+###
+# データパイプライン2
+fs = require('fs')
+firstFile = 'output.txt'
+secondFile = 'result.txt'
+readline = require('readline')
+
+console.log "-- start --"
+
+# ・出力
+Output = (filename, message)->
+  Ws = fs.WriteStream(filename)
+  Ws.on("open", ->console.log "Oopen:" + message)
+  Ws.on("drain", ->console.log "Odrain:" + message)
+  Ws.on("end", ->console.log "Oend:" + message)
+  Ws.on("close", ->console.log "Oclose:" + message)
+  Ws.on("pipe", (s)->console.log "Opipe:" + s)
+
+  for i in [0..100000]
+    Ws.write(message + "\n")
+  Ws.end()
+
+# ・入力
+fileInput = (filename) ->
+  stringBuffer = ""
+  r = fs.FileReadStream(filename, {encoding:"utf-8"})
+  r.on("open", (d)->console.log "iopen")
+  r.on("data", (d)->
+    # console.log d
+    stringBuffer = d
+  )
+  r.on("end", ->console.log "iend")
+  r.on("close", -> 
+    console.log "iclose"
+    iclose(stringBuffer)
+  )
+  
+
+# 入力終了時の処理
+iclose = (stringBuffer) ->
+  # console.log stringBuffer
+  # console.log treat(stringBuffer)
+  Output secondFile, treat(stringBuffer)
+
+# ・加工
+treat = (buffer)->
+  return buffer.substr(2,4)
+
+# tmp削除
+fileDelete = (filename) ->
+  fs.unlinkSync(filename) if fs.existsSync(filename)
+
+
+# 遅延処理
+Output firstFile, "anokutara"
+fileInput firstFile
+
+fileDelete firstFile
+# fileDelete secondFile
+
+console.log "-- end --"
+###
+
+
+
+###
+# データパイプライン
+fs = require('fs')
+firstFile = 'output.txt'
+secondFile = 'result.txt'
+readline = require('readline')
+
+console.log "-- start --"
+
+# ・初期出力
+firstOutput = (filename, message)->
+  firstWs = fs.WriteStream(filename)
+  firstWs.on("open", ->console.log "fopen")
+  firstWs.on("drain", ->console.log "fdrain")
+  firstWs.on("close", ->console.log "fclose")
+  firstWs.on("pipe", (s)->console.log s)
+
+  for i in [0..0]
+    firstWs.write(message + "\n")
+  firstWs.end()
+
+# 入力終了時の処理
+iclose = (stringBuffer) ->
+  console.log "iclose"
+  console.log stringBuffer
+  console.log treat(stringBuffer)
+  firstOutput secondFile, treat(stringBuffer)
+
+# stringBuffer
+bufferWrite = ->
+  stringBuffer = ""
+  return (data) ->
+    if data 
+      stringBuffer = data
+    else
+      stringBuffer
+
+# ・入力
+fileInput = (filename) ->
+  stringBuffer = ""
+  r = fs.FileReadStream(filename, {encoding:"utf-8"})
+  r.on("open", (d)->console.log "iopen")
+  r.on("data", (d)->
+    # console.log d
+    stringBuffer = d
+  )
+  r.on("end", ->console.log "iend")
+  r.on("close", -> iclose(stringBuffer) )
+  
+
+# ・加工
+treat = (buffer)->
+  return buffer.substr(2,4)
+
+# ・二次出力
+# 同じにすればよかった
+
+# ・加工
+# こっちも
+
+# 遅延処理
+firstOutput firstFile, "firsttext"
+fileInput firstFile
+
+
+# tmp削除
+fileDelete = (filename) ->
+  fs.unlinkSync(filename) if fs.existsSync(filename)
+
+
+fileDelete firstFile
+# fileDelete secondFile
+
+console.log "-- end --"
+###
+
+
+
+###
 console.log "Mstart"
 fs = require('fs')
 file = 'memo.txt'
