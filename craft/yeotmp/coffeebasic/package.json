@@ -1,0 +1,24 @@
+{
+  "name": "coffeebasic",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "./bin/www"
+  },
+  "dependencies": {
+    "express": "~4.4.5",
+    "static-favicon": "~2.0.0-alpha",
+    "serve-favicon": "^2.0.1",
+    "morgan": "~1.1.1",
+    "cookie-parser": "~1.3.2",
+    "body-parser": "~1.4.3",
+    "debug": "~1.0.2",
+    "jade": "~1.3.1"
+  },
+  "devDependencies": {
+    "gulp": "~3.8.8",
+    "gulp-sass": "^1.2.2",
+    "gulp-nodemon": "~1.0.4",
+    "gulp-livereload": "~2.1.1"
+  }
+}
