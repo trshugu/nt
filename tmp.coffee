@@ -4,6 +4,102 @@
 
 
 
+
+###
+# EventEmitter3
+EventEmitter = require('events').EventEmitter
+
+asyncFunc = ->
+  ev = new EventEmitter
+  console.log 'in asyncFunc'
+  ev.on 'ichi', (gospel,hoka)->
+    console.log gospel
+    hoka.emit "ni", "nidesu",hoka
+  
+  ev.once "ni",(desu, kore)->
+    console.log desu
+    kore.emit "ni", "aaaa", kore
+  ev
+
+
+sol = asyncFunc()
+sol.emit 'ichi', "gooos",sol
+
+del = asyncFunc()
+del.emit 'ichi', "gooos",sol
+###
+
+
+###
+# EventEmitter2
+EventEmitter = require('events').EventEmitter
+
+
+asyncFunc = ->
+  ev = new EventEmitter
+  console.log 'in asyncFunc'
+  ev
+
+async = asyncFunc()
+async.on 'done', (arg1, arg2)->
+  console.log arg1, arg2
+
+async.on 'death', (gospel)->
+  console.log gospel
+
+setTimeout ->
+  async.emit 'done', 'foo', 'bar'
+, 1000
+setTimeout ->
+  async.emit 'death', "voooid"
+, 2000
+###
+
+
+###
+# EventEmitter1
+EventEmitter = require('events').EventEmitter
+
+asyncFunc = ->
+  ev = new EventEmitter
+  console.log 'in asyncFunc'
+  setTimeout ->
+    ev.emit 'done', 'foo', 'bar'
+  , 1000
+  setTimeout ->
+    ev.emit 'death', "voooid"
+  , 2000
+  ev
+
+async = asyncFunc()
+async.on 'done', (arg1, arg2)->
+  console.log arg1, arg2
+
+async.on 'death', (gospel)->
+  console.log gospel
+###
+
+
+###
+# 非同期
+http = require('http')
+url = "http://localhost:1337"
+
+f = (url)->
+  http.get(url)
+
+
+a = f(url)
+a.on 'response',(i)->
+  console.log i.statusCode
+  console.log JSON.stringify( i.headers)
+  
+  i.setEncoding("utf8")
+  i.on 'data', (c)->
+    console.log c
+###
+
+
 ###
 # データパイプライン9(失敗)
 stdt = new Date()
