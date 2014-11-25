@@ -5,6 +5,13 @@
 
 
 
+
+###
+# 自分のファイル
+console.log process.argv[1]
+###
+
+
 ###
 # EventEmitter3
 EventEmitter = require('events').EventEmitter
