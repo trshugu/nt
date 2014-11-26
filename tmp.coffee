@@ -2,13 +2,95 @@
 ###
 
 
+###
+###
+h = require "http"
+a = require "assert"
+chai = require "chai"
+chai.should()
+
+# RESTTEST
+if process.argv[2] == "s"
+  console.log "server!"
+  s = h.createServer()
+  s.on "request",(q,s)->
+    s.setHeader 'Content-Type', 'text/html'
+    s.writeHead 200
+    s.end 'ok'
+    # s.end '<div id="#aide">ok</div>'
+    console.log "done"
+  
+  s.listen 80
+else
+  url = "http://localhost:80"
+  
+  ###
+  suite "tddd",->
+    test "monmone",->
+      a.equal 1,1 
+  ###
+  
+  ###
+  ###
+  describe "OKtest",->
+    before ->
+      # console.log "beee"
+    
+    after ->
+      # console.log "aeee"
+    
+    it "OKが返却されること",->
+      h.get(url).on 'response',(i)->
+        # console.log i.statusCode
+        # console.log i.headers["date"]
+        # console.log JSON.stringify( i.headers)["date"]
+        
+        i.setEncoding("utf8")
+        i.on 'data', (c)->
+          # console.log c
+          a.equal "ok", c
+          chai.assert.equal "ok", c
+          chai.expect(c).to.equal "ok"
+          # chai.should().equal "ok",c
+          c.should.equal "ok"
+          
+  
+  ###
+  sw = require 'selenium-webdriver'
+  driver = new sw.Builder()
+    .withCapabilities(sw.Capabilities.chrome())
+    .build()
+
+  chai = require 'chai'
+  chaiWebdriver = require 'chai-webdriver'
+  chai.use chaiWebdriver(driver)
+
+  driver.get "http://localhost:80"
+  chai.expect("div").dom.to.contain.text("ok")
+  ###
+
+
 
 
 
 
 ###
-# 自分のファイル
+describe "tes", ->
+  it "iiii", (done)->
+    a.equal 1,2
+    c.assert.equal 1,2
+    done()
+###
+
+###
+# 使っているスクリプト
+console.log process.argv[0]
+# 自分のファイルパス
 console.log process.argv[1]
+# 引数
+console.log process.argv[2]
+console.log process.argv[3]
+console.log process.argv[4]
 ###
 
 

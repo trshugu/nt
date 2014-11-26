@@ -1,16 +1,40 @@
 ###
 ###
 
-tmp = require "./tmp"
+# tmp = require "./tmp"
 
 
+
+
+###
+# mocha async doneを利用する
+describe "userr",->
+  describe "sabee",->
+    it "without erre",(done)->
+      setTimeout ->
+        console.log "parallel done."
+        require("chai").assert.equal 1,2
+        done()
+      , 1000
+###
+
+###
+# mocha sync
+require("chai").should()
+describe "arr",->
+  describe "inde",->
+    it "should return -1",->
+      [1,2,3].indexOf(5).should.equal(-1)
+      [1,2,3].indexOf(0).should.equal(-1)
+###
 
 ###
 # mocha
 s = (require 'chai').should()
 describe 'a',->
-  it 'death',->
+  it 'death',(d)->
     'aaa'.should.equal 'aaa'
+    d()
 ###
 
 ###
@@ -20,7 +44,7 @@ a(true,"bom")
 ###
 
 ###
-# jasmine �d����
+# jasmine 重すぎ
 describe('shi',->
   it('iiit',->
     expect(null).toEqual(1)
@@ -30,7 +54,7 @@ describe('shi',->
 
 
 ###
-# qunit �����Ȃ�
+# qunit 動かない
 tmp = require "./tmp"
 
 q = require("qunit")
@@ -44,9 +68,9 @@ with()
 
 
 #test("a basic test example", -> 
-#  ok( true, "���̃e�X�g�͐������܂����B" )
+#  ok( true, "このテストは成功しました。" )
 #  value = "hello"
-#  equal( value, "hello", "hello�ƂȂ邱�Ƃ����҂��Ă��܂��B" )
+#  equal( value, "hello", "helloとなることを期待しています。" )
 #)
 ###
 
