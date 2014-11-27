@@ -3,6 +3,87 @@
 
 
 ###
+# fluent4 emitter
+f = require('fluent-logger-node')
+l = f.createLogger()
+
+# 本処理
+stdt = new Date()
+
+l.on "flu",(i)->
+  l.post "tag.coffee", {coffeen:"post" + i.toString()}
+
+count = 10000 * 10
+for i in [0..count]
+  l.emit "flu", i
+
+eddt = new Date()
+console.log(eddt - stdt)
+# console.log l.pushQueue()
+# console.log l.sendQueue()
+
+# process.exit()
+###
+
+
+###
+# fluent3
+f = require('fluent-logger-node')
+l = f.createLogger()
+EventEmitter = require('events').EventEmitter
+
+asyncFunc = ->
+  ev = new EventEmitter
+  ev.on 'fluent', (i)->
+    # console.log i
+    l.post "tag.coffee", {coffeen:"post" + i.toString()}
+  
+  ev
+
+# 本処理
+stdt = new Date()
+
+flu = asyncFunc()
+count = 10000 * 10
+for i in [0..count]
+  # console.log i
+  # js = {}
+  # js[mes] = "foo" + i.toString()
+  flu.emit "fluent", i
+  # l.post("tag.coffee", js)
+
+
+
+eddt = new Date()
+console.log(eddt - stdt)
+
+# process.exit()
+###
+
+
+
+###
+# fluent2 NG 10000行しか送られない
+f = require('fluent-logger-node')
+l = f.createLogger()
+
+stdt = new Date()
+
+potter=(mes, count)->
+  for i in [0..count]
+    console.log i
+    js = {}
+    js[mes] = "foo" + i.toString()
+    l.post("tag.coffee", js)
+
+
+for i in [0..100]
+  potter "coffee" + i.toString(), 1000 * 1
+
+eddt = new Date()
+console.log(eddt - stdt)
+###
+
 ###
 h = require "http"
 a = require "assert"
@@ -24,14 +105,10 @@ if process.argv[2] == "s"
 else
   url = "http://localhost:80"
   
-  ###
   suite "tddd",->
     test "monmone",->
       a.equal 1,1 
-  ###
-  
-  ###
-  ###
+      
   describe "OKtest",->
     before ->
       # console.log "beee"
@@ -55,7 +132,6 @@ else
           c.should.equal "ok"
           
   
-  ###
   sw = require 'selenium-webdriver'
   driver = new sw.Builder()
     .withCapabilities(sw.Capabilities.chrome())
@@ -67,7 +143,7 @@ else
 
   driver.get "http://localhost:80"
   chai.expect("div").dom.to.contain.text("ok")
-  ###
+###
 
 
 
