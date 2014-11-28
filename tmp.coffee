@@ -3,6 +3,58 @@
 
 
 ###
+# fluent5
+f = require('fluent-logger-node')
+
+stdt = new Date()
+
+potter=(mes,o, count, l)->
+  for i in [0..count]
+    # console.log i
+    js = {}
+    js[mes] = "foo" + (o * i).toString()
+    l.post("tag.coffee", js)
+    
+  eddt = new Date()
+  console.log(eddt - stdt)
+
+
+for i in [1..1000]
+  l = f.createLogger()
+  potter "coffee" + i.toString(), i, 1000, l
+  
+###
+
+###
+# fluent stream
+f = require('fluent-logger-node')
+l = f.createLogger({tagPrefix:"tag"})
+l.post("first", {stream:"0"})
+
+# u = f.createLogger({tagPrefix:"unknouw"})
+# u.post("first", {stsdfsream:"0"})
+
+
+l.stream.on "end",->console.log "end"
+l.stream.on "finish",->console.log "fini"
+l.stream.on "connect",->
+  console.log "con"
+  l.post("event", {stream:"0"})
+l.stream.on "error",->console.log "err"
+l.stream.on "close",->
+  console.log "clo"
+  process.exit()
+
+b = new Buffer "tag.buf"
+l.stream.resume()
+l.stream.write b,"utf8",(a)->console.log a
+
+w =-> console.log l.stream._writableState.buffer
+r =-> console.log l.stream._readableState.buffer
+###
+
+
+###
 # fluent4 emitter
 f = require('fluent-logger-node')
 l = f.createLogger()
