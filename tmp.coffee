@@ -14,7 +14,7 @@ http = require "http"
 xml =  ''
 
 # $ = cheerio.load xml,{ignoreWhitespace: true, xmlMode: true}
-# console.log $("response artists result").text()
+# console.log $("re").text()
 
 url = ""
 http.get(url).on 'response',(res)->
