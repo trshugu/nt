@@ -1,6 +1,34 @@
 ###
 ###
 
+# xml作成 https://github.com/oozcitak/xmlbuilder-js
+
+
+
+
+###
+# cheerio
+cheerio = require "cheerio"
+http = require "http"
+
+xml =  ''
+
+# $ = cheerio.load xml,{ignoreWhitespace: true, xmlMode: true}
+# console.log $("response artists result").text()
+
+url = ""
+http.get(url).on 'response',(res)->
+  res.setEncoding("utf8")
+  res.on 'data', (c)->
+    # if c == xml
+    #   console.log "onaji"
+    # else
+    #   console.log "tigau"
+    $ = cheerio.load c,{ignoreWhitespace: true, xmlMode: true}
+    console.log $("r").text()
+###
+
+
 
 ###
 # fluent5
