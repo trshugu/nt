@@ -1,14 +1,54 @@
 ###
 ###
 
-# xml作成
+
+
+
+###
+# xml作成3
+builder = require "xmlbuilder"
+
+root = builder.create "root"
+root.ele "first", "gen"
+  .att "amo1", "ineine1"
+  .att "amo2", "ineine2"
+  .att "amo3", "ineine3"
+root.ele "first"
+  .ele "seccond"
+    .att "tamo", "ineine1"
+    .ele "thirdt", "lkjklj"
+      .att "sanbama", "kanami--"
+root.ele "first", "nakami"
+
+console.log root.end({pretty: true})
+###
+
+
+###
+# xml作成2
+builder = require "xmlbuilder"
+
+root = builder.create "root"
+root.com('f(x) = x^2')
+for i in [1..5]
+  item = root.ele 'data'
+  item.att 'x', i
+  item.att 'y', i * i
+
+console.log root.end({pretty: true})
+###
+
+###
+# xml作成1
 builder = require "xmlbuilder"
 
 xml = builder.create "root"
   .ele "ichiban", {"for":"nodenode"}
+  .ele "repo", {"tytptyp":"gege"}, "nantokananntoka"
+  .end {pretty: true}
 
 console.log xml
-
+###
 
 
 ###
