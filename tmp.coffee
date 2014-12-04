@@ -1,8 +1,13 @@
 ###
 ###
 
-# xml作成 https://github.com/oozcitak/xmlbuilder-js
+# xml作成
+builder = require "xmlbuilder"
 
+xml = builder.create "root"
+  .ele "ichiban", {"for":"nodenode"}
+
+console.log xml
 
 
 
