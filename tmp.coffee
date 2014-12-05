@@ -2,13 +2,74 @@
 ###
 
 
+###
 # 文字連結の速度測定
-stdt = new Date()
-eddt = new Date()
-console.log(eddt - stdt)
+n=12582912
 
-arr=["a","b","c"]
-console.log arr.join
+# +
+stdt = new Date()
+p = ""
+for i in [1..n]
+  p = p + "aaa"
+  p = p + "bbb"
+  p = p + "ccc"
+  p = p + "ddd"
+eddt = new Date()
+console.log (eddt - stdt).toString() + ":p"
+# console.log p
+
+# +=
+stdt = new Date()
+pe = ""
+for i in [1..n]
+  pe += "aaa"
+  pe += "bbb"
+  pe += "ccc"
+  pe += "ddd"
+eddt = new Date()
+console.log (eddt - stdt).toString() + ":pe"
+# console.log pe
+
+# concat
+stdt = new Date()
+con = ""
+for i in [1..n]
+  con = con.concat "aaa"
+  con = con.concat "bbb"
+  con = con.concat "ccc"
+  con = con.concat "ddd"
+eddt = new Date()
+console.log (eddt - stdt).toString() + ":concat"
+# console.log con
+
+
+# 配列にpushしてjoin
+stdt = new Date()
+arr=[]
+for i in [1..n]
+  arr.push "aaa"
+  arr.push "bbb"
+  arr.push "ccc"
+  arr.push "ddd"
+arr.join("")
+eddt = new Date()
+console.log (eddt - stdt).toString() + ":arr"
+# console.log arr.join("")
+
+
+# 文字配列[]
+stdt = new Date()
+sa = []
+for i in [1..n]
+  sa[ sa.length ] = "aaa"
+  sa[ sa.length ] = "bbb"
+  sa[ sa.length ] = "ccc"
+  sa[ sa.length ] = "ddd"
+sa.join("")
+eddt = new Date()
+console.log (eddt - stdt).toString() + ":sa"
+# console.log sa.join("")
+###
 
 
 
