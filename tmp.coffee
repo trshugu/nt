@@ -2,8 +2,13 @@
 ###
 
 
+# 文字連結の速度測定
+stdt = new Date()
+eddt = new Date()
+console.log(eddt - stdt)
 
-
+arr=["a","b","c"]
+console.log arr.join
 
 
 
