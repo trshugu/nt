@@ -4,6 +4,44 @@
 
 
 
+
+
+
+###
+# pg client instance
+pg = require "pg"
+conString = "postgres://username:password@localhost/database"
+
+client = new pg.Client conString
+client.connect (err) ->
+  return console.error 'could not connect to postgres', err if err
+  
+  client.query 'SELECT NOW() AS "theTime"', (err, result) ->
+    return console.error 'error running query', err if err
+    
+    console.log result.rows[0].theTime
+    client.end()
+###
+
+
+###
+# pg client pooling
+pg = require "pg"
+conString = "postgres://username:password@localhost/database"
+
+pg.connect conString, (err, client, done)->
+  return console.error('error fetching client from pool', err) if err
+  
+  client.query 'SELECT 1 AS number', (err, result)->
+    # call `done()` to release the client back to the pool
+    done()
+    
+    return console.error 'error running query', err if err
+    
+    console.log result.rows[0].number
+###
+
+
 ###
 # xml作成3
 builder = require "xmlbuilder"
