@@ -3,6 +3,25 @@
 
 
 ###
+# 配列IDSQL反映
+arr = ["000", "111", "222"]
+console.log arr
+
+arr.forEach (i)->
+  console.log i
+###
+
+
+
+###
+# 日付フォーマット
+require "date-utils"
+console.log new Date()
+console.log new Date().toFormat "YYYY/MM/DD HH24:MI:SS"
+###
+
+
+###
 # 文字連結の速度測定
 n=12582912
 
