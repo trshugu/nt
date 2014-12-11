@@ -2,6 +2,41 @@
 ###
 
 
+
+
+###
+# cheerio2
+cheerio = require "cheerio"
+
+# xml作成
+builder = require "xmlbuilder"
+
+root = builder.create "root"
+ids = root.ele "ids"
+ids.ele "id", "gen1"
+ids.ele "id", "gen2"
+
+# console.log root.end({pretty: true})
+xml = root.end({pretty: true})
+
+$ = cheerio.load xml, {ignoreWhitespace: true, xmlMode: true}
+console.log $("ids").length 
+console.log $("id").length
+
+console.log $("id").eq(0).text()
+console.log $("id").get().length
+console.log $("id").is("id")
+console.log $("message").is("message")
+console.log $("root").find("ids").text()
+console.log $("root").find("id").text()
+console.log $("root").find("ids").eq(0).text()
+console.log $("root").find("ids").eq(1).text()
+console.log $("root").find("id").eq(0).text()
+console.log $("root").find("id").eq(1).text()
+###
+
+
+
 ###
 # 配列IDSQL反映
 arr = ["000", "111", "222"]

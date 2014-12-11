@@ -6,6 +6,44 @@
 
 
 
+# 入れ子XMLの取得と判別
+chai = require "chai"
+cheerio = require "cheerio"
+
+# xml作成
+builder = require "xmlbuilder"
+
+root = builder.create "root"
+ids = root.ele "ids"
+ids.ele "id", "gen1"
+ids.ele "id", "gen2"
+
+# console.log root.end({pretty: true})
+xml = root.end({pretty: true})
+
+
+describe "01:", ->
+  it "01",->
+    $ = cheerio.load xml, {ignoreWhitespace: true, xmlMode: true}
+    chai.assert.ok $("root").find("id").eq(0).text()
+    chai.assert.equal $("root").find("id").eq(0).text(), "gen1"
+    chai.assert.notOk $("root").find("nasi").eq(0).text()
+    chai.assert.ok $("root").find("ids").eq(0).text()
+    chai.assert.ok $("root")
+    chai.assert.ok $("root ids")
+    chai.assert.ok $("root ids id")
+    chai.assert.ok $("root").is("root")
+    chai.assert.notOk $("nasi").is("nasi")
+    chai.assert.ok $("root").find("ids")
+    chai.assert.ok $("root").find("nasi")
+    chai.assert.notOk $("root").find("nasi").text()
+    chai.assert.notOk $("root").find("nasi").is("nasi")
+    chai.assert.ok  $("root").find("ids").is("ids")
+    chai.assert.notOk  $("root").find("nasi").is("nasi")
+
+
+
+
 ###
 # mocha async doneを利用する
 describe "userr",->
