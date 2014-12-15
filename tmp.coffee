@@ -4,6 +4,24 @@
 
 
 
+
+###
+# ガード節による値変換
+convert=(type)->
+  return "ichi" if type == 1
+  return "ni" if type == 2
+  return "san" if type == 3
+  return "shi" if type == 4
+  return "death"
+
+
+console.log convert 2
+console.log convert 4
+console.log convert 3
+console.log convert 5
+###
+
+
 ###
 # cheerio2
 cheerio = require "cheerio"
