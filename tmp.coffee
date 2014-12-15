@@ -6,6 +6,25 @@
 
 
 ###
+# ガード節による値変換2
+convert=(type)->
+  switch type
+    when 1 then "ichi"
+    when 2 then "ni"
+    when 3 then "san"
+    when 4 then "shi"
+    else "death"
+
+
+console.log convert 2
+console.log convert 4
+console.log convert 3
+console.log convert 5
+###
+
+
+
+###
 # ガード節による値変換
 convert=(type)->
   return "ichi" if type == 1
