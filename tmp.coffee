@@ -4,6 +4,19 @@
 
 
 
+# expectの配列をやりとり
+init = ->
+  arr = []
+  arr.gen = "asf"
+  arr.gen = "asf3"
+  arr.ni = "ninini"
+  arr
+
+
+arrr = init()
+console.log arrr.gen
+
+
 ###
 # 配列で定義すると2番目にインデックスが返る
 arr = [1..10]
