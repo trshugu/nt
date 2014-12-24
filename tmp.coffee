@@ -4,6 +4,26 @@
 
 
 
+# MD5
+crypto = require "crypto"
+
+md5_hex = (src) ->
+  md5 =  crypto.createHash 'md5'
+  md5.update src, 'utf8'
+  md5.digest('hex')
+  
+
+mdtmp = (src) ->
+  md5 =  crypto.createHash 'SHA256'
+  md5.update src, 'utf8'
+  md5.digest('hex')
+  
+
+# console.log md5_hex "nodnoe"
+console.log mdtmp "nanigasi"
+
+
+###
 # expectの配列をやりとり
 init = ->
   arr = []
@@ -15,6 +35,7 @@ init = ->
 
 arrr = init()
 console.log arrr.gen
+###
 
 
 ###
