@@ -4,6 +4,9 @@
 
 
 
+
+
+###
 # MD5
 crypto = require "crypto"
 
@@ -16,11 +19,19 @@ md5_hex = (src) ->
 mdtmp = (src) ->
   md5 =  crypto.createHash 'SHA256'
   md5.update src, 'utf8'
-  md5.digest('hex')
+  md5.digest('hex').substr(5,5).toUpperCase()
   
 
 # console.log md5_hex "nodnoe"
-console.log mdtmp "nanigasi"
+console.log mdtmp "sodia"
+###
+
+
+###
+# 大文字にする
+console.log "sdfUIeu".toUpperCase()
+console.log "sdfUIeu".toLowerCase()
+###
 
 
 ###
