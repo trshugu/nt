@@ -4,6 +4,18 @@
 
 
 
+###
+# 引数の取得
+function min() {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return args.reduce(function (prev, current) {
+    if (prev < current) {
+      return prev;
+    }
+    return current;
+  });
+}
+###
 
 
 ###
