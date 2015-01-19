@@ -4,7 +4,19 @@
 
 
 
+###
+# 引数の取得
+min = ->
+  args = Array.prototype.slice.call(arguments, 1);
+  return args.reduce (prev, current) ->
+    if (prev < current)
+      return prev;
+    
+    return current
+  
 
+console.log min(3,6,3,1,9)
+###
 
 ###
 # MD5
