@@ -5,6 +5,35 @@
 
 
 
+###
+# 足し算
+Number.prototype.plus = (x) ->
+  # this.toString(2)
+  # x.toString(2)
+  res = this
+  for i in [1..x]
+    res = res + 1
+  res
+
+Number.prototype.あ = (x) ->
+  # this.toString(2)
+  # x.toString(2)
+  res = this
+  for i in [1..x]
+    res = res + 1
+  res
+
+console.log 0x1 | 0x2
+console.log 1 | 2
+
+console.log 0xa | 0xb
+console.log 10 | 11
+console.log parseInt(10.toString(16),16) | parseInt(11.toString(16),16)
+
+# 1010 1011
+console.log 5.あ 3
+###
+
 
 
 ###
