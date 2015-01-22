@@ -4,6 +4,26 @@
 
 
 
+
+
+
+###
+# カリー化
+func = (x,y)->
+  x + y
+
+cfuncp = (x)->(y)->
+  x + y
+
+res = func(2,3)
+console.log res
+
+cres = cfuncp(2)
+console.log  cres(3)
+console.log  cfuncp(2)(3)
+###
+
+
 ###
 # 引数の取得
 min = ->
