@@ -1,0 +1,31 @@
+{
+  "name": "requiretmp",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "TRS",
+  "browserify": {
+    "transform": [
+      "coffeeify",
+      "debowerify"
+    ]
+  },
+  "devDependencies": {
+    "coffee-script": "*",
+    "vinyl-source-stream": "*",
+    "gulp": "*",
+    "bower": "*",
+    "browserify": "*",
+    "coffeeify": "*",
+    "debowerify": "*",
+    "browsernizr": "*"
+  },
+ "dependencies": {}
+}
+
+
+
