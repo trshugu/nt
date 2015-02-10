@@ -67,7 +67,20 @@ ordersf= (arr) ->
 
 
 console.log trial(ordersf)
+
+
+splixe = (arr) ->
+  len = arr.length
+  ary = arr.concat()
+  res = []
+  while(len)
+    res.push( ary.splice(Math.floor(Math.random()*len--),1) )
+  res
+
+console.log trial(splixe)
+
 ###
+
 
 ###
 # while

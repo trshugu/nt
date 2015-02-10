@@ -1,14 +1,11 @@
 fs = require "fs"
 
-shuffle = (a) ->
-  i = a.length - 1
-  while i >= 0
-    r = Math.floor(i * Math.random())
-    tmp = a[i]
-    a[i] = a[r]
-    a[r] = tmp
-    i--
-  a
+shuffle = (arr) ->
+  len = arr.length
+  res = []
+  while(len)
+    res.push( arr.splice( Math.floor(Math.random() * len--), 1 )[0] )
+  res
 
 module.exports = (path)->
   shuffle(fs.readFileSync(__dirname + "/" + path,"utf-8").trim().split("\n"))[0].trim()
