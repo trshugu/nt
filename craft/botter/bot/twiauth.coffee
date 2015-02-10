@@ -1,9 +1,8 @@
 twitter = require "twitter"
 fs = require "fs"
-rl = require "readline"
 
 module.exports = ->
-  lineArray = fs.readFileSync(__dirname + '/oauth.txt', "utf-8").split("\n")
+  lineArray = fs.readFileSync(__dirname + '/oauth.txt', "utf-8").trim().split("\n")
   client = new twitter(
     consumer_key: lineArray[0].trim()
     consumer_secret: lineArray[1].trim()

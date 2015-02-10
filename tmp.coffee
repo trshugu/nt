@@ -5,6 +5,58 @@
 
 
 
+
+
+
+###
+# log出力3(winston)
+winston = require('winston')
+logger = new (winston.Logger)(
+  transports: [
+    # 使う出力方法を transports で宣言する
+    new (winston.transports.Console)(
+      level: 'silly', # level は silly 以上
+      colorize: true, # 色付き
+      timestamp: true # 時間つき
+    ),
+    new (winston.transports.File)(
+      level: 'silly', # level は silly 以上
+      colorize: true, # 色付き
+      timestamp: false, # 時間つき
+      filename: 'log.txt',
+      json: false
+    )
+  ]
+)
+
+logger.silly('ばかばかしいこと')
+logger.debug('とてもどうでもいいこと')
+logger.verbose('どうでもいいこと')
+logger.info('じょうほう')
+logger.warn('やばい')
+logger.error('すごくやばい')
+###
+
+###
+# anode
+anode = require 'anode'
+
+cnf = new anode.Configuration debug : true
+
+httpServer = cnf.actor anode.http.server_beh()
+helloworld = cnf.actor anode.behavior( 'httpServer'
+  '#start' : ->
+    @send( @, '#listen', 8080, '127.0.0.1' ).to @httpServer
+  '$httpServer, #listen' : ->
+    @send( 'Server running at http://127.0.0.1:8080/' ).to cnf.console.log
+  '$httpServer, #request, request, response' : ->
+    @send( null, '#end', 'Hello Actor World\n' ).to @response
+)( httpServer ) # helloworld 
+ 
+cnf.send( '#start' ).to helloworld
+###
+
+
 ###
 # 足し算
 Number.prototype.plus = (x) ->

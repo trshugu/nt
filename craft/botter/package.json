@@ -1,0 +1,14 @@
+{
+  "name": "bot",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "coffee tb.coffee"
+  },
+  "dependencies": {
+    "twitter": "*"
+  },
+  "devDependencies": {
+    "winston": "^0.9.0"
+  }
+}
