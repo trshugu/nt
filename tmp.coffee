@@ -2,11 +2,18 @@
 ###
 
 
+console.log 10**2
 
+sorocon=(ichi)->
+  val = ichi[0]
+  if(ichi[1])
+    val += 5
+  else
+    
+  val
 
-
-
-
+console.log sorocon([4,true])
+console.log sorocon([4,false])
 
 ###
 # シャッフル
