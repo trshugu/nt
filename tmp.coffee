@@ -8,6 +8,74 @@
 
 
 
+###
+# シャッフル
+array = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+times = 1000
+
+trial = (shuffle) ->
+  average = {}
+  i = 0
+  while i < array.length
+    average[array[i]] = 0
+    i++
+  
+  i = times
+  while i--
+    arr = shuffle(array)
+    j = 0
+    while j < arr.length
+      elem = arr[j]
+      average[elem] += j
+      j++
+  
+  for elem of average
+    average[elem] /= times
+  
+  return average
+
+goodShuffle = (arr) ->
+  i = undefined
+  j = undefined
+  temp = undefined
+  arr = arr.slice()
+  i = arr.length
+  if i == 0
+    return arr
+  while --i
+    j = Math.floor(Math.random() * (i + 1))
+    temp = arr[i]
+    arr[i] = arr[j]
+    arr[j] = temp
+  arr
+
+
+console.log trial(goodShuffle)
+
+badShuffle1 = (arr) ->
+  arr.slice().sort(->
+    Math.round(Math.random() * 2) - 1
+  )
+
+console.log trial(badShuffle1)
+
+ordersf= (arr) ->
+  random = arr.map(Math.random)
+  arr.sort((a, b)->
+    random[arr.indexOf(b)] - random[arr.indexOf(a)]
+  )
+
+
+console.log trial(ordersf)
+###
+
+###
+# while
+n=5
+while(n)
+  console.log n
+  console.log Math.floor(Math.random() * n--)
+###
 
 ###
 # log出力3(winston)
