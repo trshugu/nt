@@ -3,21 +3,25 @@
 
 ###
 ###
-console.log 10**2
+console.log 10**1
 
 sorocon=(ichi)->
   val = ichi[0]
   if(ichi[1])
     val += 5
-  else
-    
+  
   val
 
 console.log sorocon([4,true])
 console.log sorocon([4,false])
 
+so = [
+  [4,true]
+  [4,false]
+  [2,true]
+]
 
-
+console.log so
 
 ###
 # idを検索し、なければ追記
