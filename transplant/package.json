@@ -1,0 +1,12 @@
+{
+  "name": "bot",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "coffee tmp.coffee"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.9.0",
+    "winston": "^0.9.0"
+  }
+}
