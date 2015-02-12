@@ -1,7 +1,8 @@
 ###
 ###
 
-
+###
+###
 console.log 10**2
 
 sorocon=(ichi)->
@@ -14,6 +15,92 @@ sorocon=(ichi)->
 
 console.log sorocon([4,true])
 console.log sorocon([4,false])
+
+
+
+
+###
+# idを検索し、なければ追記
+fs = require "fs"
+# id = Math.floor(Math.random() * 100)
+id = 12
+console.log fs.readFileSync(__dirname + "/donelist.txt", "utf-8").trim().split("\n")
+if fs.readFileSync(__dirname + "/donelist.txt", "utf-8").trim().split("\n").indexOf(id.toString()) == -1
+  fs.appendFileSync(__dirname + "/donelist.txt", id + "\n")
+else
+  console.log "atta"
+###
+
+###
+val = "abc"
+
+if /abc/.test(val)
+  console.log "aru"
+else
+  console.log "nai"
+###
+
+###
+val = "abc"
+reg = new RegExp(val)
+
+
+if reg.test("abcd")
+  console.log "aru"
+else
+  console.log "nai"
+###
+
+###
+console.log(__filename)
+console.log(require('path').basename(__filename))
+###
+
+###
+def = (word="naiyo")->
+  console.log word
+
+
+def()
+def("aruyo")
+###
+
+
+###
+d = new Date()
+
+res = switch d.getHours()
+  when 1 then "ichi"
+  when 2,11 then "ni"
+
+console.log res
+###
+
+###
+# ランダム返却
+cacha_rand = (list) ->
+  list.splice( Math.floor(Math.random() * list.length), 1 )[0].trim()
+
+console.log cacha_rand(["あ","い","う","え"])
+
+cacha = ->
+  cacha_rand(["タ","チ","ツ","テ","ト","カ","キ","ク","ケ","コ"]) +
+  cacha_rand(["ァ","ィ","ゥ","ェ","ォ","ャ","ュ","ョ",""]) +
+  "ッ" +
+  cacha_rand(["タ","チ","ツ","テ","ト","カ","キ","ク","ケ","コ"]) +
+  cacha_rand(["ァ","ィ","ゥ","ェ","ォ","ャ","ュ","ョ"])
+
+console.log cacha()
+###
+
+
+###
+params = screen_name: "sage"
+client.get('statuses/user_timeline', params, (e,t,r)->
+  t.map((t)-> console.log t.text.replace(/^@\w+?\s/g,"").replace(/\s/g,""))
+)
+###
+
 
 ###
 # シャッフル
