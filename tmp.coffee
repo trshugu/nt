@@ -5,6 +5,71 @@
 
 
 
+
+
+###
+# future
+Future = require "fibers/future"
+fs = Future.wrap require 'fs'
+
+Future.task(->
+  # Get a list of files in the directory
+  fileNames = fs.readdirFuture('.').wait()
+  console.log 'Found ' + fileNames.length + ' files'
+  
+  # Stat each file
+  stats = []
+  ii = 0
+  while ii < fileNames.length
+    stats.push fs.statFuture(fileNames[ii])
+    ++ii
+  
+  stats.map (f) ->
+    `var ii`
+    f.wait()
+    return
+  
+  # Print file size
+  ii = 0
+  while ii < fileNames.length
+    console.log fileNames[ii] + ': ' + stats[ii].get().size
+    ++ii
+  return
+).detach()
+###
+
+
+###
+# fiber
+Fiber = require "fibers"
+
+sleep = (ms)->
+  fiber = Fiber.current
+  setTimeout(->
+    fiber.run()
+  , ms)
+  Fiber.yield()
+
+Fiber(->
+  console.log "wait.." + new Date
+  sleep(1000)
+  console.log "OK" + new Date
+).run()
+
+console.log "backmain"
+
+inc = Fiber((start)->
+  total = start
+  while (true)
+    total += Fiber.yield(total)
+)
+
+ii = inc.run(1)
+while ii <= 10
+  console.log ii
+  ii = inc.run(1)
+###
+
 ###
 # console.log 10**1
 
