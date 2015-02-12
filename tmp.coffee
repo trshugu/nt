@@ -1,9 +1,12 @@
 ###
 ###
 
+
+
+
+
 ###
-###
-console.log 10**1
+# console.log 10**1
 
 sorocon=(ichi)->
   val = ichi[0]
@@ -12,8 +15,8 @@ sorocon=(ichi)->
   
   val
 
-console.log sorocon([4,true])
-console.log sorocon([4,false])
+# console.log sorocon([4,true])
+# console.log sorocon([4,false])
 
 so = [
   [4,true]
@@ -21,7 +24,16 @@ so = [
   [2,true]
 ]
 
-console.log so
+# console.log so
+res = so.reverse().map((a,i)->
+  sorocon(a) * (10 ** i)
+).reduce((a,b)->
+  a+b
+)
+
+console.log res
+###
+
 
 ###
 # idを検索し、なければ追記
