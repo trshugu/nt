@@ -7,8 +7,102 @@
 
 
 
+
+
+###
+# yield(co) --harmonyをつけたらできた
+fs = require 'fs'
+co = require 'co'
+
+co ->
+  files = yield co.wrap(fs.readdir)('.')
+  data = yield co.wrap(fs.readFile)(files[0], 'utf-8')
+  console.log data
+###
+
+
+###
+# deferred NG
+fs = require 'fs'
+Q = require 'q'
+
+a = Q.nfcall(fs.readdir, '.')
+  .then (files) ->
+    return Q.nfcall(fs.readFile, files[0], 'utf-8')
+  .then (data) ->
+    console.log data
+
+a.done()
+
+###
+
+
+###
+# yield以前
+fs = require 'fs'
+
+fs.readdir '.', (err, files) ->
+  console.log files
+  fs.readFile files[1], 'utf-8', (err, data)->
+    console.log data
+###
+
+
+
+###
+# promise
+Promise = require "Promise"
+p1 = new Promise (res,rej) ->
+  setTimeout(res, 1000)
+
+p1.all
+###
+
 ###
 # future
+context = 'foo': 'bar'
+Future = require 'future'
+
+future = Future.create(context)
+err = ""
+message = 'Hello World!'
+
+future.whenever (error, data) ->
+  # throw err if(error)
+  console.log @foo + ' says: ' + data
+  return
+
+
+future.setTimeout 1000
+future.deliver err, message
+###
+
+
+###
+# filter
+console.log [1,2,3,2].filter (i)-> i>=2
+console.log (item for item in [1,2,3,2] when item >= 2)
+
+# includes
+included = "a long test string".indexOf("test") isnt -1
+console.log included
+
+# -1 の比較をビット演算子をつかって代替する
+string   = "a long test string"
+included = !!~ string.indexOf "test"
+console.log included
+
+# Min/Max
+console.log Math.max [14, 35, -7, 46, 98]
+console.log Math.min [14, 35, -7, 46, 98]
+
+console.log Math.max [14, 35, -7, 46, 98]...
+console.log Math.min [14, 35, -7, 46, 98]...
+###
+
+
+###
+# future ファイルの容量計算
 Future = require "fibers/future"
 fs = Future.wrap require 'fs'
 
@@ -18,57 +112,86 @@ Future.task(->
   console.log 'Found ' + fileNames.length + ' files'
   
   # Stat each file
-  stats = []
-  ii = 0
-  while ii < fileNames.length
-    stats.push fs.statFuture(fileNames[ii])
-    ++ii
-  
-  stats.map (f) ->
-    `var ii`
-    f.wait()
-    return
+  # stats = fileNames.map((i) -> fs.statFuture(i))
+  stats = ( fs.statFuture(i) for i in fileNames)
+  stats.map (f) -> f.wait()
   
   # Print file size
-  ii = 0
-  while ii < fileNames.length
-    console.log fileNames[ii] + ': ' + stats[ii].get().size
-    ++ii
-  return
+  stdt = new Date()
+  for q in [1..1000000]
+    fileNames.forEach (i,j) -> i + ": " + stats[j].get().size
+  eddt = new Date()
+  ichi = eddt - stdt
+  
+  # forEachよりもこっち(for in)のほうがはやい
+  stdt = new Date()
+  for q in [1..1000000]
+    a + ": " + stats[b].get().size for a, b in fileNames
+  eddt = new Date()
+  console.log ichi
+  console.log(eddt - stdt)
 ).detach()
 ###
 
 
 ###
-# fiber
+# fiber2
 Fiber = require "fibers"
 
+console.log "1@@" # 1 関数の定義
 sleep = (ms)->
+  console.log "4@@"
   fiber = Fiber.current
+  console.log "5@@"
   setTimeout(->
-    fiber.run()
+    console.log "8@@" # 6 タイムアウトし実行開始
+    fiber.run() # 7 4のyieldが実行される
+    console.log "11@@" # 10 7の処理が終わったので残りを処理
   , ms)
-  Fiber.yield()
+  console.log "6@@"
+  Fiber.yield() # 4 停止し、いったん抜ける
+  console.log "9@@" # 8 7のrunを受けて実行され終了
 
+console.log "2@@" # 2 Fiber実行
 Fiber(->
+  console.log "3@@"
   console.log "wait.." + new Date
-  sleep(1000)
+  sleep(1000) # 3 関数実行 停止
+  console.log "10@@" # 9 sleepが終了したので開始
   console.log "OK" + new Date
 ).run()
 
-console.log "backmain"
+console.log "7@@"  # 5 ここから一秒待つ
+###
+
+
+
+###
+# fiber1
+Fiber = require "fibers"
 
 inc = Fiber((start)->
+  console.log("1@@:" + start)
   total = start
   while (true)
+    console.log("2@@:" + start)
+    console.log("2@@:" + total)
     total += Fiber.yield(total)
+    console.log("3@@:" + start)
+    console.log("3@@:" + total)
 )
 
+console.log("4@@")
 ii = inc.run(1)
+console.log("5@@")
 while ii <= 10
+  console.log("6@@")
   console.log ii
-  ii = inc.run(1)
+  # console.log typeof ii
+  ii = inc.run(2)
+  console.log("7@@")
 ###
+
 
 ###
 # console.log 10**1
