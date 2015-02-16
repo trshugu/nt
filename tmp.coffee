@@ -7,8 +7,50 @@
 
 
 
+# future2
+Future = require "fibers/future"
+# wait = Future.wait
+
+sl=(ms)->
+  future = new Future
+  setTimeout ->
+    future.return()
+  , ms
+  future
 
 
+calc = (ms)->
+  start = new Date
+  sl(ms).wait()
+  new Date - start
+calc.future()
+
+
+calc(2000).resolve (e,v)->
+  console.log  v + "ms"
+
+
+
+###
+# fibonacci generator
+Fiber = require "fibers"
+
+Fib = ->
+  f = Fiber ->
+    Fiber.yield 0
+    prev = 0
+    curr = 1
+    while true
+      Fiber.yield  curr
+      tmp = prev + curr
+      prev = curr
+      curr = tmp
+  
+  f.run.bind(f)
+
+seq = Fib()
+[1..19].forEach (i)-> console.log seq()
+###
 
 
 
@@ -116,7 +158,7 @@ Fiber = require "fibers"
 
 inc = Fiber ->
   i = 0
-  while(true)
+  while true
     Fiber.yield(i++)
 
 [1..5].forEach (i)-> console.log inc.run()
