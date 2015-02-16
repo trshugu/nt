@@ -7,6 +7,7 @@
 
 
 
+###
 # future2
 Future = require "fibers/future"
 # wait = Future.wait
@@ -19,15 +20,16 @@ sl=(ms)->
   future
 
 
-calc = (ms)->
+calc = ((ms)->
   start = new Date
   sl(ms).wait()
   new Date - start
-calc.future()
+).future()
 
 
 calc(2000).resolve (e,v)->
   console.log  v + "ms"
+###
 
 
 
