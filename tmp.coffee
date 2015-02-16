@@ -9,6 +9,120 @@
 
 
 
+
+
+
+
+###
+# ●fiber 使用できない
+# Fiber = require "fiber"
+
+
+# ●fibers
+Fibers = require "fibers"
+###
+
+
+###
+# ●future
+Future = require "future"
+
+# ●futures 存在しない
+# Futures = require "futures"
+###
+
+
+###
+Fiber = require "fibers"
+Future = require "fibers/future"
+wait = Future.wait
+
+sleep = (ms)->
+  future = new Future
+  setTimeout ->
+    future.return()
+  , ms
+  future
+
+f = Fiber ->
+  console.log("1")
+  sleep(2000).wait()
+  console.log("2")
+  "3"
+
+ret = f.run()
+console.log "ret:" + ret
+###
+
+
+
+###
+# intput -> outputの例 fiberを使った場合
+Fiber = require "fibers"
+fs  = require "fs"
+
+console.log "1"
+resume_cb = (f)->
+  console.log "res 1 関数定義"
+  ->
+    console.log "res 2 fsの処理完了" # read完了
+    f.run Array.prototype.slice.call arguments
+    console.log "res 3 終了" # writeを待つ
+
+console.log "2"
+main = ->
+  console.log "4 current定義"
+  f = Fiber.current
+  console.log "5 readFile開始"
+  fs.readFile "input.txt", "utf-8", resume_cb(f) # 関数定義
+  console.log "6 mainから出るyield"
+  input_res = Fiber.yield() # mainから出る
+  console.log "8 readが完了し戻ってくる" # readが完了し戻ってくる
+  console.log input_res[0] if(input_res[0])
+  
+  console.log "9 writeFile開始"
+  fs.writeFile "output.txt", input_res[1], "utf-8", resume_cb(f) # 関数定義
+  console.log "10 rea
+  dのresumeに戻すyield"
+  output_res = Fiber.yield() # readのresumeに戻す
+  console.log "11 writeが完了し戻ってくる" # writeが完了し戻ってくる
+  console.log output_res[0] if(output_res[0])
+  console.log "12 main終了"
+  
+
+console.log "3 mainに入る"
+Fiber(main).run() # mainに入る
+console.log "7 readを待つ" # readを待つ
+###
+
+
+
+###
+# intput -> outputの例
+fs  = require "fs"
+
+fs.readFile "input.txt", "utf-8" , (e,d)->
+  console.log e if(e)
+  console.log d
+  
+  fs.writeFile "output.txt", d, "utf-8", (e) ->
+    console.log e if(e)
+###
+
+
+###
+# fiber3 fiberの直接利用は非推奨とのこと
+Fiber = require "fibers"
+
+inc = Fiber ->
+  i = 0
+  while(true)
+    Fiber.yield(i++)
+
+[1..5].forEach (i)-> console.log inc.run()
+###
+
+
 ###
 # yield(co) --harmonyをつけたらできた
 fs = require 'fs'
