@@ -3,8 +3,9 @@
 
 
 
-
-
+# mecab
+k = require "kuromoji"
+k.builder({dicPath: "node_modules/kuromoji/dist/dict/"}).build (e,t)-> console.log t.tokenize "すもももももも"
 
 
 ###
