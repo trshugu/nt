@@ -3,9 +3,13 @@
 
 
 
+###
 # mecab
 k = require "kuromoji"
-k.builder({dicPath: "node_modules/kuromoji/dist/dict/"}).build (e,t)-> console.log t.tokenize "すもももももも"
+k.builder({dicPath: "node_modules/kuromoji/dist/dict/"}).build (e,t)->
+  t.tokenize("すもももももも").forEach (i)->
+    console.log i.surface_form + "," + i.pos + "," + i.pos_detail_1 + "," + i.pos_detail_2 + "," + i.reading
+###
 
 
 ###
