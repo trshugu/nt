@@ -3,6 +3,133 @@
 
 
 
+
+
+###
+# 日付リストをソート
+dl = '[' + \ 
+  '{"a":"2015/02/25 10:50:01"},' + \
+  '{"a":"2015/02/25 13:50:10"},' + \
+  '{"a":"2015/02/25 10:50:20"},' + \
+  '{"a":"2015/02/25 10:51:10"},' + \
+  '{"a":"2015/02/25 12:50:10"},' + \
+  '{"a":"2015/02/25 10:50:10"},' + \
+  '{"a":"2015/02/25 10:50:13"},' + \
+  '{"a":"2015/02/25 10:50:11"},' + \
+  '{"a":"2015/02/25 10:50:12"}' + \
+  ']'
+j = JSON.parse dl
+console.log j.sort (i,j)->Date.parse(i.a) > Date.parse(j.a)
+###
+
+
+
+###
+# リストをソート
+obj = [1,4,6,3,1]
+console.log obj.sort()
+
+j = JSON.parse '[{"a":1},{"a":4},{"a":6},{"a":3},{"a":1},{"a":2},{"a":2},{"a":1}]'
+console.log j.sort (i,j)->i.a > j.a
+###
+
+###
+# json保存
+fs  = require "fs"
+
+# オブジェクトからjsonへ変換テスト
+obj = 
+  ary:[0,1,2],
+  obj:
+    a:0,
+    b:1,
+    c:2
+
+str = JSON.stringify(obj);
+
+# テスト出力
+# console.log str
+# console.log typeof str
+
+# jsonからオブジェクトへ変換テスト
+str = '{"id":{"ary":[0,1,2],\n"ob'
+str += 'j":{"a":0,"b":1,"c":22222}}}'
+str = '[{"id":1},{"id":2}]'
+obj = JSON.parse str
+
+# console.log typeof obj
+
+# テスト出力
+# console.log obj.ary
+# console.log obj.obj
+
+
+fs.writeFile "str.txt", str, "utf-8", (e) -> console.log e if(e)
+# fs.writeFile "obj.txt", obj, "utf-8", (e) -> console.log e if(e)
+
+fs.readFile "str.txt", "utf-8" , (e,d)->
+  console.log e if(e)
+  console.log d
+  console.log typeof d
+  fo = JSON.parse d
+  console.log fo.ary
+  console.log fo.bon
+  console.log fo[0].id
+  console.log fo[1].id
+  console.log fo.map (i)-> i.id
+
+console.log "death"
+###
+
+
+###
+# 日付→文字
+d = new Date()
+s = d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2) + " " \
+   + ("0" + d.getHours()).slice(-2) + ":" \
+   + ("0" + d.getMinutes()).slice(-2) + ":" \
+   + ("0" + d.getSeconds()).slice(-2)
+
+console.log s
+
+# 文字→日付(数値)
+console.log Date.parse("2015/02/25 10:50:10")
+
+console.log Date.parse(s)
+
+f=(d)->
+  d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2) + " " \
+   + ("0" + d.getHours()).slice(-2) + ":" \
+   + ("0" + d.getMinutes()).slice(-2) + ":" \
+   + ("0" + d.getSeconds()).slice(-2)
+
+console.log "check"
+console.log new Date()
+console.log f(new Date())
+console.log Date.parse(f(new Date()))
+console.log Date(Date.parse(f(new Date())))
+console.log new Date(Date.parse(f(new Date())))
+console.log typeof new Date(Date.parse(f(new Date())))
+###
+
+
+###
+# 日付型を数値で
+console.log Date() # string
+console.log Date().valueOf() # string
+
+console.log new Date() # object
+console.log new Date().valueOf() # number
+
+console.log Date(new Date().valueOf()) # string
+console.log new Date(new Date().valueOf()) # object
+###
+
+
 ###
 # mecab
 k = require "kuromoji"
