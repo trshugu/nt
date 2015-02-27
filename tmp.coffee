@@ -3,6 +3,42 @@
 
 
 
+###
+# jsonに追加 同期でやらないとダメ
+fs  = require "fs"
+
+f=(d)->
+  d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2) + " " \
+   + ("0" + d.getHours()).slice(-2) + ":" \
+   + ("0" + d.getMinutes()).slice(-2) + ":" \
+   + ("0" + d.getSeconds()).slice(-2)
+
+fs.writeFileSync "input.json", "[]" # 初期化
+
+for i in [0..2]
+  # 非同期
+  fs.readFile "input.json", "utf-8" , (e,d)->
+    fo = JSON.parse d
+    add = {"val1":120 ,"val2":50, "vala":10, "date":f(new Date())}
+    fo.push add
+    st = JSON.stringify(fo)
+    
+    fs.writeFile "input.json", st, "utf-8", (e) -> 
+      console.log e if(e)
+
+
+for i in [0..2]
+  # 同期
+  d = fs.readFileSync "input.json", "utf-8"
+  fo = JSON.parse d
+  add = {"val1":120 ,"val2":50, "vala":10, "date":f(new Date())}
+  fo.push add
+  st = JSON.stringify(fo)
+  fs.writeFileSync "input.json", st
+###
+
 
 
 ###
