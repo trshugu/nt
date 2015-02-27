@@ -1,3 +1,3 @@
 @echo off
 set DEBUG=expresstemplate
-coffee bin/www %1
+coffee app.coffee %1
