@@ -2,6 +2,156 @@
 ###
 
 
+
+
+###
+# post express
+a=require("express")()
+b=require "body-parser"
+a.use b.json()
+a.use b.urlencoded(extended: false)
+
+a.post "/", (q,r)->
+  console.log r.body.name
+  r.set 'Content-Type', 'application/json'
+  r.json {"jjj":"dondon"}
+
+a.listen 3000
+###
+
+###
+# 最小サーバー
+require("http").createServer((a,b)->b.end("sdf" + a.url)).listen 3000
+###
+
+###
+# poster2
+h=require "http"
+
+o = 
+  uri: "http://yahoo.co.jp"
+  form: {name: "testest"}
+  json: true
+
+q=h.request o,(r)->
+  r.setEncoding("utf8")
+  r.on 'data', (c)->
+    console.log c.toString()
+  r.on "end",->
+    console.log "end"
+.on "error",(e)->
+
+# q.end()
+###
+
+###
+# poster
+req = require "request"
+
+o = 
+  uri: "http://localhost:3000"
+  form: {name: "testest"}
+  json: true
+
+req.post o, (e,r,b)->
+  # console.log e
+  console.log r
+  console.log b
+###
+
+###
+# getter
+http = require "http"
+
+http.get("http://yahoo.co.jp").on 'response',(res)->
+  res.setEncoding("utf8")
+  res.on 'data', (c)->
+    console.log c
+###
+
+
+
+###
+# auth
+CQAuth = ->
+  @init()
+  return
+
+CQAuth.prototype =
+  init: ->
+    DROPBOX_APP_KEY = 'SET_YOUR_APP_KEY'
+    
+    @client = new (Dropbox.Client)(key: DROPBOX_APP_KEY)
+    @client.authenticate { interactive: false }, (error) ->
+      console.log 'Authentication error: ' + error if error
+  
+  login: -> @client.authenticate()
+  logout: ->
+    @client.signOut { mustInvalidate: false }, (error) ->
+      console.log 'Singn out error: ' + error if error
+    # location.reload()
+  
+  isLogin: -> @client.isAuthenticated()
+
+
+auth = new CQAuth
+console.log 'Login Success' if auth.isLogin()
+auth.login()
+console.log 'Login Success' if auth.isLogin()
+
+# list
+CQList = ->
+  @init()
+  return
+
+CQList.prototype =
+  init: ->
+    @client = null
+    @table = null
+  
+  load: (client) -> @client = client
+  
+  create: ->
+    _self = this
+    @client.getDatastoreManager().openDefaultDatastore (error, datastore) ->
+      alert 'Error opening default datastore: ' + error if error
+      _self.table = datastore.getTable('quill')
+      _self.update()
+      datastore.recordsChanged.addListener -> _self.update()
+  
+  update: ->
+    records = @table.query()
+    records.forEach (i) -> console.log i
+
+# main
+auth = new CQAuth
+list = new CQList
+if auth.isLogin()
+  list.load auth.client
+  list.create()
+  table = list.table
+  title = 'ABC'
+  content = 'DEF'
+  share = 'private'
+  table.insert
+    title: title
+    content: content
+    share: share
+###
+
+
+###
+# classmethod
+fun = ->
+  @meso()
+
+fun.prototype =
+  meso: ->
+    console.log "mememe"
+
+new fun
+###
+
 ###
 # jsonに追加 同期でやらないとダメ
 fs  = require "fs"
