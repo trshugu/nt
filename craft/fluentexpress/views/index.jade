@@ -1,0 +1,11 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    script(src="/socket.io/socket.io.js")
+    script(type="text/javascript" src="tmp.js")
+  body
+    h1= title
+    p Welcome to #{title}
+    input(type='button',value="pus",onClick="s.emit('flu','nandatte')")
+ 
