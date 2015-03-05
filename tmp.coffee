@@ -5,6 +5,37 @@
 
 
 ###
+req = require "request"
+
+o = 
+  uri: "http://simple-note.appspot.com/api/login"
+  body: ""
+
+req.post o, (e,r,b)->
+  r.setEncoding("utf8")
+  console.log r
+  console.log b
+  console.log r.statusCode
+###
+
+
+###
+# base64
+b = new Buffer "ああああ"
+s = b.toString "base64"
+console.log s
+
+a = new Buffer s, "base64"
+c = a.toString()
+console.log c
+
+console.log new Buffer("ああああ").toString("base64")
+console.log new Buffer("44GC44GC44GC44GC", "base64").toString()
+###
+
+
+
+###
 # post express
 a=require("express")()
 b=require "body-parser"
@@ -25,7 +56,7 @@ require("http").createServer((a,b)->b.end("sdf" + a.url)).listen 3000
 ###
 
 ###
-# poster2
+# poster2 NG
 h=require "http"
 
 o = 
