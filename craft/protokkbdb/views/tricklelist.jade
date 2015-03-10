@@ -1,0 +1,58 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    script(type="text/javascript", src="jquery/dist/jquery.min.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    link(href="tricklelist.css" rel="stylesheet")
+    script(src="/socket.io/socket.io.js")
+    script(type="text/javascript" src="tricklelist.js")
+  body
+    #tl.table
+      .row
+        .column 筋
+        .column 気
+        .column 回
+        .column ヨ
+        .column 指
+        .column リ
+        .column メ
+        .column ア
+        .column J
+        .column
+          | 
+      .row
+        .column
+          input(type="checkbox" v-model="kin")
+        .column
+          input(type="checkbox" v-model="ki")
+        .column
+          input(type="checkbox" v-model="kai")
+        .column
+          input(type="checkbox" v-model="yo")
+        .column
+          input(type="checkbox" v-model="shi")
+        .column
+          input(type="checkbox" v-model="ri")
+        .column
+          input(type="checkbox" v-model="me")
+        .column
+          input(type="checkbox" v-model="ami")
+        .column
+          input(type="checkbox" v-model="ju")
+        .column
+          button(v-on="click: tladd()") sub
+      .row(v-repeat="tlist")
+        .column {{kin ? "○" : "×"}}
+        .column {{ki ? "○" : "×"}}
+        .column {{kai ? "○" : "×"}}
+        .column {{yo ? "○" : "×"}}
+        .column {{shi ? "○" : "×"}}
+        .column {{ri ? "○" : "×"}}
+        .column {{me ? "○" : "×"}}
+        .column {{ami ? "○" : "×"}}
+        .column {{ju ? "○" : "×"}}
+        .column {{date}}
+    
+    
+    
