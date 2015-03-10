@@ -4,6 +4,17 @@
 
 
 
+###
+# ページング
+a = [1..98]
+n = 5
+p = [1..20]
+
+p.forEach (p)->
+  console.log p + "ページ目：" + a.slice n * (p-1), n * p
+###
+
+
 
 ###
 req = require "request"
