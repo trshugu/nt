@@ -33,6 +33,7 @@ app.use require('stylus').middleware(path.join(__dirname, 'public'))
 
 # routes
 app.get '/', (req, res)-> res.render 'index'
+app.get '/kkbdb', (req, res)-> res.render 'kkbdb'
 app.get '/tricklelist', (req, res)-> res.render 'tricklelist'
 app.get '/links', (req, res)-> res.render 'links'
 
@@ -81,7 +82,18 @@ Date2String = (d)->
    + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
    + ("0" + d.getDate()).slice(-2)
 
+DateTime2String = (d)->
+  d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2) + " " \
+   + ("0" + d.getHours()).slice(-2) + ":" \
+   + ("0" + d.getMinutes()).slice(-2) + ":" \
+   + ("0" + d.getSeconds()).slice(-2)
+
 io.sockets.on 'connection', (soc) ->
+  # ----------------------------------------------
+  # tricklelist
+  # ----------------------------------------------
   # tl取得して表示
   soc.on "trickle_disp", ->
     tl = JSON.parse(fs.readFileSync "tl.json", "utf-8")
@@ -118,7 +130,28 @@ io.sockets.on 'connection', (soc) ->
     
     # 表示指示
     io.emit "trickle_redesp"
-
+  
+  # ----------------------------------------------
+  # kkbdb
+  # ----------------------------------------------
+  soc.on "kkbdb_disp", ->
+    kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8")
+    io.emit "kkbdb_disp_res", kkbdb
+  
+  soc.on "kkbdb_add", (val1, val2, vala, date)->
+    kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8")
+    kkbdb.unshift {"val1":val1, "val2":val2, "vala":vala, "date":date}
+    fs.writeFileSync "kkb.json", JSON.stringify(kkbdb)
+    
+    # 表示指示
+    io.emit "kkbdb_redesp"
+  
+  soc.on "kkbdb_delete", (date)->
+    kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8").filter (i)-> i.date != date
+    fs.writeFileSync "kkb.json", JSON.stringify(kkbdb)
+    
+    # 表示指示
+    io.emit "kkbdb_redesp"
 
 
 

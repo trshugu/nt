@@ -1,0 +1,31 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    script(type="text/javascript", src="jquery/dist/jquery.min.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    link(href="kkbdb.css" rel="stylesheet")
+    script(src="/socket.io/socket.io.js")
+    script(type="text/javascript" src="kkbdb.js")
+  body
+    #kkbdb.table
+      .row
+        .column
+          input(type="text" value="" v-model="val1")
+        .column
+          input(type="text" value="" v-model="val2")
+        .column
+          input(type="text" value="" v-model="vala")
+        .column
+          button(v-on="click: kkbadd()") sub
+        .column
+          | 
+      .row(v-repeat="kkb")
+        .column {{val1}}
+        .column {{val2}}
+        .column {{vala}}
+        .column {{date}}
+        .column(v-on="click: kkbdelete(this.date)") 　×　
+    
+    
+    
