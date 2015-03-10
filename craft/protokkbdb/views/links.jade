@@ -1,0 +1,32 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    script(type="text/javascript", src="jquery/dist/jquery.min.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    link(href="links.css" rel="stylesheet")
+    script(src="/socket.io/socket.io.js")
+    script(type="text/javascript" src="links.js")
+  body
+    #links.table
+      .row
+        .column
+          input(type="text" value="" v-model="uri")
+        .column
+          input(type="text" value="" v-model="comment")
+        .column
+          button(v-on="click: linksadd()") sub
+        .column
+          | 
+      .row(v-repeat="links")
+        .column
+          a(href="{{uri}}") {{uri}}
+        .column {{comment}}
+        .column(v-on="click: linksdelete(this.uri)") 　×　
+      .row
+        .column(v-on="click: paging(this.page - 1)") <<
+        .column {{page}}
+        .column(v-on="click: paging(this.page + 1)") >>
+    
+    
+    

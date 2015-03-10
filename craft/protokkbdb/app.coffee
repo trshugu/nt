@@ -94,12 +94,12 @@ io.sockets.on 'connection', (soc) ->
   # ----------------------------------------------
   # tricklelist
   # ----------------------------------------------
-  # tlŽæ“¾‚µ‚Ä•\Ž¦
+  # tlå–å¾—ã—ã¦è¡¨ç¤º
   soc.on "trickle_disp", ->
     tl = JSON.parse(fs.readFileSync "tl.json", "utf-8")
     io.emit "trickle_disp_res", tl
   
-  # tlŽæ“¾‚µ‚Ä’Ç‰Á
+  # tlå–å¾—ã—ã¦è¿½åŠ 
   soc.on "trickle_add", (
     kin,
     ki,
@@ -128,7 +128,7 @@ io.sockets.on 'connection', (soc) ->
     
     fs.writeFileSync "tl.json", JSON.stringify(tl)
     
-    # •\Ž¦ŽwŽ¦
+    # è¡¨ç¤ºæŒ‡ç¤º
     io.emit "trickle_redesp"
   
   # ----------------------------------------------
@@ -143,15 +143,45 @@ io.sockets.on 'connection', (soc) ->
     kkbdb.unshift {"val1":val1, "val2":val2, "vala":vala, "date":date}
     fs.writeFileSync "kkb.json", JSON.stringify(kkbdb)
     
-    # •\Ž¦ŽwŽ¦
+    # è¡¨ç¤ºæŒ‡ç¤º
     io.emit "kkbdb_redesp"
   
   soc.on "kkbdb_delete", (date)->
     kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8").filter (i)-> i.date != date
     fs.writeFileSync "kkb.json", JSON.stringify(kkbdb)
     
-    # •\Ž¦ŽwŽ¦
+    # è¡¨ç¤ºæŒ‡ç¤º
     io.emit "kkbdb_redesp"
+  
+  # ----------------------------------------------
+  # links
+  # ----------------------------------------------
+  DisplayLimit = 5
+  soc.on "links_disp", (page = 1)->
+    page = parseInt(page)
+    links = JSON.parse(fs.readFileSync "links.json", "utf-8")
+    links_limit = links.slice(DisplayLimit * (page - 1), DisplayLimit * page)
+    # ãªã‹ã£ãŸå ´åˆæœ€çµ‚é 
+    if links_limit.length == 0
+      lastpage = Math.ceil(links.length / DisplayLimit)
+      links_limit = links.slice(DisplayLimit * (lastpage - 1), DisplayLimit * lastpage)
+    io.emit "links_disp_res", links_limit, lastpage
+  
+  soc.on "links_add", (u,c)->
+    links = JSON.parse(fs.readFileSync "links.json", "utf-8")
+    links.unshift {"uri":u, "comment":c}
+    fs.writeFileSync "links.json", JSON.stringify(links)
+    
+    # è¡¨ç¤ºæŒ‡ç¤º
+    io.emit "links_redesp"
+  
+  soc.on "links_delete", (d, page)->
+    links = JSON.parse(fs.readFileSync "links.json", "utf-8").filter (i)-> i.uri != d
+    fs.writeFileSync "links.json", JSON.stringify(links)
+    
+    # è¡¨ç¤ºæŒ‡ç¤º
+    io.emit "links_redesp", page
+
 
 
 
