@@ -4,6 +4,139 @@
 
 
 ###
+# sync vs stream
+filelist = ["outputa.txt","outputs.txt","outputt.txt"]
+for filename in filelist
+  require("fs").unlinkSync(filename) if require("fs").existsSync(filename)
+###
+
+###
+# stream
+stdt = new Date()
+r = require("fs").createReadStream "input.txt", {encoding:"utf-8"}
+L = (cb) -> r.on "data", cb
+S = (list)-> list.map (i)-> i.trim().toUpperCase()
+w = require("fs").createWriteStream('outputt.txt', { encoding:"utf-8", flags: 'a' })
+R = (set)-> w.write set.join("\r\n")
+L (d) -> R S d.split('\n')
+r.on "end",  -> w.end()
+w.on "close", ->
+  eddt = new Date()
+  console.log "st:" + (eddt - stdt).toString()
+###
+
+###
+# async
+astdt = new Date()
+aL = (cb)-> require("fs").readFile "input.txt", "utf-8" , cb
+aS = (list)-> list.map (i)-> i.trim().toUpperCase()
+aR = (set)-> require("fs").writeFile "outputa.txt", set.join("\r\n"), (e)->
+  aeddt = new Date()
+  console.log "as:" + (aeddt - astdt).toString()
+aL (e,d)-> aR aS d.trim().split('\r\n')
+###
+
+###
+# sync
+sstdt = new Date()
+sL = -> (require("fs").readFileSync "input.txt", "utf-8").trim().split('\r\n')
+sS = (list)-> list.map (i)-> i.trim().toUpperCase()
+sR = (set) -> require("fs").writeFileSync "outputs.txt", set.join("\r\n")
+sR sS sL()
+seddt = new Date()
+console.log "sy:" + (seddt - sstdt).toString()
+###
+
+
+
+
+
+###
+# stream2
+# inputのリストを取得する
+L = (cb) -> (require("fs").createReadStream "input.txt", {encoding:"utf-8"}).on "data", cb
+
+# リストを加工する
+S = (list)-> list.map (i)-> i.trim().toUpperCase()
+
+# 結果をoutputする
+R = (set)-> (require("fs").createWriteStream('output.txt', { encoding:"utf-8", flags: 'a' })).write set.join("\r\n")
+
+# L (d) -> R S d.split('\n')
+L (d) ->
+  set =  S d.split('\n')
+  R set
+###
+
+
+
+###
+# stream1
+# inputのリストを取得する
+L = (cb) -> (require("fs").createReadStream "input.txt", {encoding:"utf-8"}).on "data", cb
+
+# リストを加工する
+S = (list)-> list.map (i)-> i.trim().toUpperCase()
+
+# 結果をoutputする
+R = (set)-> require("fs").appendFile "output.txt", set.join("\r\n"), (e)->
+
+# L (d) -> R S d.split('\n')
+L (d) ->
+  set =  S d.split('\n')
+  R set
+###
+
+###
+# L (e,d)-> R S d.trim().split('\r\n')
+L (e,d)-> 
+  list = d.trim().split('\r\n')
+  set = S list
+  R set
+###
+
+
+###
+# filewriteもstreamであるべき
+w = require("fs").createWriteStream('output.txt', { encoding:"utf-8", flags: 'a' })
+
+w.on "open", -> console.log "open"
+w.on "close", -> console.log "close"
+# w.write Math.floor(Math.random() * 100).toString()
+for i in [1..10000]
+  bit = 0
+  if i % 2 == 0
+    bit = 1
+  w.write bit.toString()
+
+w.end()
+###
+
+
+###
+# filereadもstreamであるべき
+# require("fs").readFile "input.txt", "utf-8" , (e,d) ->
+#   console.log d
+
+# createReadStream 非同期
+r = require("fs").createReadStream "input.txt", {encoding:"utf-8"}
+
+res = ""
+ondata = (cb) -> r.on "data", cb
+
+r.on "end", ->
+  console.log res.length
+  console.log "end"
+
+ondata (d) ->
+  res += d
+  console.log d.length
+  console.log "cccyaaannkkuu!!!!!!!!!!"
+###
+
+
+
+###
 a=[1,2,3,4,5]
 # console.log a.filter((i)->i%2==0).map((i)-> i * 2).reduce((l,r)->l+r)
 
