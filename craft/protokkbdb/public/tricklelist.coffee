@@ -27,15 +27,16 @@ $ ->
     methods:
       disp:(d)->
         today = d.filter (i)->i.date == Date2String(new Date())
-        this.kin = today[0].kin
-        this.ki = today[0].ki
-        this.kai = today[0].kai
-        this.yo = today[0].yo
-        this.shi = today[0].shi
-        this.ri = today[0].ri
-        this.me = today[0].me
-        this.ami = today[0].ami
-        this.ju = today[0].ju
+        if today[0]
+          this.kin = today[0].kin
+          this.ki = today[0].ki
+          this.kai = today[0].kai
+          this.yo = today[0].yo
+          this.shi = today[0].shi
+          this.ri = today[0].ri
+          this.me = today[0].me
+          this.ami = today[0].ami
+          this.ju = today[0].ju
         this.tlist = d
       tladd:->
         s.emit "trickle_add",
