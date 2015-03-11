@@ -3,6 +3,87 @@
 
 
 
+###
+a=[1,2,3,4,5]
+# console.log a.filter((i)->i%2==0).map((i)-> i * 2).reduce((l,r)->l+r)
+
+filfun = (i)-> i % 2 == 0
+mapfun = (i)-> i * 2
+redfun = (l,r)-> l + r
+
+res = a
+  .filter( filfun )
+  .map( mapfun )
+  .reduce( redfun )
+
+console.log res
+###
+
+###
+# inputのリストを取得する
+L = (cb)-> require("fs").readFile "input.txt", "utf-8" , cb
+
+# リストを加工する
+S = (list)-> list.map (i)-> i.trim().toUpperCase()
+
+# 結果をoutputする
+R = (set)-> require("fs").writeFile "output.txt", set.join("\r\n"), (e)->
+
+
+# L (e,d)-> R S d.trim().split('\r\n')
+L (e,d)-> 
+  list = d.trim().split('\r\n')
+  set = S list
+  R set
+###
+
+
+
+
+###
+# inputのリストを取得する
+L = ->
+  file = require("fs").readFileSync "input.txt", "utf-8"
+  file.trim().split('\r\n')
+
+# リストを加工する
+S = (list)-> list.map (i)-> i.trim().toUpperCase()
+
+# 結果をoutputする
+R = (set) -> require("fs").writeFileSync "output.txt", set.join("\r\n")
+
+se = L()
+re = S(se)
+R(re)
+###
+
+
+###
+# inputのリストを取得する
+L = ->
+  fs  = require "fs"
+  file = fs.readFileSync "input.txt", "utf-8"
+  list = file.trim().split('\r\n')
+  list
+
+# リストを加工する
+S = (list)->
+  set = list.map (i)-> i.trim().toUpperCase()
+  set
+
+# 結果をoutputする
+R = (set) ->
+  fs  = require "fs"
+  res = set.join("\r\n")
+  
+  fs.writeFileSync "output.txt", res
+
+se = L()
+re = S(se)
+R(re)
+###
+
+
 
 ###
 # ページング
@@ -244,10 +325,28 @@ dl = '[' + \
   '{"a":"2015/02/25 10:50:10"},' + \
   '{"a":"2015/02/25 10:50:13"},' + \
   '{"a":"2015/02/25 10:50:11"},' + \
-  '{"a":"2015/02/25 10:50:12"}' + \
+  '{"a":"2015/02/25 10:50:12"},' + \
+  '{"a":"2015/03/11 15:40:43"},' + \
+  '{"a":"2015/03/11 15:45:22"},' + \
+  '{"a":"2015/03/11 15:40:41"},' + \
+  '{"a":"2015/03/11 15:45:17"},' + \
+  '{"a":"2015/03/11 15:45:19"},' + \
+  '{"a":"2015/03/11 15:40:39"},' + \
+  '{"a":"2015/03/11 15:40:54"},' + \
+  '{"a":"2015/03/11 15:40:59"},' + \
+  '{"a":"2015/03/11 15:40:58"},' + \
+  '{"a":"2015/03/11 15:40:50"},' + \
+  '{"a":"2015/03/11 15:40:46"},' + \
+  '{"a":"2015/03/11 15:40:44"},' + \
+  '{"a":"2015/03/11 15:40:37"},' + \
+  '{"a":"2015/03/11 15:40:34"},' + \
+  '{"a":"2015/03/11 15:40:31"},' + \
+  '{"a":"2015/03/10 16:23:12"},' + \
+  '{"a":"2015/03/10 16:11:57"},' + \
+  '{"a":"2015/03/10 14:22:11"}' + \
   ']'
 j = JSON.parse dl
-console.log j.sort (i,j)->Date.parse(i.a) > Date.parse(j.a)
+console.log j.sort (i,j)-> Date.parse(j.a) - Date.parse(i.a)
 ###
 
 

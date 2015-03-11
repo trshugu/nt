@@ -134,24 +134,60 @@ io.sockets.on 'connection', (soc) ->
   # ----------------------------------------------
   # kkbdb
   # ----------------------------------------------
+  
+  # soc.on "kkbdb_disp", ->
+  #   kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8")
+  #   io.emit "kkbdb_disp_res", kkbdb
+  
+  fileget = (cb) -> fs.readFile "kkb.json", "utf-8", cb
+  # soc.on "kkbdb_disp", ->
+  #   fileget (e,d) ->
+  #     kkbdb = JSON.parse(d)
+  #     io.emit "kkbdb_disp_res", kkbdb
+  
   soc.on "kkbdb_disp", ->
-    kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8")
-    io.emit "kkbdb_disp_res", kkbdb
+    fileget (e,d) -> io.emit "kkbdb_disp_res", JSON.parse(d)
+  
+  # soc.on "kkbdb_add", (val1, val2, vala, date)->
+  #   kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8")
+  #   kkbdb.unshift {"val1":val1, "val2":val2, "vala":vala, "date":date}
+  #   fs.writeFileSync "kkb.json", JSON.stringify(kkbdb)
+  #   
+  #   # 表示指示
+  #   io.emit "kkbdb_redesp"
+  
+  # filewrite = (val,cb) -> fs.writeFile "kkb.json", val, cb
+  # soc.on "kkbdb_add", (val1, val2, vala, date)->
+  #   fileget (e,d) ->
+  #     kkbdb = JSON.parse(d)
+  #     kkbdb.unshift {"val1":val1, "val2":val2, "vala":vala, "date":date}
+  #     
+  #     filewrite JSON.stringify(kkbdb), (e)->
+  #       # 表示指示
+  #       io.emit "kkbdb_redesp"
   
   soc.on "kkbdb_add", (val1, val2, vala, date)->
-    kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8")
-    kkbdb.unshift {"val1":val1, "val2":val2, "vala":vala, "date":date}
-    fs.writeFileSync "kkb.json", JSON.stringify(kkbdb)
-    
-    # 表示指示
-    io.emit "kkbdb_redesp"
+    fileget (e,d) ->
+      kkbdb = JSON.parse(d)
+      kkbdb.unshift {"val1":val1, "val2":val2, "vala":vala, "date":date}
+      
+      fs.writeFile "kkb.json", JSON.stringify(kkbdb), (e)->
+        # 表示指示
+        io.emit "kkbdb_redesp"
+  
+  # soc.on "kkbdb_delete", (date)->
+  #   kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8").filter (i)-> i.date != date
+  #   fs.writeFileSync "kkb.json", JSON.stringify(kkbdb)
+  #   
+  #   # 表示指示
+  #   io.emit "kkbdb_redesp"
   
   soc.on "kkbdb_delete", (date)->
-    kkbdb = JSON.parse(fs.readFileSync "kkb.json", "utf-8").filter (i)-> i.date != date
-    fs.writeFileSync "kkb.json", JSON.stringify(kkbdb)
-    
-    # 表示指示
-    io.emit "kkbdb_redesp"
+    fileget (e,d) ->
+      kkbdb = JSON.parse(d).filter (i)-> i.date != date
+      fs.writeFile "kkb.json", JSON.stringify(kkbdb), (e)->
+        # 表示指示
+        io.emit "kkbdb_redesp"
   
   # ----------------------------------------------
   # links

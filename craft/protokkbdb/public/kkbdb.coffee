@@ -23,7 +23,7 @@ $ ->
       kkb:[]
     methods:
       disp:(d)->
-        sorted = d.sort (i,j)-> Date.parse(i.date) < Date.parse(j.date)
+        sorted = d.sort (i,j)-> Date.parse(j.date) - Date.parse(i.date)
         this.val1 = sorted[0].val1
         this.val2 = sorted[0].val2
         this.vala = sorted[0].vala
