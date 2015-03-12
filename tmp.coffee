@@ -3,6 +3,181 @@
 
 
 
+
+
+###
+ichi = ->
+  console.log 1
+  setTimeout ni , 1000
+
+ni = -> console.log 2
+
+console.log 0
+setTimeout ichi , 1000
+###
+
+###
+f = require "fs"
+res = {}
+
+P = (r) -> console.log r.a + r.b + r.c
+C = (e,c) ->
+  res.c = c
+  P(res)
+
+B = (e,b) ->
+  res.b = b
+  f.readFile "c.txt", "utf-8", C
+
+A = (e,a) ->
+  res.a = a
+  f.readFile "b.txt", "utf-8", B
+
+Z = (cb)-> f.readFile "a.txt", "utf-8", cb
+
+Z A
+###
+
+###
+f = require "fs"
+
+f.readFile "a.txt", "utf-8", (e,a) ->
+  f.readFile "b.txt", "utf-8", (e,b) ->
+    f.readFile "c.txt", "utf-8", (e,c) ->
+      console.log a + b + c
+###
+
+###
+P = (err, c) -> console.log a + b + c
+C = (cb) -> get 'c.txt', cb
+B = (cb) -> get 'b.txt', cb
+A = (cb)-> get 'a.txt', cb
+
+get = require('./get')
+
+A B C P
+###
+
+###
+A = (width, widthIndex) ->
+  height = Math.round(width / aspect)
+  console.log 'resizing ' + filename + 'to ' + height + 'x' + height
+  @resize(width, height).write destination + 'w' + width + '_' + filename, (err) ->
+    console.log 'Error writing file: ' + err if err
+
+B = (err, values) ->
+  if err
+    console.log 'Error identifying file size: ' + err
+    return
+  
+  console.log filename + ' : ' + values
+  aspect = values.width / values.height
+  widths.forEach (A).bind(this)
+
+C = (filename, fileIndex) ->
+  console.log filename
+  gm(source + filename).size B
+
+# zu viel
+D = (err, files) ->
+  if err
+    console.log 'Error finding files: ' + err
+    return
+  
+  files.forEach C
+
+fs.readdir source, D
+###
+
+###
+req = require "request"
+
+G = (cb)-> req.get {uri:"http://yahoo.co.jp"}, cb
+P = (h,cb)-> req.post {uri:"http://yahoo.co.jp", body:h + "noinoinoinoinionoinion"}, cb
+
+postheader = (e,r,b) ->
+  r.setEncoding("utf8")
+  console.log r.request.body.toString("utf8")
+
+G (e,r,b) ->
+  console.log b.split("\n")[0]
+  h = b.split("\n")[0]
+  
+  P h, postheader
+###
+
+
+###
+req = require "request"
+
+G = (cb)-> req.get {uri:"http://yahoo.co.jp"}, cb
+P = (h,cb)-> req.post {uri:"http://yahoo.co.jp", body:h + "noinoinoinoinionoinion"}, cb
+
+postheader = (e,r,b) ->
+  r.setEncoding("utf8")
+  console.log r.request.body.toString("utf8")
+
+getheader = (e,r,b) ->
+  console.log b.split("\n")[0]
+  h = b.split("\n")[0]
+  
+  P h, postheader
+
+
+G getheader
+###
+
+
+###
+req = require "request"
+
+G = (cb)-> req.get {uri:"http://yahoo.co.jp"}, cb
+P = (h,cb)-> req.post {uri:"http://yahoo.co.jp", body:h + "noinoinoinoinionoinion"}, cb
+
+v = G (e,r,b) ->
+  console.log b.split("\n")[0]
+  b.split("\n")[0]
+  console.log r.request.uri
+
+console.log "v"
+console.log v.uri
+###
+
+###
+req = require "request"
+
+G = (cb)-> req.get {uri:"http://yahoo.co.jp"}, cb
+P = (h,cb)-> req.post {uri:"http://yahoo.co.jp", body:h + "noinoinoinoinionoinion"}, cb
+
+G (e,r,b) ->
+  console.log b.split("\n")[0]
+  h = b.split("\n")[0]
+  
+  P h,(e,r,b) ->
+    r.setEncoding("utf8")
+    console.log r.request.body.toString("utf8")
+###
+
+
+###
+req = require "request"
+
+req.get {uri:"http://yahoo.co.jp"}, (e,r,b) ->
+  console.log b.split("\n")[0]
+  h = b.split("\n")[0]
+  
+  req.post {uri:"http://yahoo.co.jp", body:h + "noinoinoinoinionoinion"}, (e,r,b) ->
+    r.setEncoding("utf8")
+    console.log r.request.body.toString("utf8")
+###
+
+
+
+
+
+
+
+
 ###
 # sync vs stream
 filelist = ["outputa.txt","outputs.txt","outputt.txt"]
