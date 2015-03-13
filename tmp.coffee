@@ -6,6 +6,170 @@
 
 
 ###
+root = (cb) app.get "/", cb
+
+root (q,s)-> s.render "index" {aaa:"dddd"}
+###
+
+
+
+###
+# hapi
+h = require "hapi"
+s = new h.Server()
+s.connection
+  host: 'localhost'
+  port: 8000
+
+s.views
+  engines:
+    jade: require "jade"
+  relativeTo: __dirname
+  path: './views'
+
+s.route
+  method: "GET"
+  path:"/"
+  handler:
+    view: "index"
+
+hhell = (req, reply)-> reply "hell world", {"dead":"end"}
+s.route
+  method: "GET"
+  path:"/hell"
+  handler: hhell
+
+nhell = (req, reply)-> reply 'Hell, ' + encodeURIComponent(req.params.name) + '!'
+s.route
+  method: "GET"
+  path:"/{name}"
+  handler: nhell
+
+st = (s)-> console.log s.info.uri
+s.start(st(s))
+###
+
+###
+# エコーバック
+
+S = (s,cb)->s.on "data", cb
+E = (s,cb)->s.on "end", cb
+scb = (d)-> s.write d
+ecb = -> s.end "dead\n"
+
+
+se = require("net").createServer (s)->
+  s.write "hell\n"
+  
+  S s,(d)-> s.write d
+  E s,->s.end "dead\n"
+  
+
+se.listen 7000, "localhost"
+###
+
+###
+h=require "http"
+
+o = 
+  hostname: "yahoo.co.jp"
+  port: 80
+  method: "GET"
+
+# イベントの定義
+D = (sel, cb) -> sel.on "data", cb
+E = (sel, cb) -> sel.on "end", cb
+G = (o, cb) -> h.request o, cb
+
+# 処理の定義
+dcb = (c)-> console.log c.split("\n")[0]
+ecb = -> console.log "end"
+gcb = (r)->
+  console.log "koko"
+  r.setEncoding("utf8")
+  D r, dcb
+  E r, ecb
+
+q=G o, gcb
+
+console.log "ue"
+q.on "error",(e)->console.log e
+q.end()
+console.log "shita"
+###
+
+###
+# 並行処理4
+cluster = require "cluster"
+cpuCount = require("os").cpus().length
+
+# クラスタを利用して処理を分散（CPUの数だけ）
+if cluster.isMaster
+  # console.log('CPU: ' + cpuCount)
+  # console.log('isMaster?: ' + cluster.isMaster)
+  
+  for i in [1..cpuCount]
+    w = cluster.fork()
+    w.on 'message',(msg)->
+      console.log 'Mmsg:' + msg
+    
+    w.send 'sensen'
+  
+  cluster.on 'exit',(worker, code, signal)->
+    console.log 'worker_id:' + worker.id
+  
+  
+else
+  console.log process.pid + " hell..."
+  process.on 'message',(msg)->
+    console.log 'Wmsg:' + msg
+    process.send msg
+  
+  process.send "deathhh"
+  # process.exit()
+
+###
+
+
+
+###
+# 並行処理(cluster) 3
+cluster = require "cluster"
+cpuCount = require("os").cpus().length
+
+# クラスタを利用して処理を分散（CPUの数だけ）
+if cluster.isMaster
+  console.log 'CPU: ' + cpuCount
+  console.log 'isMaster?: ' + cluster.isMaster
+  
+  for i in [1..cpuCount]
+    cluster.fork().send('sensen')
+  
+  cluster.on 'message', (msg)->
+    console.log 'Mmsg:' + msg
+  
+  cluster.on 'exit',(worker, code, signal)->
+    console.log 'worker_id:' + worker.id
+    console.log 'worker_pid:' + worker.process.pid
+    # console.log 'code:' + code
+    # console.log 'signal:' + signal
+  
+else
+  console.log "hell..."
+  process.on 'message',(msg)->
+    console.log 'Wmsg:' + msg
+    
+    process.send msg
+  
+  process.send "deathhh"
+  process.exit()
+###
+
+
+
+
+
+###
 ichi = ->
   console.log 1
   setTimeout ni , 1000
