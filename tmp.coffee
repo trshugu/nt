@@ -2,6 +2,112 @@
 ###
 
 
+# 並行処理 単一方向
+cluster = require "cluster"
+cpuCount = require("os").cpus().length
+
+if cluster.isMaster
+  for i in [1..cpuCount]
+    w = cluster.fork()
+  
+  # 終了を受け取る
+  cluster.on 'exit',(worker, code, signal)->
+    console.log worker.process.pid + ' exit:' + worker.id
+  
+else
+  console.log "iamchild! " + process.pid
+  process.exit()
+  
+
+
+
+###
+cluster = require "cluster"
+cpuCount = require("os").cpus().length
+
+if cluster.isMaster
+  for i in [1..cpuCount]
+    w = cluster.fork()
+    # 子から受け取る
+    w.on 'message',(msg)->
+      console.log 'master: get ' + msg
+    
+    # 子に送る
+    w.send 'iammaster'
+  
+else
+  # 親から受け取る
+  process.on 'message',(msg)->
+    console.log "worker: get " + msg
+    process.exit()
+  
+  # 親に送る
+  process.send "iamchild"
+###
+
+###
+# 並行処理6
+cluster = require "cluster"
+cpuCount = require("os").cpus().length
+
+if cluster.isMaster
+  console.log process.pid + " in master"  
+  for i in [1..cpuCount]
+    console.log "fork:" + i
+    w = cluster.fork()
+    w.on 'message',(msg)->
+      console.log 'on_message:MasterMsg:' + msg
+    
+    w.send 'fork send'
+    console.log "forklast:" + i
+  
+  cluster.on 'exit',(worker, code, signal)->
+    console.log 'exit:worker_id:' + worker.id
+  
+  console.log "master last"  
+  
+else
+  console.log process.pid + " in worker"
+  process.on 'message',(msg)->
+    console.log 'on_messaage:WorkerMsg:' + msg
+    process.send msg
+    process.exit()
+  
+  process.send "worker last"
+  
+###
+
+
+
+
+###
+# 並行処理5(失敗例)
+cluster = require "cluster"
+cpuCount = require("os").cpus().length
+
+if cluster.isMaster
+  for i in [1..cpuCount]
+    console.log "fork:" + i
+    cluster.fork().send 'fork send'
+  
+  # forkの返り値(process)にイベントを設定しないと発火しない
+  cluster.on 'message', (msg)->
+    console.log 'on_message:MasterMsg:' + msg
+  
+  cluster.on 'exit',(worker, code, signal)->
+    console.log 'exit:worker_id:' + worker.id
+  
+  console.log "master last"  
+else
+  console.log process.pid + " in worker"
+  process.on 'message',(msg)->
+    console.log 'on_messaage:WorkerMsg:' + msg
+    process.send msg
+    process.exit()
+  
+  process.send "worker last"
+###
+
 
 
 
