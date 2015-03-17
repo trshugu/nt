@@ -2,11 +2,205 @@
 ###
 
 
+
+
+
+###
+# cluster express multi
+sleep = (s) ->
+  e = (new Date).getTime() + s * 1000
+  while (new Date).getTime() <= e
+    continue
+  return
+
+exp = ->
+  a=require("express")()
+
+  a.get "/", (q,r)->
+    console.log "getin"
+    sleep 3
+    r.send "test"
+
+  a.listen 3000, ->
+    console.log "onit"
+  
+  console.log "expre"
+
+
+c = require("cluster")
+if c.isMaster
+  for i in [1..require("os").cpus().length]
+    w = c.fork()
+  
+  c.on 'exit', (w, co, s)->
+    console.log "exit"
+    c.fork()
+  
+else
+  console.log process.pid
+  # exp()
+  a=require("express")()
+
+  a.get "/", (q,r)->
+    console.log "getin"
+    console.log process.pid
+    # sleep 3
+    r.send "test"
+    # process.exit()
+
+  a.listen 3000, ->
+    console.log "onit"
+  
+  console.log "expre"
+###
+
+
+###
+# cluster express single
+sleep = (s) ->
+  e = (new Date).getTime() + s * 1000
+  while (new Date).getTime() <= e
+    continue
+  return
+
+a=require("express")()
+
+a.get "/", (q,r)->
+  console.log "getin"
+  sleep 3
+  r.send "test"
+
+a.listen 3000, ->
+  console.log "onit"
+###
+
+
+###
+# cluster server
+cluster = require 'cluster'
+http = require('http')
+
+if cluster.isMaster
+  i = 0
+  while i < require('os').cpus().length
+    w = cluster.fork()
+    w.on 'message',(msg)->
+      console.log msg
+    
+    i++
+  
+  
+  cluster.on 'exit', (worker, code, signal) ->
+    console.log 'worker(' + worker.id + ').exit ' + worker.process.pid
+    return
+  
+  cluster.on 'online', (worker) ->
+    console.log 'worker(' + worker.id + ').online ' + worker.process.pid
+    return
+  
+  cluster.on 'listening', (worker, address) ->
+    console.log 'worker(' + worker.id + ').listening ' + address.address + ':' + address.port
+    return
+else
+  http.createServer (req, res) ->
+    ip_address = null
+    ip_address = req.connection.remoteAddress
+    console.log 'client requested : ' + ip_address
+    res.writeHead 200
+    res.end 'hell world\n'
+    process.send "iamchild"
+    throw new Error "dead"
+    # return
+  .listen 3000
+###
+
+
+
+###
+# callbackhellsleep 分割できない
+repeating = 0
+do ->
+  redoFunc = arguments.callee
+  console.log 'o'
+  setTimeout (->
+    console.log 't'
+    setTimeout (->
+      if ++repeating >= 5
+        console.log 'e'
+      else
+        redoFunc()
+      return
+    ), 1000
+    return
+  ), 1000
+  return
+###
+
+###
+# async sleep
+async = require 'async'
+repeating = 0
+async.forever (callback) ->
+  async.series [
+    (callback) ->
+      console.log 'sleep one'
+      setTimeout callback, 1000
+      return
+    (callback) ->
+      console.log 'sleep two'
+      setTimeout callback, 1000
+      return
+    (callback) ->
+      if ++repeating < 5
+        callback()
+      else
+        console.log 'endin'
+      return
+  ], callback
+  return
+, (err) ->
+  console.log err
+  return
+###
+
+
+
+###
+# NGsleep
+sleep = (s) ->
+  e = (new Date).getTime() + s * 1000
+  while (new Date).getTime() <= e
+    continue
+  return
+
+# sleep 10
+# sleep 10
+
+c = require("cluster")
+if c.isMaster
+  for i in [1..require("os").cpus().length]
+    w = c.fork()
+  
+  c.on 'exit', (w, co, s)-> console.log "exit"
+  
+else
+  i = Math.floor(Math.random() * 10)
+  console.log i
+  sleep i
+  console.log "pexit"
+  process.exit()
+###
+
+
+
+
+###
 # 並行処理 単一方向
 cluster = require "cluster"
 cpuCount = require("os").cpus().length
 
 if cluster.isMaster
+  console.log "master " + process.pid
   for i in [1..cpuCount]
     w = cluster.fork()
   
@@ -18,7 +212,7 @@ else
   console.log "iamchild! " + process.pid
   process.exit()
   
-
+###
 
 
 ###
