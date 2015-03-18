@@ -3,7 +3,100 @@
 
 
 
+cluster = require 'cluster'
+http = require('http')
 
+# 返却値取得
+M = (msg)->
+  console.log msg
+
+cl = ->
+  l = []
+  for i in [0...10]
+    l.push Math.floor(Math.random() * 10)
+  return ->
+    l.splice(0,5)
+
+
+a = cl()
+i = 1
+while  i > 0
+  l = a()
+  i = l.length
+
+
+createList = ->
+  l = []
+  for i in [0...10]
+    l.push Math.floor(Math.random() * 10)
+  l
+
+l = createList()
+M = (i)->i 
+R = (l,r)->l + r
+
+l.map(M).reduce(R)
+
+
+if cluster.isMaster
+  # クロージャリスト作成
+  cList = cl()
+  
+  i = 0
+  while i < require('os').cpus().length
+    w = cluster.fork()
+    w.on 'message',M
+    
+    w.send "messaage",
+    
+    i++
+  
+  # リスト振り分け
+  cluster.on 'online', (worker) ->
+    
+    
+  
+else
+  process.on 'message',(msg)->
+    process.send "iamchild"
+    process.exit()
+
+
+
+
+###
+# collect inject
+# l = [1,5,3,2]
+createList = ->
+  l = []
+  for i in [0...10]
+    l.push Math.floor(Math.random() * 10)
+  l
+
+l = createList()
+M = (i)->i 
+R = (l,r)->l + r
+
+console.log l.map(M).reduce(R)
+###
+
+###
+# クロージャリスト
+cl = ->
+  l = []
+  for i in [0...10]
+    l.push Math.floor(Math.random() * 10)
+  return ->
+    console.log l
+    l.splice(0,5)
+
+
+a = cl()
+i = 1
+while  i > 0
+  l = a()
+  i = l.length
+###
 
 ###
 # cluster express multi
