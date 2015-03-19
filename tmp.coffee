@@ -24,7 +24,7 @@ while  i > 0
   l = a()
   i = l.length
 
-
+###
 createList = ->
   l = []
   for i in [0...10]
@@ -36,7 +36,7 @@ M = (i)->i
 R = (l,r)->l + r
 
 l.map(M).reduce(R)
-
+###
 
 if cluster.isMaster
   # クロージャリスト作成
@@ -47,7 +47,7 @@ if cluster.isMaster
     w = cluster.fork()
     w.on 'message',M
     
-    w.send "messaage",
+    w.send cList()
     
     i++
   
@@ -58,7 +58,10 @@ if cluster.isMaster
   
 else
   process.on 'message',(msg)->
-    process.send "iamchild"
+    console.log msg.length
+    
+    if msg.length != 0
+      console.log "yuugen"
     process.exit()
 
 
