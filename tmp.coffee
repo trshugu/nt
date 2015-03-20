@@ -3,67 +3,90 @@
 
 
 
+
+
+
+# http2https
+app.use (req, res, next) ->
+  schema = (req.headers['x-forwarded-proto'] || '').toLowerCase()
+  if schema == 'https' || req.secure
+    next()
+  else
+    res.redirect 'https://' + req.headers.host + req.url
+
+
+###
+# 並行mapreduce 微妙
+stdt = new Date()
+
 cluster = require 'cluster'
 http = require('http')
+list_length = 0
+res_length = 0
+res_list = []
+# list_count = 100000000
+list_count = 100000
+splice_num = Math.ceil list_count / require("os").cpus().length
 
 # 返却値取得
-M = (msg)->
-  console.log msg
+fromChild = (msg)->
+  # console.log msg.sum
+  res_length = msg.length + res_length
+  res_list.push msg.sum
+  if res_length >=list_length
+    console.log res_list.map(M).reduce(R)
+    eddt = new Date()
+    console.log (eddt - stdt).toString()
+    # console.log list_count + "/" + splice_num + ":" + (eddt - stdt).toString()
 
+# リストをレキシカルスコープで作成し呼び出し毎に部分返却する
 cl = ->
-  l = []
-  for i in [0...10]
-    l.push Math.floor(Math.random() * 10)
+  # l = [0...list_count]
+  # l = []
+  # for i in [0...list_count]
+  #   l.push Math.floor(Math.random() * 10)
+  
+  num = 1
+  
   return ->
-    l.splice(0,5)
+    # console.log l.length
+    # l.splice(0,splice_num)
+    ret_list = []
+    for i in [0...splice_num]
+      if list_count >= num 
+        ret_list.push num
+      num++
+    
+    ret_list
 
-
-a = cl()
-i = 1
-while  i > 0
-  l = a()
-  i = l.length
-
-###
-createList = ->
-  l = []
-  for i in [0...10]
-    l.push Math.floor(Math.random() * 10)
-  l
-
-l = createList()
 M = (i)->i 
 R = (l,r)->l + r
-
-l.map(M).reduce(R)
-###
 
 if cluster.isMaster
   # クロージャリスト作成
   cList = cl()
-  
-  i = 0
-  while i < require('os').cpus().length
-    w = cluster.fork()
-    w.on 'message',M
+  li = cList()
+  while li.length > 0
+    list_length = li.length + list_length
+    if li.length != 0
+      w = cluster.fork()
+      # 子からの返却
+      w.on 'message', fromChild
+      w.send li
     
-    w.send cList()
-    
-    i++
-  
-  # リスト振り分け
-  cluster.on 'online', (worker) ->
-    
-    
+    li = cList()
   
 else
   process.on 'message',(msg)->
-    console.log msg.length
-    
     if msg.length != 0
-      console.log "yuugen"
+      process.send
+        sum : msg.map(M).reduce(R)
+        length : msg.length
+      
+    
     process.exit()
-
+  
+###
 
 
 

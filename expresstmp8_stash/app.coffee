@@ -17,14 +17,6 @@ app.use require("cookie-parser")()
 app.use require("stylus").middleware(path.join(__dirname, "public"))
 app.use express.static(path.join(__dirname, "public"))
 
-# https対応
-app.use (req, res, next) ->
-  schema = (req.headers['x-forwarded-proto'] || '').toLowerCase()
-  if schema == 'https' || req.secure
-    next()
-  else
-    res.redirect 'https://' + req.headers.host + req.url
-
 # route
 routes = require "./routes/index"
 users = require "./routes/users"
