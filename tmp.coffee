@@ -5,7 +5,180 @@
 
 
 
+###
+# gzipping4
+e = require "express"
+a = e()
+c = require 'compression'
+a.use c()
 
+a.get "/",(q,s)->
+  console.log "get"
+  s.set "Pragma": "no-cache"
+  s.status "200"
+  s.contentType "multipart/mixed"
+  s.set "Content-Encoding": "gzip"
+  s.set "Transfer-Encoding": "chunked"
+  s.attachment "dlz.txt"
+  
+  s.download "/gh/nt/big.txt", "dl.txt"
+    
+  # st = require("fs").createReadStream "big.txt", {encoding:"utf-8"}
+  # st.on "data", (d)->
+  #   s.write d
+    # buf = new Buffer(d, "utf-8")
+    # require("zlib").gzip buf, (err,result)->
+    #   console.log err if err
+    #   s.write result
+  
+  # st.on "end", ->
+  #   console.log "endddd"
+  #   s.end()
+
+a.listen 3000,->
+  console.log "on"
+###
+
+
+
+###
+# gzipping3 ng
+e = require "express"
+a = e()
+c = require 'compression'
+a.use c()
+a.get "/",(q,s)->
+  console.log "get"
+  s.set "Pragma": "no-cache"
+  s.status "200"
+  s.contentType "multipart/mixed"
+  s.set "Content-Encoding": "gzip"
+  s.set "Transfer-Encoding": "chunked"
+  s.attachment "dlz.txt"
+  
+  
+  st = require("fs").createReadStream "big.txt", {encoding:"utf-8"}
+  st.on "data", (d)->
+    s.write d
+    # buf = new Buffer(d, "utf-8")
+    # require("zlib").gzip buf, (err,result)->
+    #   console.log err if err
+    #   s.write result
+  
+  st.on "end", ->
+    console.log "endddd"
+    s.end()
+  
+  
+  require("fs").readFile "/gh/nt/big.txt", "utf-8", (e,d)->
+    console.log 1
+    require("zlib").gzip d, (err,result)->
+      console.log 2
+      console.log err if err
+      s.send result
+  
+  buf = new Buffer(require("fs").readFileSync("/gh/nt/big.txt", "utf-8"), "utf-8")
+  console.log 1
+  require("zlib").gzip buf, (err,result)->
+    console.log 2
+    console.log err if err
+    s.send result
+  
+  # s.download "/gh/nt/big.txt", "dl.txt"
+
+a.listen 3000,->
+  console.log "on"
+###
+
+###
+# gzipping2 一日にして成らず
+a = require("express")()
+a.get "/",(q,s)->
+  console.log "get"
+  s.set "Pragma": "no-cache"
+  s.status "200"
+  s.contentType "multipart/mixed"
+  s.set "Content-Encoding": "gzip"
+  s.attachment "dlz.txt"
+  console.log 0
+  buf = new Buffer(require("fs").readFileSync("/gh/nt/big.txt", "utf-8"), "utf-8")
+  console.log 1
+  require("zlib").gzip buf, (err,result)->
+    console.log 2
+    console.log err if err
+    s.send result
+  
+  # s.download "/gh/nt/big.txt", "dl.txt"
+
+a.listen 3000,->
+  console.log "on"
+###
+
+###
+# gzipping
+largetext = [0...(1024 * 1024 * 10)].map((i)->"a").join("")
+
+a = require("express")()
+a.get "/",(q,s)->
+  console.log "get"
+  s.set "Pragma": "no-cache"
+  s.status "200"
+  s.set "Content-Encoding": "gzip"
+  buf = new Buffer(largetext, "utf-8")
+  require("zlib").gzip buf, (err,result)->
+    s.end result
+  
+  # s.end largetext
+  
+
+a.listen 3000,->
+  console.log "on"
+###
+
+###
+# express response
+a = require("express")()
+a.get "/",(q,s)->
+  console.log "get"
+  s.header "nai": "denndenn"
+  s.set "saf": "etset"
+  s.set "Pragma": "no-cache"
+  s.status "200"
+  # s.type "png"
+  # s.attachment "aa.png"
+  # s.cookie "mons", "nakami"
+  # s.clearCookie "mons"
+  # s.download "/gh/nt/a.png", "dl.png"
+  # s.contentType "text/planeeee"
+  # s.format
+  #   "text/plain": -> s.send "for"
+  #   "application/json": -> s.send {"for":2}
+  # s.links
+  #   next: "http://yahoo.co.jp"
+  #   last: "http://google.co.jp"
+  # s.status "302"
+  # s.location "http://yahoo.co.jp"
+  # s.redirect "http://localhost:3000"
+  # s.sendStatus 200
+  
+  # s.jsonp {"sdaf":1}
+  # s.json {"sdaf":1}
+  # s.send "dead"
+  # s.vary "User-Agent"
+  # s.set "Content-Encoding": "gzip"
+  # buf = new Buffer("aaaa", "utf-8")
+  # require("zlib").gzip buf, (err,result)->
+  #   s.end result
+  
+  # s.end("aaaa")
+  
+
+a.listen 3000,->
+  console.log "on"
+###
+
+
+###
 # http2https
 app.use (req, res, next) ->
   schema = (req.headers['x-forwarded-proto'] || '').toLowerCase()
@@ -13,6 +186,8 @@ app.use (req, res, next) ->
     next()
   else
     res.redirect 'https://' + req.headers.host + req.url
+###
+
 
 
 ###
