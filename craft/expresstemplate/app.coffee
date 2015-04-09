@@ -1,10 +1,6 @@
 debug = require("debug")("expresstemplate")
 express = require "express"
 path = require "path"
-favicon = require "serve-favicon"
-logger = require "morgan"
-cookieParser = require "cookie-parser"
-bodyParser = require "body-parser"
 http = require 'http'
 
 app = express()
@@ -13,12 +9,14 @@ app = express()
 app.set "views", path.join(__dirname, "views")
 app.set "view engine", "jade"
 
+favicon = require "serve-favicon"
 # uncomment after placing your favicon in /public
 # app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use logger("dev")
+app.use require("morgan")("dev")
+bodyParser = require "body-parser"
 app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: false)
-app.use cookieParser()
+app.use require("cookie-parser")()
 app.use express.static(path.join(__dirname, "public"))
 app.use express.static(path.join(__dirname, 'bower_components'))
 
@@ -30,6 +28,8 @@ app.use require('coffee-middleware')
 
 # use stylus
 app.use require('stylus').middleware(path.join(__dirname, 'public'))
+
+# ここにhttps対応
 
 # routes
 routes = require './routes'

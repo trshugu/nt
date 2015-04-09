@@ -4,6 +4,15 @@
 
 
 
+###
+# config
+config = require "config"
+console.log config
+
+console.log process.env.NODE_ENV
+###
+
+
 
 ###
 # gzipping4
