@@ -4,6 +4,37 @@
 
 
 
+
+
+###
+# bench2
+
+t1 = ->
+  for i in [0...10000]
+    console.log i
+
+t2 = ->
+  [0...10000].forEach (i) ->
+    console.log i
+
+exports.compare =
+  test1: t1
+  test2: t2
+
+require("bench").runMain()
+###
+
+###
+# bench
+exports.compare =
+  test1: ->
+    console.log "cooode1"
+  test2: ->
+    console.log "coooodooo2"
+
+require("bench").runMain()
+###
+
 ###
 # config
 config = require "config"
