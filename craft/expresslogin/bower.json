@@ -1,0 +1,19 @@
+{
+  "name": "expesstemplate",
+  "version": "0.0.0",
+  "authors": [
+    "aaa"
+  ],
+  "license": "TRS",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "coffee-script": "~1.8.0",
+    "jquery": "~2.1.1"
+  }
+}

@@ -2,6 +2,7 @@ debug = require("debug")("expresstemplate")
 express = require "express"
 path = require "path"
 http = require 'http'
+session = require "express-session"
 
 app = express()
 
@@ -31,11 +32,15 @@ app.use require('stylus').middleware(path.join(__dirname, 'public'))
 
 # ここにhttps対応
 
+# session
+app.use session
+  secret: "sekret"
+  resave: false
+  saveUninitialized: true
+  nanigasi: "bonbon"
+
 # routes
 require("./controller/routes") app
-routes = require './routes'
-app.get '/', routes.index
-app.get '/users', routes.users
 
 # catch 404 and forward to error handler
 app.use (req, res, next) ->
