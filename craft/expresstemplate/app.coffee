@@ -33,9 +33,6 @@ app.use require('stylus').middleware(path.join(__dirname, 'public'))
 
 # routes
 require("./controller/routes") app
-routes = require './routes'
-app.get '/', routes.index
-app.get '/users', routes.users
 
 # catch 404 and forward to error handler
 app.use (req, res, next) ->
