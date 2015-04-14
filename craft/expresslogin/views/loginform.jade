@@ -4,7 +4,8 @@ block content
   h1= title
   p Welcome to #{title}
   | user pake
-  form(method="POST", target="./logined")
+  form(method="POST", enctype="multipart/form-data", target="./upload")
     input(type="text", name="word" value="")
     input(type="hidden", name="mode" value="input")
+    input(type="file", name="fiile")
     input(type="submit", value="送信")

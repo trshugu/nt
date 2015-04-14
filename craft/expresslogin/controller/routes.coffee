@@ -17,4 +17,6 @@ module.exports = (app)->
   app.post "/m_login", mlogin
   app.get "/m_top", require "./m_top"
   
+  app.post "/upload", require "./upload" # NG?
+  app.post "/loginform", require "./upload"
 

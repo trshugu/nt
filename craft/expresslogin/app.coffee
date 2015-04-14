@@ -3,6 +3,7 @@ express = require "express"
 path = require "path"
 http = require 'http'
 session = require "express-session"
+multer = require "multer"
 
 app = express()
 
@@ -17,6 +18,7 @@ app.use require("morgan")("dev")
 bodyParser = require "body-parser"
 app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: true)
+app.use multer({dest: "./uploads/"})
 app.use require("cookie-parser")()
 app.use express.static(path.join(__dirname, "public"))
 app.use express.static(path.join(__dirname, 'bower_components'))
