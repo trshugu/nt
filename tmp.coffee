@@ -7,6 +7,118 @@
 
 
 ###
+# 10個毎スリープ
+async = require "async"
+
+hako = ->
+  ire = [0...100]
+  return -> ire.splice 0,10
+
+tri = hako()
+gett = tri()
+async.forever (cb)->
+  async.series [
+    (cb)->
+      console.log gett
+      setTimeout cb, 1000
+    (cb)->
+      gett = tri()
+      if gett.length > 0
+        cb()
+      else
+        console.log "end"
+  ], cb
+###
+
+###
+# asyncスリープ
+async = require "async"
+
+rep = 0
+async.forever (cb)->
+  async.series [
+    (cb)->
+      console.log "idhi"
+      setTimeout cb, 1000
+    (cb)->
+      if ++rep < 3
+        cb()
+      else
+        console.log "end"
+  ], cb
+###
+
+###
+tri = hako()
+gett = tri()
+while gett.length > 0
+  console.log gett
+  gett = tri()
+###
+
+###
+# リストから10個毎取り出す
+hako = ->
+  ire = [0...100]
+  return -> ire.splice 0,10
+
+tri = hako()
+
+gett = tri()
+while gett.length > 0
+  console.log gett
+  gett = tri()
+###
+
+###
+# 10個毎に1秒スリープ 微妙
+# for i in [0...100]
+console.log "doi"
+
+cb = ->
+  console.log "mini"
+  setTimeout cb2,1000
+
+cb2 = ->
+  console.log "mini2"
+
+setTimeout cb,1000
+
+console.log "ido"
+###
+
+###
+# ミリ秒 エポック秒
+startD = new Date
+for i in [0...1000000000]
+  i = i + i
+endD = new Date
+console.log endD - startD
+
+starta = new Date
+a = starta.getTime()
+for i in [0...1000000000]
+  i = i + i
+enda = new Date
+b = enda.getTime()
+console.log b - a
+
+console.log starta
+console.log starta.getTime()
+console.log new Date().getTime()
+###
+
+
+###
+start = new Date
+console.log start
+console.log new Date - start
+
+console.log start.getTime()
+console.log start.getDate()
+###
+
+###
 # bench2
 
 t1 = ->
