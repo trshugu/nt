@@ -7,6 +7,100 @@
 
 
 ###
+# 三項演算子
+a = if (true) then "ichi" else "ni"
+console.log a
+###
+
+###
+# 非同期例外スロー3 domainの利用 Explicit Binding
+domain = require("domain").create()
+
+domain.on "error", (e)->
+  console.log "domain errort:"
+  console.log e
+
+console.log "start"
+
+require("fs").readFile "noching.txt", "utf-8", domain.bind (e,d)->
+  if e
+    console.log "eraata"
+    console.log e
+    throw e
+  else
+    console.log "normal"
+    console.log d
+
+console.log "end"
+###
+
+###
+# 非同期例外スロー2 domainの利用
+domain = require("domain").create()
+
+domain.on "error", (e)->
+  console.log "domain errort:"
+  console.log e
+
+console.log "start"
+
+domain.run ->
+  console.log "domain start"
+  
+  require("fs").readFile "noching.txt", "utf-8", (e,d)->
+    if e
+      console.log "eraata"
+      console.log e
+      throw e
+    else
+      console.log "normal"
+      console.log d
+  
+  console.log "domain  end"
+
+
+
+console.log "end"
+###
+
+
+
+
+
+###
+# 非同期例外スロー
+console.log "start"
+
+require("fs").readFile "noching.txt", "utf-8", (e,d)->
+  try
+    console.log "try"
+    if e
+      console.log "eraata"
+      console.log e
+      throw e
+    else
+      console.log "normal"
+      console.log d
+  catch e
+    console.log "catch"
+    console.log e
+  finally
+    console.log "final"
+
+#  # throw "morenmore"
+#  th = throw "anoutar"
+#  console.log "th teigi"
+#  th()
+#  a()
+
+# throw "death"
+
+console.log "end"
+###
+
+
+
+###
 # 10個毎スリープ
 async = require "async"
 
