@@ -7,6 +7,34 @@
 
 
 ###
+# ホワイトリストマッチング
+censor_text = "abcd"
+list =[
+  "ab"
+  "ff"
+  "fe"
+]
+
+for i in list
+  console.log i
+  if censor_text.match new RegExp(i)
+    console.log censor_text + "is matthi"
+    break
+
+console.log "end"
+###
+
+
+
+###
+rege = new RegExp "ab"
+i = rege
+
+console.log censor_text + "is matthi" if censor_text.match(i)
+###
+
+
+###
 # 三項演算子
 a = if (true) then "ichi" else "ni"
 console.log a
