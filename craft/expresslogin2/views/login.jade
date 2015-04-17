@@ -4,7 +4,7 @@ block content
   h1= title
   p Welcome to #{title}
   | top form pake
-  form(method="POST", target="./m_login")
+  form(method="POST", action="./login", target="_self")
     input(type="text", name="word" value="true")
     input(type="hidden", name="mode" value="input")
     input(type="submit", value="送信")
