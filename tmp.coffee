@@ -6,6 +6,39 @@
 
 
 
+
+###
+# 通過したらvalue NGならfalseを返すメソッドのチェーン
+ichi = (val)->
+  if val.length == 1
+    val
+  else
+    false
+
+
+ni = (val)->
+  if val.match("a")
+    val
+  else
+    false
+
+console.log ichi "a"
+console.log ichi "n"
+console.log ichi "an"
+console.log ichi "bn"
+
+console.log ni "a"
+console.log ni "n"
+console.log ni "an"
+console.log ni "bn"
+
+console.log ichi ni "a"
+console.log ichi ni "n"
+console.log ichi ni "an"
+console.log ichi ni "bn"
+###
+
+
 ###
 # ホワイトリストマッチング
 censor_text = "abcd"
