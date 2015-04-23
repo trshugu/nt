@@ -5,6 +5,33 @@
 
 
 
+###
+# n秒経過を判定
+str_data = "1429766042952"
+# console.log str_data - new Date().getTime()
+# console.log parseInt str_data
+console.log new Date().getTime() - parseInt(str_data)
+
+m = 3
+if (new Date().getTime() - parseInt(str_data)) > m *  60 * 1000
+  console.log m + "分以上経過"
+else
+  console.log m + "分経過してない"
+
+h = 1
+if (new Date().getTime() - parseInt(str_data)) > h * 60 *  60 * 1000
+  console.log h + "時間経過"
+else
+  console.log h + "時間経過してない"
+
+d = 1
+if (new Date().getTime() - parseInt(str_data)) > d * 24 * 60 *  60 * 1000
+  console.log d + "日経過"
+else
+  console.log d + "日経過してない"
+###
+
+
 
 
 ###
