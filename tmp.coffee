@@ -4,7 +4,26 @@
 
 
 
+###
+# デコエン2
+crypto = require 'crypto'
 
+hash = crypto.createHash 'md5'
+hash.update 'randomToken'
+ive = hash.digest()
+
+cipher = crypto.createCipheriv 'aes-256-cbc', "b52c96bea30646abf8170f333bbd42b9", ive
+text = '共通鍵暗号方式'
+crypted = cipher.update text, 'utf-8', 'hex'
+crypted += cipher.final 'hex'
+console.log crypted
+
+decipher = crypto.createDecipheriv 'aes-256-cbc', "b52c96bea30646abf8170f333bbd42b9", ive
+# decipher.update crypted, 'hex', 'utf-8'
+decode = decipher.update crypted, 'hex', 'utf-8'
+decode += decipher.final "utf-8"
+console.log decode
+###
 
 
 ###
@@ -18,7 +37,7 @@ console.log crypted
 
 decipher = crypto.createDecipher 'aes-256-cbc', 'password'
 # decipher.update crypted, 'hex', 'utf-8'
-decode = decipher.update "1c0d50c3e73e352066353f8dd40a16af4f8160d8199f3858ec8a674b58b2e4fc", 'hex', 'utf-8'
+decode = decipher.update crypted, 'hex', 'utf-8'
 decode += decipher.final "utf-8"
 console.log decode
 ###
