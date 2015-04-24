@@ -5,6 +5,35 @@
 
 
 
+
+
+###
+# デコエン
+crypto = require 'crypto'
+cipher = crypto.createCipher 'aes-256-cbc', 'password'
+text = '共通鍵暗号方式'
+crypted = cipher.update text, 'utf-8', 'hex'
+crypted += cipher.final 'hex'
+console.log crypted
+
+decipher = crypto.createDecipher 'aes-256-cbc', 'password'
+# decipher.update crypted, 'hex', 'utf-8'
+decode = decipher.update "1c0d50c3e73e352066353f8dd40a16af4f8160d8199f3858ec8a674b58b2e4fc", 'hex', 'utf-8'
+decode += decipher.final "utf-8"
+console.log decode
+###
+
+
+
+###
+crypto = require 'crypto'
+decipher = crypto.createDecipher "aes-256-cbc", "pass"
+decode = decipher.update "59e768fc4bd8d7da30fc92306f1eaedf", "hex","utf-8"
+decode += decipher.final "utf-8"
+console.log decode
+###
+
+
 ###
 # n秒経過を判定
 str_data = "1429766042952"
