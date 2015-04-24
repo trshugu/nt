@@ -4,6 +4,29 @@
 
 
 
+
+###
+# 画像サイズ変更
+gm = require "gm"
+
+a = gm("./logo.png")
+a.resize(240, 240)
+a.write("./out240.png",(e)->console.log e)
+console.log a
+
+b = gm("./logo.png")
+b.resize(24, 24)
+b.write("./out24.png",(e)->console.log e)
+console.log b
+
+c = gm("./logo.png")
+c.resize(120, 120)
+c.write("./out120.png",(e)->console.log e)
+console.log c
+###
+
+
+
 ###
 # デコエン2
 crypto = require 'crypto'
