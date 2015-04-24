@@ -7,12 +7,95 @@
 
 ###
 # 画像サイズ変更
-gm = require "gm"
+resizer = (name, size, imageMagick) ->
+  re = require("gm")("./in/" + name)
+  re.options {imageMagick: true} if imageMagick
+  re.resize size, size
+  im = if imageMagick then "_im" else "_gm"
+  outpath = "./out/" + size.toString() + im + "_" + name
+  re.write outpath, (e)->
+    if e?
+      console.log e
+    else
+      console.log "success" + outpath
+      endD = new Date
+      console.log endD - startD
 
+startD = new Date
+
+# ディレクトリ内のファイル名を取得する
+require('fs').readdir './in', (err, files) ->
+  # console.log files
+  for i in files
+    resizer i, 200, false
+###
+
+
+
+###
+# 画像サイズ変更
+resizer = (name, size, imageMagick) ->
+  re = require("gm")("./in/" + name)
+  re.options {imageMagick: true} if imageMagick
+  re.resize size, size
+  im = if imageMagick then "_im" else "_gm"
+  outpath = "./out/" + size.toString() + im + "_" + name
+  re.write outpath, (e)->
+    if e?
+      console.log e
+    else
+      console.log "success" + outpath
+      endD = new Date
+      console.log endD - startD
+
+startD = new Date
+
+for i in [0...1000]
+  resizer "logo.png", 240, true
+  resizer "logo.png", 24, true
+  resizer "logo.png", 120, true
+
+for i in [0...1000]
+  resizer "logo.png", 240, false
+  resizer "logo.png", 24, false
+  resizer "logo.png", 120, false
+###
+
+
+###
+# 画像サイズ変更
+resizer = (name, size, imageMagick) ->
+  re = require("gm")("./in/" + name)
+  re.options {imageMagick: true} if imageMagick
+  re.resize size, size
+  im = if imageMagick then "_im" else "_gm"
+  outpath = "./out/" + size.toString() + im + "_" + name
+  re.write outpath, (e)->
+    if e?
+      console.log e
+    else
+      console.log "success"
+
+resizer "logo.png", 240, true
+resizer "logo.png", 24, true
+resizer "logo.png", 120, true
+
+resizer "logo.png", 240, false
+resizer "logo.png", 24, false
+resizer "logo.png", 120, false
+###
+
+
+
+###
+gm = require "gm"
 a = gm("./logo.png")
 a.resize(240, 240)
-a.write("./out240.png",(e)->console.log e)
-console.log a
+a.write "./out240.png",(e)->
+  if e?
+    console.log e
+  else
+    console.log "success"
 
 b = gm("./logo.png")
 b.resize(24, 24)
@@ -24,7 +107,6 @@ c.resize(120, 120)
 c.write("./out120.png",(e)->console.log e)
 console.log c
 ###
-
 
 
 ###
