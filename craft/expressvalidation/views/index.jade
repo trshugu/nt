@@ -1,0 +1,53 @@
+extends layout
+
+block content
+  script(type="text/javascript").
+    var hiki = ""
+    if ("#{kakure}".length != 0)
+      hiki = "#{kakure}"
+    
+    console.log("#{val}")
+    var mval = ""
+    if ("#{val}".length != 0)
+      mval = "#{val}"
+  
+  h1= title
+  p Welcome to #{title}
+  
+  | #{arr.a}
+  | #{arr.b}
+  
+  pre
+    | ＊vからの入力
+    | ＊vmで取得して返却
+    | ＊mで取得して返却
+    | ＊返却されたものをvで表示
+    | ＊jadeで値を取得
+    | ＊vueからも取得
+    | ・postvalueを即時に調査
+  br
+  | #{kakure}
+  br
+  | error有無
+  br
+  if error == false
+    | ある
+  br
+  #vali
+    form(method="POST" action="/" target="_self")
+      input(type="text" name="valiin" v-model="valiin" value="#{val}")
+      
+      .vueout
+        | {{vo}}
+        br
+        | {{valiin}}
+        
+      .valiout
+        | バリデーション通過後のメッセージ
+        | #{error}
+      input(type="hidden" name="hid" value="kakure")
+      input(type="submit" value="submit")
+
+
+
+

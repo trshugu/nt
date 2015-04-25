@@ -4,12 +4,228 @@
 
 
 
+###
 redis = require "redis"
 
 client = redis.createClient()
 
 client.set "testewse", "soidoi"
 client.get "testewse"
+###
+
+
+###
+# 画像サイズ変更
+resizer = (name, size, imageMagick) ->
+  re = require("gm")("./in/" + name)
+  re.options {imageMagick: true} if imageMagick
+  re.resize size, size
+  im = if imageMagick then "_im" else "_gm"
+  outpath = "./out/" + size.toString() + im + "_" + name
+  re.write outpath, (e)->
+    if e?
+      console.log e
+    else
+      console.log "success" + outpath
+      endD = new Date
+      console.log endD - startD
+
+startD = new Date
+
+# ディレクトリ内のファイル名を取得する
+require('fs').readdir './in', (err, files) ->
+  # console.log files
+  for i in files
+    resizer i, 200, false
+###
+
+
+
+###
+# 画像サイズ変更
+resizer = (name, size, imageMagick) ->
+  re = require("gm")("./in/" + name)
+  re.options {imageMagick: true} if imageMagick
+  re.resize size, size
+  im = if imageMagick then "_im" else "_gm"
+  outpath = "./out/" + size.toString() + im + "_" + name
+  re.write outpath, (e)->
+    if e?
+      console.log e
+    else
+      console.log "success" + outpath
+      endD = new Date
+      console.log endD - startD
+
+startD = new Date
+
+for i in [0...1000]
+  resizer "logo.png", 240, true
+  resizer "logo.png", 24, true
+  resizer "logo.png", 120, true
+
+for i in [0...1000]
+  resizer "logo.png", 240, false
+  resizer "logo.png", 24, false
+  resizer "logo.png", 120, false
+###
+
+
+###
+# 画像サイズ変更
+resizer = (name, size, imageMagick) ->
+  re = require("gm")("./in/" + name)
+  re.options {imageMagick: true} if imageMagick
+  re.resize size, size
+  im = if imageMagick then "_im" else "_gm"
+  outpath = "./out/" + size.toString() + im + "_" + name
+  re.write outpath, (e)->
+    if e?
+      console.log e
+    else
+      console.log "success"
+
+resizer "logo.png", 240, true
+resizer "logo.png", 24, true
+resizer "logo.png", 120, true
+
+resizer "logo.png", 240, false
+resizer "logo.png", 24, false
+resizer "logo.png", 120, false
+###
+
+
+
+###
+gm = require "gm"
+a = gm("./logo.png")
+a.resize(240, 240)
+a.write "./out240.png",(e)->
+  if e?
+    console.log e
+  else
+    console.log "success"
+
+b = gm("./logo.png")
+b.resize(24, 24)
+b.write("./out24.png",(e)->console.log e)
+console.log b
+
+c = gm("./logo.png")
+c.resize(120, 120)
+c.write("./out120.png",(e)->console.log e)
+console.log c
+###
+
+
+###
+# デコエン2
+crypto = require 'crypto'
+
+hash = crypto.createHash 'md5'
+hash.update 'randomToken'
+ive = hash.digest()
+
+cipher = crypto.createCipheriv 'aes-256-cbc', "b52c96bea30646abf8170f333bbd42b9", ive
+text = '共通鍵暗号方式'
+crypted = cipher.update text, 'utf-8', 'hex'
+crypted += cipher.final 'hex'
+console.log crypted
+
+decipher = crypto.createDecipheriv 'aes-256-cbc', "b52c96bea30646abf8170f333bbd42b9", ive
+# decipher.update crypted, 'hex', 'utf-8'
+decode = decipher.update crypted, 'hex', 'utf-8'
+decode += decipher.final "utf-8"
+console.log decode
+###
+
+
+###
+# デコエン
+crypto = require 'crypto'
+cipher = crypto.createCipher 'aes-256-cbc', 'password'
+text = '共通鍵暗号方式'
+crypted = cipher.update text, 'utf-8', 'hex'
+crypted += cipher.final 'hex'
+console.log crypted
+
+decipher = crypto.createDecipher 'aes-256-cbc', 'password'
+# decipher.update crypted, 'hex', 'utf-8'
+decode = decipher.update crypted, 'hex', 'utf-8'
+decode += decipher.final "utf-8"
+console.log decode
+###
+
+
+
+###
+crypto = require 'crypto'
+decipher = crypto.createDecipher "aes-256-cbc", "pass"
+decode = decipher.update "59e768fc4bd8d7da30fc92306f1eaedf", "hex","utf-8"
+decode += decipher.final "utf-8"
+console.log decode
+###
+
+
+###
+# n秒経過を判定
+str_data = "1429766042952"
+# console.log str_data - new Date().getTime()
+# console.log parseInt str_data
+console.log new Date().getTime() - parseInt(str_data)
+
+m = 3
+if (new Date().getTime() - parseInt(str_data)) > m *  60 * 1000
+  console.log m + "分以上経過"
+else
+  console.log m + "分経過してない"
+
+h = 1
+if (new Date().getTime() - parseInt(str_data)) > h * 60 *  60 * 1000
+  console.log h + "時間経過"
+else
+  console.log h + "時間経過してない"
+
+d = 1
+if (new Date().getTime() - parseInt(str_data)) > d * 24 * 60 *  60 * 1000
+  console.log d + "日経過"
+else
+  console.log d + "日経過してない"
+###
+
+
+
+
+###
+# 通過したらvalue NGならfalseを返すメソッドのチェーン
+ichi = (val)->
+  if val.length == 1
+    val
+  else
+    false
+
+
+ni = (val)->
+  if val.match("a")
+    val
+  else
+    false
+
+console.log ichi "a"
+console.log ichi "n"
+console.log ichi "an"
+console.log ichi "bn"
+
+console.log ni "a"
+console.log ni "n"
+console.log ni "an"
+console.log ni "bn"
+
+console.log ichi ni "a"
+console.log ichi ni "n"
+console.log ichi ni "an"
+console.log ichi ni "bn"
+###
 
 ###
 # ホワイトリストマッチング
