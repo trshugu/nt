@@ -10,8 +10,12 @@ redis = require "redis"
 client = redis.createClient()
 
 client.set "testewse", "soidoi"
-client.get "testewse"
+client.get "testewse", (e,d)->
+  console.log d
+  client.end()
 ###
+
+
 
 
 ###
