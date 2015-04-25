@@ -4,7 +4,12 @@
 
 
 
+redis = require "redis"
 
+client = redis.createClient()
+
+client.set "testewse", "soidoi"
+client.get "testewse"
 
 ###
 # ホワイトリストマッチング
