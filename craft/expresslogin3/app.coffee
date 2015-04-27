@@ -5,14 +5,14 @@ http = require 'http'
 session = require "express-session"
 
 app = express()
-RedisStore = require("connect-redis")(session)
+# RedisStore = require("connect-redis")(session)
 app.use session
   key: "sess_id"
   cookie:
     maxAge: 1000 * 60 * 60
-  store: new RedisStore
-    db: 1
-    prefix: "session"
+  # store: new RedisStore
+  #   db: 1
+  #   prefix: "session"
   resave: false
   saveUninitialized: true
   secret: "sekret"
