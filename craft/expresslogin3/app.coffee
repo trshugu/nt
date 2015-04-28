@@ -5,7 +5,10 @@ http = require 'http'
 session = require "express-session"
 
 app = express()
+
+###
 RedisStore = require("connect-redis")(session)
+console.log new RedisStore
 app.use session
   key: "sess_id"
   cookie:
@@ -16,7 +19,7 @@ app.use session
   resave: false
   saveUninitialized: true
   secret: "sekret"
-
+###
 
 # view engine setup
 app.set "views", path.join(__dirname, "views")
@@ -25,7 +28,13 @@ app.set "view engine", "jade"
 favicon = require "serve-favicon"
 # uncomment after placing your favicon in /public
 # app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use require("morgan")("dev")
+
+accessLogStream = require("fs").createWriteStream(__dirname + '/access.log', {encoding:"utf-8", flags: 'a'})
+morgan = require "morgan"
+app.use morgan "combined",
+  stream: accessLogStream
+  format: "dev"
+
 bodyParser = require "body-parser"
 app.use bodyParser.json()
 app.use bodyParser.urlencoded(extended: false)
