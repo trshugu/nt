@@ -1,5 +1,11 @@
-extends layout
-
-block content
-  h1= title
-  p Welcome to #{title}
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type="text/javascript", src="coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="validator-js/validator.min.js")
+    script(type="text/javascript", src="javascript/vali.js")
+  body
+    h1= title
+    p Welcome to #{title}

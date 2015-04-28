@@ -13,7 +13,8 @@
     "tests"
   ],
   "dependencies": {
-    "coffee-script": "~1.8.0",
-    "jquery": "~2.1.1"
+    "coffee-script": "~1.9.2",
+    "jquery": "~2.1.1",
+    "validator-js": "~3.39.0"
   }
 }

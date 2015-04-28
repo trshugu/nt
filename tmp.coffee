@@ -3,6 +3,51 @@
 
 
 
+
+###
+# validator.js
+v = require "validator"
+
+console.log v.isEmail "for@asdfs.asdfsd"
+console.log v.isEmail "forsafsdf"
+console.log v.isEmail ""
+console.log v.isEmail "asdfs@asdf."
+console.log v.isEmail "asdfs@asdf"
+console.log v.isEmail "asdfs@asdf.safsdf.sdfdf"
+
+console.log v.isAlphanumeric "sdafjsdfoi"
+console.log v.isAlphanumeric "sdafjsdfoss8090sfi3i"
+console.log v.isAlphanumeric "3409834"
+console.log v.isAlphanumeric "あいう"
+console.log v.contains "100", "100"
+console.log v.contains "101", "100"
+console.log v.isLength "asdffsd"
+console.log v.isLength "100", 1
+console.log v.isLength "100", 3
+console.log v.isLength "100", 5
+console.log v.isLength "100", 1, 5
+console.log v.isLength "100", 1, 2
+console.log v.isLength "abcdefghij", 0, 2
+console.log v.isLength "", 0
+console.log v.isLength "", 1
+console.log v.isLength "1", 0
+console.log v.isLength "1", 1
+console.log v.isLength "", 0, 1
+console.log v.isLength "", 1, 1
+console.log v.isLength "1", 0, 1
+console.log v.isLength "1", 1, 1
+console.log v.isFullWidth "あ"
+console.log v.isFullWidth "a"
+console.log v.isHalfWidth "あ"
+console.log v.isHalfWidth "a"
+console.log v.isVariableWidth "あいう"
+console.log v.isVariableWidth "aiu"
+console.log v.isVariableWidth "あiう"
+###
+
+
+
+
 ###
 # morgan
 fs = require "fs"
