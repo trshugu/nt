@@ -2,7 +2,13 @@ debug = require("debug")("expresstemplate")
 cluster = require "cluster"
 
 if cluster.isMaster
-  for i in [1..require("os").cpus().length]
+  cpu_count = 1
+  if(process.env.DEBUG)
+    cpu_count = 1
+  else
+    cpu_count = require("os").cpus().length
+  
+  for i in [1..cpu_count]
     w = cluster.fork()
     debug "fork:" + w.process.pid
   
@@ -20,17 +26,29 @@ else
   session = require "express-session"
 
   app = express()
-  # RedisStore = require("connect-redis")(session)
-  app.use session
-    key: "sess_id"
-    cookie:
-      maxAge: 1000 * 60 * 60
-    # store: new RedisStore
-    #   db: 1
-    #   prefix: "session"
-    resave: false
-    saveUninitialized: true
-    secret: "sekret"
+  if(process.env.DEBUG)
+    console.log "debug!!!"
+    RedisStore = require("connect-redis")(session)
+    app.use session
+      key: "sess_id"
+      cookie:
+        maxAge: 1000 * 60 * 60
+      resave: false
+      saveUninitialized: true
+      secret: "sekret"
+  else
+    console.log "productio"
+    RedisStore = require("connect-redis")(session)
+    app.use session
+      key: "sess_id"
+      cookie:
+        maxAge: 1000 * 60 * 60
+      store: new RedisStore
+        db: 1
+        prefix: "session"
+      resave: false
+      saveUninitialized: true
+      secret: "sekret"
 
 
   # view engine setup

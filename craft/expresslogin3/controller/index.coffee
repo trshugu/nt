@@ -1,10 +1,7 @@
-redis = require "redis"
 
 module.exports = (req, res)->
   console.log req.session
-  
-  req.session.don = "k"
-  c = redis.createClient()
-  c.set "aaa", "vvv"
+  console.log process.pid
+  req.session.don = if req.session.don? then req.session.don + 1 else 1
   
   res.render 'index', { title:"exp", raise: req.session.rai}

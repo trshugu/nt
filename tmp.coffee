@@ -4,6 +4,22 @@
 
 
 
+
+###
+# バリデーションチェック
+a = false
+b = false
+c = true
+
+if a \
+    || b \
+    || c
+  console.log "tari"
+else
+  console.log "tnasi"
+###
+
+
 ###
 redis = require "redis"
 
