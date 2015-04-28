@@ -3,7 +3,57 @@
 
 
 
+###
+# morgan
+fs = require "fs"
+m = require "morgan"
 
+accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
+
+# logger = m "dev"
+# logger = m "combined"
+# logger = m "common"
+# logger = m "short"
+logger = m "tiny", stream: accessLogStream
+
+
+require('http').createServer (q,s)->
+  logger q, s, (e)->
+    s.setHeader 'content-type', 'text/plain'
+    s.end 'hell, world'
+.listen 3000
+###
+
+
+
+###
+# loggerモジュール
+levels = [
+  'info',
+  'debug',
+  'warn',
+  'error'
+]
+
+levels.forEach (lv)->
+  module.exports[lv] = (msg)->
+    console.log lv + ":" +msg
+
+this.info "death"
+this.debug "hell"
+###
+
+
+
+###
+# 画像の大きさ取得
+ch = require("gm")("./logo.png")
+ch.size (e,s)->
+  if e?
+    console.log e
+  else
+    console.log s
+###
 
 ###
 # バリデーションチェック
