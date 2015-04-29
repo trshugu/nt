@@ -3,6 +3,11 @@
 
 
 
+###
+# サニタイズ
+v = require "validator"
+console.log v.escape "<asdf> #$%&'()=|{}"
+###
 
 ###
 # validator.js
