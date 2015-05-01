@@ -1,3 +1,10 @@
 node_modules
 bower_components
 *.as3proj
+*.mp4
+*.ogv
+*.webm
+*.m4a
+*.mp3
+*.mov
+*.m4v

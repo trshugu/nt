@@ -3,6 +3,22 @@
 
 
 
+
+
+
+###
+# 等尺
+gm = require "gm"
+a = gm("./test.png")
+# a.resize(null, 240)
+a.resize(240)
+a.write "./out240w.png",(e)->
+  if e?
+    console.log e
+  else
+    console.log "success"
+###
+
 ###
 # サニタイズ
 v = require "validator"
