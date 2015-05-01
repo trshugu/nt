@@ -3,8 +3,16 @@
 
 
 
+###
+# Default date added at the end of the file
+rotatingLogStreamA = require('file-stream-rotator').getStream({filename:"test.log", frequency:"daily", verbose: false});
 
+# Default date added using file pattern
+# rotatingLogStreamB = require('file-stream-rotator').getStream({filename:"tmp/test-%DATE%.log", frequency:"daily", verbose: false});
 
+# Custom date added using file pattern using moment.js formats
+# rotatingLogStreamC = require('file-stream-rotator').getStream({filename:"tmp/test-%DATE%.log", frequency:"daily", verbose: false, date_format: "YYYY-MM-DD"});
+###
 
 ###
 # 等尺

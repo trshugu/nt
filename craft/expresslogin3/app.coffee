@@ -76,6 +76,7 @@ else
   #   mor req, res, (e)->
   #     next()
   
+  ###
   f = require('fluent-logger-node')
   l = f.createLogger({tagPrefix:"tag.express"})
   app.use (req, res, next) ->
@@ -105,7 +106,12 @@ else
     res.on('close', logRequest)
     
     next();
+  ###
   
+  # rotatingLogStream = require('file-stream-rotator').getStream({filename:"test.log", frequency:"1m", verbose: false});
+  # app.use require("morgan") "tiny", stream: rotatingLogStream
+  
+  app.use require("morgan") "tiny", stream: require('fs').createWriteStream(__dirname + '/log.txt', { flags: 'a' })
   
   bodyParser = require "body-parser"
   app.use bodyParser.json()
