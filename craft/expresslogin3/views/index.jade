@@ -11,6 +11,28 @@ html
     script(type="text/javascript").
       videojs.options.flash.swf = "video-js.swf";
   body
+    | test
+    br
+    | zzz #{emess} aaa
+    | #{emess}
+    #{emess}
+    br
+    if emess
+      | 無印
+    else
+      | 無印e
+    br
+    if emess == undifined
+      | undifである
+    else
+      | unf else 
+    br
+    if emess == ""
+      | 空である
+    else
+      | 空でない
+    br
+    | test
     h1= title
     p Welcome to #{title}
     
