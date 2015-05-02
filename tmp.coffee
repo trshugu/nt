@@ -17,7 +17,7 @@ rotatingLogStreamA = require('file-stream-rotator').getStream({filename:"test.lo
 ###
 # 等尺
 gm = require "gm"
-a = gm("./test.png")
+a = gm("./height.png")
 # a.resize(null, 240)
 a.resize(240)
 a.write "./out240w.png",(e)->
