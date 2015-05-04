@@ -1,3 +1,5 @@
+httpscheck = require "./https"
+
 module.exports = (app)->
   app.get "/", require "./index"
   app.get "/user", require "./user"
@@ -15,6 +17,20 @@ module.exports = (app)->
     res.render 'xf',
       xf: val
   
+  app.get "/vali", require "./vali"
+  app.post "/vali", require "./vali"
+  
+  app.get "/follow", require "./follow"
+  # app.get "/follow", require "./follow"
+  
+  app.get "/api", (req,res)-> res.send "ok"
+  
+  app.get "/socket", require "./socket"
+  app.get "/socketssl", httpscheck, require "./socket"
+  
+  app.get "/foll", require "./foll"
+  
+  app.get "/api", require "./api"
+  app.get "/apiget", require "./apiget"
   
   
-

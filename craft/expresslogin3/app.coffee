@@ -176,7 +176,6 @@ else
   ###
   app.set 'port', process.env.PORT || 3000
   server = http.createServer(app)
-  # io = require('socket.io').listen(server)
   server.listen app.get('port'), ->
     debug "Express server listening on portee " + server.address().port
   ###
@@ -185,9 +184,23 @@ else
     key: fs.readFileSync "./key.key"
     cert: fs.readFileSync "./crt.crt"
   
-  server = http.createServer(app).listen 3000, ->
+  server = http.createServer(app).listen 80, ->
     debug 'Express server listening on port ' + server.address().port
+  io = require('socket.io').listen(server)
   
   secserver = https.createServer(options, app).listen 443, ->
     debug 'Express server listening on port ' + secserver.address().port
+  iossl = require('socket.io').listen(secserver)
+  
+  require("./controller/socapi") io
+  require("./controller/socapi") iossl
+  
+  server_api = http.createServer(app).listen 8080, ->
+    debug 'Express server listening on port ' + server_api.address().port
+  
+  ###
+  io.sockets.on 'connection', (soc)->
+    soc.on "sock", (d)->
+      console.log d
+  ###
 

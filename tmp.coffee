@@ -1,6 +1,37 @@
 ###
 ###
 
+###
+# api2
+getApi = (url,cb)->
+  require("http").get(url).on 'response', cb
+
+# コールバック関数を返却させることでクロージャに
+cb_res = ->
+  return (res)->
+    res.setEncoding("utf8")
+    res.on 'data', cb_print
+
+
+getApi "http://localhost/api", cb_res()
+
+cb_print = (c)->
+  # 続きの処理
+  console.log c
+###
+
+###
+# api
+http = require "http"
+
+http.get("http://localhost/api")
+.on 'response',(res)->
+  res.setEncoding("utf8")
+  res.on 'data', (c)->
+    console.log c
+###
+
+
 
 
 ###
