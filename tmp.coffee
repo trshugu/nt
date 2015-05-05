@@ -2,7 +2,15 @@
 ###
 
 
+###
+# 拡張子取得
+file = "asdf.abc"
+ext = file.match(/[.].*/)[0].slice 1
+console.log ext
+###
 
+
+###
 # 自分にメソッドを取り込む
 require("./vali")()
 # console.log vali
@@ -12,6 +20,9 @@ aaa = ->
 
 
 aaa()
+###
+
+
 
 ###
 # api2

@@ -35,3 +35,5 @@ module.exports = (app)->
   
   app.get "/upload", require "./upload"
   
+  app.get "/socjson", require "./socjson"
+  
