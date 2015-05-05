@@ -33,4 +33,5 @@ module.exports = (app)->
   app.get "/api", require "./api"
   app.get "/apiget", require "./apiget"
   
+  app.get "/upload", require "./upload"
   

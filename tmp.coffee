@@ -1,6 +1,15 @@
 ###
 ###
 
+
+
+# 自分にメソッドを取り込む
+require("./vali")()
+# console.log vali
+
+
+pri "eee"
+
 ###
 # api2
 getApi = (url,cb)->
