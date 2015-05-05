@@ -7,8 +7,11 @@
 require("./vali")()
 # console.log vali
 
+aaa = ->
+  pri "eee"
 
-pri "eee"
+
+aaa()
 
 ###
 # api2
