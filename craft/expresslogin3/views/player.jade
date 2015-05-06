@@ -1,0 +1,46 @@
+doctype html
+html
+  head
+    title= title
+    link(type="text/css" href="jplayer/dist/skin/pink.flag/css/jplayer.pink.flag.min.css" rel="stylesheet")
+    script(type="text/javascript", src="coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="validator-js/validator.min.js")
+    script(type="text/javascript", src="zepto/zepto.min.js")
+    script(type="text/javascript", src="jplayer/dist/jplayer/jquery.jplayer.min.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(type="text/javascript", src="/javascript/player.js")
+    script(type="text/coffeescript").
+        console.log "embed"
+
+  body
+    .a a
+    #jquery_jplayer_1.jp-jplayer
+      #jp_container_1.jp-audio(role='application', aria-label='media player')
+          .jp-type-single
+            .jp-gui.jp-interface
+              .jp-volume-controls
+                button.jp-mute(role='button', tabindex='0') mute
+                button.jp-volume-max(role='button', tabindex='0') max volume
+                .jp-volume-bar
+                  .jp-volume-bar-value
+              .jp-controls-holder
+                .jp-controls
+                  button.jp-play(role='button', tabindex='0') play
+                  button.jp-stop(role='button', tabindex='0') stop
+                .jp-progress
+                  .jp-seek-bar
+                    .jp-play-bar
+                .jp-current-time(role='timer', aria-label='time') &nbsp;
+                .jp-duration(role='timer', aria-label='duration') &nbsp;
+                .jp-toggles
+                  button.jp-repeat(role='button', tabindex='0') repeat
+            .jp-details
+              .jp-title(aria-label='title') &nbsp;
+            .jp-no-solution
+              span Update Required
+              | To play the media you will need to either update your browser to a recent version or update your 
+              a(href='http://get.adobe.com/flashplayer/', target='_blank') Flash plugin
+              | .
+        
+        

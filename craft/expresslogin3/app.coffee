@@ -65,7 +65,7 @@ else
   favicon = require "serve-favicon"
   # uncomment after placing your favicon in /public
   # app.use(favicon(__dirname + '/public/favicon.ico'));
-  # app.use require("morgan")("dev")
+  app.use require("morgan")("dev")
   # app.use require("morgan")("common")
   
   # f = require('fluent-logger-node')
@@ -119,6 +119,7 @@ else
   app.use require("cookie-parser")()
   app.use express.static(path.join(__dirname, "public"))
   app.use express.static(path.join(__dirname, 'bower_components'))
+  app.use express.static(path.join(__dirname, 'sound'))
   
   # use coffeescript
   app.use require('coffee-middleware')

@@ -9,6 +9,18 @@ html
     script(type="text/javascript", src="/javascript/socjson.js")
   body
     #vue
+      .click(v-on="click:add('{\"name\":\"追加\", \"type\":\"b\", \"src\":\"<div>noi</div>\"}')") add
+      .list(v-repeat="item: get_list")
+        .obj {{item}}
+        .type(v-show="item.type == 'a'")
+          .item {{item.name}} 名前 Aです
+          .item {{item.src}} 源 Aです
+          br
+        .type(v-show="item.type == 'b'")
+          .item {{item.name}} 名前 Bです
+          .item {{item.src}} 源 Bです
+          br
+      
       
       br
       br

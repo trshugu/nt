@@ -16,6 +16,10 @@
     "coffee-script": "~1.9.2",
     "jquery": "~2.1.1",
     "validator-js": "~3.39.0",
-    "xss-filters": "~1.1.2"
+    "xss-filters": "~1.1.2",
+    "zepto": "~1.1.6",
+    "jplayer": "~2.9.2",
+    "videojs": "~4.12.5",
+    "audiojs": "*"
   }
 }
