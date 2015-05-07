@@ -16,3 +16,8 @@ html
         //-
           img.imgView
           p#clear
+    br
+    #vue
+      input(type="file" name="vuefile" v-model="vuefile" lazy)
+      .print {{vuefile}}
+      img(v-attr="src: vuefile")

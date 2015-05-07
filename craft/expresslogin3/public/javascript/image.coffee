@@ -1,4 +1,16 @@
 $ ->
+  vm = new Vue
+    el:"#vue"
+    data:
+      vuefile:""
+      im:""
+    watch:
+      vuefile:(n,o)->
+        console.log vm.vuefile
+  
+  console.log vm.vuefile
+  
+  
   setFI = $("#jake")
   setFI.each ->
     selfF = $(this)
