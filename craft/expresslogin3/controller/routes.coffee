@@ -1,6 +1,8 @@
 httpscheck = require "./https"
 
 module.exports = (app)->
+  app.get "/image", (req,res)-> res.render "image"
+  
   app.get "/videojs", (req,res)->res.render "videojs"
   app.get "/player", (req,res)->res.render "player"
   

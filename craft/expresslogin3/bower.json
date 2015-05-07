@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "coffee-script": "~1.9.2",
-    "jquery": "~2.1.1",
+    "jquery": "~2.1.4",
     "validator-js": "~3.39.0",
     "xss-filters": "~1.1.2",
     "zepto": "~1.1.6",
