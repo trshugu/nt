@@ -2,12 +2,36 @@
 ###
 
 
-###
+
+# ホワイトリスト2
+# target = "asoijdf.jpg"
+# ngtarget = "asoijdf.abc"
+
+# assertExtension = (val) ->
+#   ["jpg","png"].some (i)-> i == val.match(/[.].*/)[0].slice(1)
+
+# console.log assertExtension target
+# console.log assertExtension ngtarget
+
+
+# ホワイトリスト
+# v = require "validator"
+# allow = ["jpg","png"]
+
+# target = "asoijdf.jpg"
+# ngtarget = "asoijdf.abc"
+
+# assertExtension = (val) ->
+#   allow.filter((i)->i==val.match(/[.].*/)[0].slice(1)).length > 0
+
+# console.log assertExtension target
+# console.log assertExtension ngtarget
+
+
 # 拡張子取得
-file = "asdf.abc"
-ext = file.match(/[.].*/)[0].slice 1
-console.log ext
-###
+# file = "asdf.abc"
+# ext = file.match(/[.].*/)[0].slice 1
+# console.log ext
 
 
 ###
