@@ -1,6 +1,8 @@
 httpscheck = require "./https"
 
 module.exports = (app)->
+  app.get "/common", (req,res)-> res.render "common", {header:"hedddoooo"}
+  
   app.get "/select", (req,res)-> 
     param = {}
     param.sele = "nini"
