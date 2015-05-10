@@ -1,6 +1,11 @@
 httpscheck = require "./https"
 
 module.exports = (app)->
+  app.get "/select", (req,res)-> 
+    param = {}
+    param.sele = "nini"
+    res.render "select", param
+  
   app.get "/debounce", (req,res)-> res.render "debounce"
   app.get "/image", (req,res)-> res.render "image"
   
