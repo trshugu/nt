@@ -2,6 +2,73 @@
 ###
 
 
+###
+nodemailer = require 'nodemailer'
+smtpTransport = require 'nodemailer-smtp-transport'
+
+t = nodemailer.createTransport(smtpTransport(
+  host : "localhost"
+  post : 25))
+
+mailOptions =
+    from: ""
+    to: ""
+    subject: "subjeeect"
+    text: "testeste"
+
+t.sendMail mailOptions, (e, i)->
+  if e
+    console.log e
+  else
+    console.log i
+    console.log i.response
+###
+
+
+###
+nm = require "nodemailer"
+t= nm.createTransport smtpTransport, {host : "localhost", post : 25}
+
+mailOptions =
+    from: "info@dev.eggs.mu"
+    to: "kazuto.suzuki@recochoku.co.jp"
+    subject: "subjeeect"
+    text: "testeste"
+
+t.sendMail mailOptions, (e, i)->
+  if e
+    console.log e
+  else
+    console.log i
+    console.log i.response
+###
+
+###
+# nodemailer
+nm = require "nodemailer"
+t= nm.createTransport
+  service: "Gmail"
+  auth: {user:"",pass:""}
+
+"SMTP"
+host:"localhost"
+post:"25"
+
+mailOptions =
+    from: ""
+    to: ""
+    subject: "subusbu"
+    text: "testeste"
+
+t.sendMail mailOptions, (e, i)->
+  if e
+    console.log e
+  else
+    console.log i
+    console.log i.response
+###
+
+
 
 # ホワイトリスト2
 # target = "asoijdf.jpg"
