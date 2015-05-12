@@ -189,15 +189,30 @@ else
     debug 'Express server listening on port ' + server.address().port
   io = require('socket.io').listen(server)
   
+  redis=require "redis"
+  rs = require "socket.io-redis"
+  pub = redis.createClient(6379, "localhost")
+  sub = redis.createClient(6379, "localhost")
+  io.adapter rs(
+    key: "rs_"
+    host: "localhost"
+    port: 6379
+    pubClient: pub
+    subClient: sub
+    )
+  
+  require("./controller/socapi") io
+  
+  ###
   secserver = https.createServer(options, app).listen 443, ->
     debug 'Express server listening on port ' + secserver.address().port
   iossl = require('socket.io').listen(secserver)
   
-  require("./controller/socapi") io
   require("./controller/socapi") iossl
   
   server_api = http.createServer(app).listen 8080, ->
     debug 'Express server listening on port ' + server_api.address().port
+  ###
   
   ###
   io.sockets.on 'connection', (soc)->

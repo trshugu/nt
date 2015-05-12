@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type="text/javascript", src="coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="validator-js/validator.min.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(type="text/javascript", src="/javascript/rs.js")
+  body
+    h1= title
+    p Welcome to #{title}
+    
+    .socket#sock
+      .button(v-on="click: socke") aaa
+      | {{m}}
