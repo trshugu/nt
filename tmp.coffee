@@ -8,7 +8,7 @@ smtpTransport = require 'nodemailer-smtp-transport'
 
 t = nodemailer.createTransport(smtpTransport(
   host : "localhost"
-  post : 25))
+  port : 25))
 
 mailOptions =
     from: ""
