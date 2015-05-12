@@ -2,6 +2,12 @@
 ###
 
 
+
+###
+n="https://w.soundcloud.com/playr/ asfs><><af"
+console.log n.match(/https:\/\/w.soundcloud.com\/player\//)
+###
+
 ###
 nodemailer = require 'nodemailer'
 smtpTransport = require 'nodemailer-smtp-transport'
