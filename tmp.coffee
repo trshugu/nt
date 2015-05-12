@@ -30,8 +30,8 @@ nm = require "nodemailer"
 t= nm.createTransport smtpTransport, {host : "localhost", post : 25}
 
 mailOptions =
-    from: "info@dev.eggs.mu"
-    to: "kazuto.suzuki@recochoku.co.jp"
+    from: ""
+    to: ""
     subject: "subjeeect"
     text: "testeste"
 
