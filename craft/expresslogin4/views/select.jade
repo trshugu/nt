@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type="text/javascript", src="coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    script(type="text/javascript", src="/jquery/dist/jquery.min.js")
+    script(type="text/javascript", src="/javascript/select.js")
+  body
+    #vue
+      .post #{sele}
+      .select {{sele}}
+      .post(v-text="sele" v-model="sss")
+      input(type="hidden" v-model="sele" value="#{sele}")
+      .sel
+        //- select(type="text" name="nnn" v-model="sele" debounce="800" options="ooo")
+        select(type="text" name="nnn" v-model="sele" debounce="800")
+          option(value="") nasi
+          option(value="vvvv") hokkai
+          option(value="nini") nibanme
+          

@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type="text/javascript", src="coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="validator-js/validator.min.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    script(type="text/javascript", src="/javascript/follow.js")
+    //-
+      script(type="text/javascript").
+        isPost = "#{postback}"
+  body
+    h1= title
+    p Welcome to #{title}
+    
+    .f#follow3
+      .li(v-repeat="items" v-on="click: toggle(this)")
+    br
+    .f#follow2
+      .on(v-show="button" v-on="click: toggle") おん
+      .off(v-show="!button" v-on="click: toggle") おふ
+      //-
+        input(type="checkbox" v-model="button")
+    br
+    br
+    .f#follow
+      .on(v-show="button") おん
+      .off(v-show="!button") おふ
+      input(type="checkbox" v-model="button")
+    br
+    br
+    .follow(onClick="fun(this)")
+      .do フォローする
+      .done フォロー中
+      .ban 解除
+    input(type="button" value="button" onClick="fun()")
+
+
+
+

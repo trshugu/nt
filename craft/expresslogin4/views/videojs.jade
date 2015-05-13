@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    title= title
+    link(type="text/css" href="/videojs/dist/video-js/video-js.min.css" rel="stylesheet")
+    script(type="text/javascript", src="/coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="/validator-js/validator.min.js")
+    script(type="text/javascript", src="/videojs/dist/video-js/video.novtt.js")
+    script(type="text/javascript", src="/audiojs/audiojs/audio.min.js")
+    script(type="text/javascript", src="/vue/dist/vue.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(type="text/javascript", src="/javascript/audiojs.js")
+
+    script(type="text/coffeescript").
+      console.log "embed"
+      # videojs.options.flash.swf = "video-js.swf"
+
+  body
+    .b b
+    audio(src="/06.m4a" preload="auto")
+    audio(src="/05.m4a")
+    audio(src="http://localhost/04.m4a" preload="none")
+    audio(src="/03.m4a" preload="auto")
+    
+    .a a
+    audio#audio_example.video-js.vjs-default-skin(controls preload="auto" poster="/logo.png" data-setup='{}')
+      source(src="/02.m4a" type='audio/mp3')
+
+    audio#audio_example.video-js.vjs-default-skin(controls preload="auto" poster="/logo.png" data-setup='{}')
+      source(src="/kpp.m4a" type='audio/mp3')
+    
+    audio#audio_example.video-js.vjs-default-skin(controls preload="auto" poster="/logo.png" data-setup='{}')
+      source(src="/juke.mp3" type='audio/mp3')
+
+    video#example_video_1.video-js.vjs-default-skin(controls preload="none" width="640" height="264" poster="/logo.png" data-setup="{}")
+      source(src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4')
+    
+    video#example_video_1.video-js.vjs-default-skin(controls preload="none" width="640" height="264" poster="/logo.png" data-setup="{}")
+      source(src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4')
+
+    
