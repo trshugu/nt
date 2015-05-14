@@ -20,6 +20,7 @@
     "zepto": "~1.1.6",
     "jplayer": "~2.9.2",
     "videojs": "~4.12.5",
-    "audiojs": "*"
+    "audiojs": "*",
+    "vue": "~0.11.10"
   }
 }

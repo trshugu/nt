@@ -1,5 +1,7 @@
 debug = require("debug")("expresstemplate")
 cluster = require "cluster"
+sio = require 'socket.io'
+sio_redis = require 'socket.io-redis'
 
 if cluster.isMaster
   cpu_count = 1
@@ -35,7 +37,12 @@ else
   app = express()
   if(process.env.DEBUG)
     console.log "debug!!!"
-    RedisStore = require("connect-redis")(session)
+  else
+    console.log "productio" + process.pid
+    
+  ###
+  if(process.env.DEBUG)
+    console.log "debug!!!"
     app.use session
       key: "sess_id"
       cookie:
@@ -49,14 +56,15 @@ else
     app.use session
       key: "sess_id"
       cookie:
-        maxAge: 1000 * 60 * 60
-      store: new RedisStore
-        db: 1
-        prefix: "session"
+        maxAge: 1000 * 30
+        # maxAge: 1000 * 60 * 60
+      # store: new RedisStore
+      #   db: 1
+      #   prefix: "session"
       resave: false
       saveUninitialized: true
       secret: "sekret"
-  
+  ###
   
   # view engine setup
   app.set "views", path.join(__dirname, "views")
@@ -185,11 +193,57 @@ else
     key: fs.readFileSync "./key.key"
     cert: fs.readFileSync "./crt.crt"
   
+  
   server = http.createServer(app).listen 80, ->
     debug 'Express server listening on port ' + server.address().port
-  io = require('socket.io').listen(server)
+  io = require('socket.io').listen(3000)
   
-  redis=require "redis"
+  # io.set "transports", [ 'websocket', "polling" ]
+  redis = require('socket.io-redis')
+  io.adapter(redis({ host: 'localhost', port: 6379 }))
+  
+  io.set "transports", [ 'websocket', "polling", 'jsonp-polling']
+  
+  
+  
+  ###
+  server = http.createServer(app).listen 80, ->
+    console.log 'Express server listening on port ' + server.address().port + " pid:" + process.pid
+  
+  io = sio(server)
+  io.set "transports", [ 'websocket', "polling", 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling' ]
+  io.adapter(sio_redis({ host: 'localhost', port: 6379 }))
+  ###
+  
+  
+  process.on 'message', (message, connection) ->
+    if message != 'sticky-session:connection'
+      return
+    
+    server.emit 'connection', connection
+    connection.resume()
+    return
+  
+  
+  ###
+  redis = require('socket.io-redis')
+  io.adapter redis(
+    host: 'localhost'
+    port: 6379
+  )
+  ###
+  
+  ###
+  ioredis = require "socket.io-redis"
+  io.adapter new ioredis(
+    key: "rs_"
+    host: "localhost"
+    port: 6379
+  )
+  ###
+  
+  ###
+  redis = require "redis"
   rs = require "socket.io-redis"
   pub = redis.createClient(6379, "localhost")
   sub = redis.createClient(6379, "localhost")
@@ -200,6 +254,7 @@ else
     pubClient: pub
     subClient: sub
     )
+  ###
   
   require("./controller/socapi") io
   
