@@ -2,6 +2,29 @@
 ###
 
 
+###
+console.log if "アア".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "ンン".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "ーー".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "ヮッ".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "ゥゥ".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+
+console.log if "ゎッ".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "アア".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "あア".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "ああ".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "ｱｱ".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "アjkjア".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "aaアア".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "aaあアア".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "aaあ".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "aaああｱ".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+console.log if "aｄああｱ".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
+###
+
+
+
+###
 # pub/sub
 redis = require("redis")
 client1 = redis.createClient()
@@ -34,7 +57,7 @@ client1.on "pmessage", (pattern, channel, message)->
   
 
 client1.psubscribe "channel*"
-
+###
 
 
 ###
