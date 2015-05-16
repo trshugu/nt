@@ -1,6 +1,9 @@
 httpscheck = require "./https"
 
 module.exports = (app)->
+  app.get "/socl", require "./socl"
+  
+  
   app.get "/rs",  (req,res)-> res.render "rs"
   app.get "/common", (req,res)-> res.render "common", {header:"hedddoooo"}
   

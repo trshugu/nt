@@ -187,7 +187,8 @@ else
   
   server = http.createServer(app).listen 80, ->
     debug 'Express server listening on port ' + server.address().port
-  io = require('socket.io').listen(3000)
+  # io = require('socket.io').listen(3000)
+  io = require('socket.io').listen(server)
   
   
   redis=require "redis"
