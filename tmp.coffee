@@ -2,6 +2,22 @@
 ###
 
 
+
+
+###
+# コンバート
+convertTypeName = (type)->
+  switch type
+    when "a" then return "eee"
+    when "b" then return "bii"
+    when "c" then return "shii"
+  
+  return "noi"
+
+
+console.log convertTypeName "a"
+###
+
 ###
 console.log if "アア".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
 console.log if "ンン".match(/^[ア-ンガ-ボァ-ョヮッー]+$/) then true else false
