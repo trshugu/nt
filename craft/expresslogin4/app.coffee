@@ -190,14 +190,14 @@ else
   # io = require('socket.io').listen(3000)
   io = require('socket.io').listen(server)
   
-  
+  ###
   redis=require "redis"
   rs = require "socket.io-redis"
   io.adapter rs(
     host: "localhost"
     port: 6379
     )
-  
+  ###
   require("./controller/socapi") io
   
   ###

@@ -1,6 +1,7 @@
 httpscheck = require "./https"
 
 module.exports = (app)->
+  app.get "/audio", (req,res)->res.render "audio"
   app.get "/socl", require "./socl"
   
   
