@@ -5,6 +5,22 @@
 
 
 ###
+# ランダムでリストから一件取得
+li = [1,2,3,4,5,6,7]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+console.log li.splice( Math.floor(Math.random() * li.length), 1 )[0]
+###
+
+
+###
 # コンバート
 convertTypeName = (type)->
   switch type
