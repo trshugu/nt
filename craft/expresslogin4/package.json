@@ -36,6 +36,7 @@
     "socket.io": "*",
     "socket.io-redis": "^0.1.4",
     "stylus": "*",
+    "validator": "^3.40.0",
     "xss-filters": "^1.1.2"
   }
 }
