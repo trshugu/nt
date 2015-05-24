@@ -3,6 +3,52 @@
 
 
 
+# emitter
+server = require("http").createServer (q,s)->
+  res.writeHead 200,
+    Content-Type: "text/html"
+  res.end("sev conn")
+
+console.log "1"
+io = require("socket.io").listen(server)
+server.listen 3000
+
+rs = require "socket.io-redis"
+io.adapter rs(
+  host: "localhost"
+  port: 6379
+  )
+
+
+console.log "2"
+io.sockets.on "connection", (soc)->
+  soc.on "emitkey", (d)->
+    console.log "emit11"
+    console.log d
+  
+  soc.on "disconnect", ->
+    console.log "discon"
+  
+
+console.log "3"
+cli = require("socket.io-client")
+clisoc = cli.connect("http://localhost:3000")
+
+console.log "4"
+clisoc.on 'connect', (d)-> 
+  console.log "ccc"
+
+console.log "5"
+clisoc.on "emitkey",(v)->
+  console.log "kta"
+  console.log v
+
+
+console.log "6"
+e = require("socket.io-emitter")("localhost")
+e.emit "emitkey", "valVal"
+
+
 
 ###
 # ランダムでリストから一件取得

@@ -1,0 +1,18 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type="text/javascript", src="coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    script(type="text/javascript", src="/jquery/dist/jquery.min.js")
+    script(type="text/javascript", src="/javascript/debounce.js")
+    script(type="text/coffeescript").
+      window.onload = ->
+        console.log "emb"
+  body
+    #vue
+      input(type="text" v-model="debu" debounce="800")
+      input(type="text" v-model="debu2" debounce="800")
+      .a {{debu}}
+      .2 {{debu2}}
