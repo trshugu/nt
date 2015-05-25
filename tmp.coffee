@@ -3,6 +3,18 @@
 
 
 
+# redis expire
+redis = require "redis"
+
+client = redis.createClient()
+
+client.set "exp", "ireire"
+client.expire "exp", 20
+
+client.get "exp", (e,d)->
+  console.log d
+  client.end()
+
 
 ###
 # ランダムでリストから一件取得
