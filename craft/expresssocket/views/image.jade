@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type="text/javascript", src="coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    script(type="text/javascript", src="/jquery/dist/jquery.min.js")
+    script(type="text/javascript", src="/javascript/image.js")
+    script(type="text/coffeescript")
+        
+  body
+    .file
+      #jake
+        input(type="file" name="file")
+        //-
+          img.imgView
+          p#clear
+    br
+    #vue
+      input(type="file" name="vuefile" v-model="vuefile" lazy)
+      .print {{vuefile}}
+      img(v-attr="src: vuefile")
