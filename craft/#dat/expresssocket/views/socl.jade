@@ -1,0 +1,46 @@
+doctype html
+html
+  head
+    title= title
+    script(type="text/javascript", src="coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="validator-js/validator.min.js")
+    script(type="text/javascript", src="vue/dist/vue.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(type="text/javascript", src="/javascript/socl.js")
+  body
+    #vue
+      #{list}
+      .click(v-on="click:push()") add
+      .order(v-repeat="i : lll")
+        .item {{i.name}} / {{i.type}} / {{i.src}}
+      br
+      .order(v-repeat="lll | orderBy 'name'")
+        .item {{name}} / {{type}} / {{src}}
+      
+      //-
+        .click(v-on="click:add('{\"name\":\"追加\", \"type\":\"b\", \"src\":\"<div>noi</div>\"}')") add
+        .list(v-repeat="item: get_list")
+          .obj {{item}}
+          .type(v-show="item.type == 'a'")
+            .item {{item.name}} 名前 Aです
+            .item {{item.src}} 源 Aです
+            br
+          .type(v-show="item.type == 'b'")
+            .item {{item.name}} 名前 Bです
+            .item {{item.src}} 源 Bです
+            br
+        
+        
+        br
+        br
+        .list(v-repeat="nai: arrjso")
+          item(v-repeat="nai")
+            .leaf {{$key}}
+            .leaf {{$value}}
+        br
+        .list(v-repeat="jso")
+          item {{$key}}
+          item {{$value}}
+        br
+        .list(v-repeat="laaa")
+          .item {{$value}}

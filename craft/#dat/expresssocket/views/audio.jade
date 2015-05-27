@@ -1,0 +1,27 @@
+doctype html
+html
+  head
+    title= title
+    link(type="text/css" href="/videojs/dist/video-js/video-js.min.css" rel="stylesheet")
+    script(type="text/javascript", src="/coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="/validator-js/validator.min.js")
+    script(type="text/javascript", src="/videojs/dist/video-js/video.novtt.js")
+    script(type="text/javascript", src="/audiojs/audiojs/audio.min.js")
+    script(type="text/javascript", src="/vue/dist/vue.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(type="text/javascript", src="/javascript/audiojs.js")
+
+    script(type="text/coffeescript").
+      console.log "embed"
+      # videojs.options.flash.swf = "video-js.swf"
+
+  body
+    .b b
+      audio#ichi(src="/ju.mp3" preload="auto")
+      
+      audio(src="/ju.mp3" preload="auto")
+      audio(src="/ju.mp3" preload="auto")
+      audio(src="/ju.mp3" preload="auto")
+      audio(src="/ju.mp3" preload="auto")
+
+    
