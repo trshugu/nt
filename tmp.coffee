@@ -3,6 +3,7 @@
 
 
 
+###
 # emitter
 server = require("http").createServer (q,s)->
   res.writeHead 200,
@@ -47,7 +48,38 @@ clisoc.on "emitkey",(v)->
 console.log "6"
 e = require("socket.io-emitter")("localhost")
 e.emit "emitkey", "valVal"
+###
 
+
+
+
+# server = require("http").createServer (q,s)->
+#   res.writeHead 200,
+#     Content-Type: "text/html"
+#   res.end("sev conn")
+
+require("http").createServer((a,b)-> 
+  b.end("""
+  <a href="http://localhost:3000/weakness">link</a>
+  <form method="POST" action="http://localhost:3000/weakness">
+    <input type='text' name="intext">
+    <input type='submit'>
+  </form>
+  """)
+).listen 3001
+
+
+
+###
+# 日付変換
+epoch2date = (d)->
+  console.log d
+  d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2) + " " \
+   + ("0" + d.getHours()).slice(-2) + ":" \
+   + ("0" + d.getMinutes()).slice(-2)
+###
 
 ###
 # redis expire
@@ -2414,7 +2446,7 @@ console.log "death"
 
 
 ###
-# 日付→文字
+# 日付→文字 日付変換
 d = new Date()
 s = d.getFullYear() + "/" \
    + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
@@ -2425,7 +2457,7 @@ s = d.getFullYear() + "/" \
 
 console.log s
 
-# 文字→日付(数値)
+# 文字→日付(数値) 日付数値変換
 console.log Date.parse("2015/02/25 10:50:10")
 
 console.log Date.parse(s)
