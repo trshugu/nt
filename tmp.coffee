@@ -7,9 +7,9 @@
 @method sadf
   @param [String] fdfdf
   @option [sdfkj] fefe
-###
 sadf= ->
   console.log "noi"
+###
 
 ###
 # emitter
