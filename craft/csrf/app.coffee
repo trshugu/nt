@@ -38,6 +38,8 @@ app.use session
   secret: "secretsec"
   resave: false
   saveUninitialized: true
+  proxy: true
+  cookie: {secure: true}
 
 # ==============================================================================
 # CSRF
@@ -49,6 +51,7 @@ app.use (req, res, next) ->
   next()
 
 ###
+###
 # ここにhttps対応
 app.use (req, res, next) ->
   schema = (req.headers['x-forwarded-proto'] || '').toLowerCase()
@@ -56,7 +59,6 @@ app.use (req, res, next) ->
     next()
   else
     res.redirect 'https://' + req.headers.host + req.url
-###
 
 # routes
 require("./controller/routes") app
@@ -98,3 +100,11 @@ server.listen app.get('port'), ->
   debug "Express server listening on portee " + server.address().port
 
 
+# https設定
+options = 
+  key: require("fs").readFileSync "./key.key"
+  cert: require("fs").readFileSync "./crt.crt"
+
+secserver = require("https").createServer(options, app).listen 443, ->
+  debug 'Express server listening on port ' + secserver.address().port
+# iossl = require('socket.io').listen(secserver)

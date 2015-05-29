@@ -10,6 +10,10 @@ module.exports = (req, res)->
   console.log "headerのクッキー"
   console.log req.headers.cookie
   
+  console.log "コネクション"
+  console.log req.connection.encrypted
+  console.log req.connection.proxySecure
+  
   disp = {}
   disp.title = "weakness"
   # disp.csrf = req.csrfToken()

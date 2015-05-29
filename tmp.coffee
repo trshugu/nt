@@ -3,6 +3,9 @@
 
 
 
+
+
+
 ###
 # emitter
 server = require("http").createServer (q,s)->
@@ -51,8 +54,138 @@ e.emit "emitkey", "valVal"
 ###
 
 
+###
+# 基本
+module.exports.noi = ->
+  console.log "boumow"
+
+console.log @
+@.noi()
+
+console.log this
+this.noi()
+
+console.log 0b1010
+
+for num in [0...10] by 2
+  console.log num
+
+console.log [1,2,3,4,5,6,7][2..4]
+c = [1..10][2..4]=[11,12]
+console.log c
+
+[a, b, c...] = [1,2,3,4,5,6,7]
+console.log a
+console.log c
+
+console.log not "a"
+console.log not undefined
+console.log not null
+console.log yes
+console.log no
+console.log on
+console.log off
+console.log 5**5
+console.log 3125//5
+
+param = {}
+console.log param.noi?.noir
+
+console.log i for i in [1,2,34,5]
+console.log i + j for i,j of {a: "asdf",b: "asdf"}
+###
 
 
+###
+# オブジェクト連想配列のループ2
+h = {}
+h.a = "aaa"
+h.b = "bbb"
+h.i = {}
+h.i.c = "ccc"
+h.i.d = "ddd"
+console.log h
+
+for k, v of h
+  console.log k
+  console.log v
+
+for k, v of h when k is "i"
+  for ke, va of v
+    console.log ke
+    console.log va
+###
+
+###
+# オブジェクト連想配列のループ
+item = {}
+item.c = "ccc"
+item.d = "ddd"
+
+h = {}
+h.a = "aaa"
+h.b = "bbb"
+h.i = item
+console.log h
+
+for k, v of h
+  console.log k
+  console.log v
+
+for k, v of h when k is "i"
+  for ke, va of v
+    console.log ke
+    console.log va
+###
+
+
+
+###
+# 文
+console.log "a" is "a"
+console.log "a" is "A"
+console.log a?
+console.log undifined?
+console.log null?
+console.log 0?
+console.log ""?
+console.log ''?
+console.log if true or "a" == "b" then "t" else "f"
+console.log if true and "a" == "b" then "t" else "f"
+console.log "a" isnt "b"
+console.log !"a" == false
+
+a = 5
+if 4 < a > 2
+  console.log "t"
+else
+  console.log "f"
+###
+
+
+###
+a = null
+b = "bbb"
+# a ? a = b
+# console.log a
+
+# 定義されてなかったらエラー
+# a ?= b
+# console.log a
+###
+
+###
+a = null
+b = "bbb"
+# a or a = b
+# console.log a
+
+a or= b
+console.log a
+###
+
+
+###
 # server = require("http").createServer (q,s)->
 #   res.writeHead 200,
 #     Content-Type: "text/html"
@@ -67,7 +200,7 @@ require("http").createServer((a,b)->
   </form>
   """)
 ).listen 3001
-
+###
 
 
 ###
