@@ -61,6 +61,23 @@ e.emit "emitkey", "valVal"
 
 
 
+###
+# 時限装置
+# 今の時間
+now = new Date()
+console.log now
+
+# 目的の時間
+targetTime = new Date(Date.parse("2015/06/01 15:08:00"))
+console.log targetTime
+
+# 時間判定
+if now > targetTime
+  console.log "目的の時間を過ぎている"
+else
+  console.log "目的の時間がきていない"
+###
+
 
 
 ###
