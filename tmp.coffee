@@ -59,6 +59,33 @@ e.emit "emitkey", "valVal"
 ###
 
 
+
+
+
+
+###
+# 配列が存在しなかった場合foreachに影響があるかどうか→ない
+arrayA = []
+
+listA = []
+if arrayA[0]?
+  for i in arrayA
+    listA.push i
+
+console.log listA
+
+
+arrayB = [1,2,3]
+
+listB = []
+if arrayB[0]?
+  for i in arrayB
+    listB.push i
+
+console.log listB
+###
+
+
 ###
 # 基本
 module.exports.noi = ->
