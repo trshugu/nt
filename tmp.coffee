@@ -60,6 +60,35 @@ e.emit "emitkey", "valVal"
 
 
 
+###
+# Greenwich対応
+# 今の時間
+now = new Date()
+console.log now
+console.log Date.parse(now)
+
+# 目的の時間 NG
+targetTime = new Date(Date.parse("2015/06/01 15:08:00"))
+console.log targetTime
+console.log Date.parse(targetTime)
+
+# 目的の時間2 NG
+targetTime2 = new Date(Date.parse("2015/06/01 15:08:00") - (1000 * 60 * 60 * 9))
+console.log targetTime2
+console.log Date.parse(targetTime2)
+
+# 絶対的な値で使う
+targetTime3 = Date.parse("2015/06/01 16:00:00") # 1433142000000
+console.log targetTime3
+
+# 時間判定
+if now > 1433142000000
+  console.log "目的の時間を過ぎている"
+else
+  console.log "目的の時間がきていない"
+###
+
+
 
 ###
 # 時限装置
