@@ -1,7 +1,14 @@
 ###
 ###
 
+###
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update Math.floor(Math.random() * 1000000).toString() + new Date().getTime().toString(), "utf8"
+  cry.digest 'hex'
 
+console.log getHash
+###
 
 ###
 @method sadf
