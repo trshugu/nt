@@ -834,20 +834,24 @@ console.log decode
 
 
 ###
+###
 # デコエン
 crypto = require 'crypto'
-cipher = crypto.createCipher 'aes-256-cbc', 'password'
+
 text = '共通鍵暗号方式'
+
+cipher = crypto.createCipher 'aes-256-cbc', 'password'
 crypted = cipher.update text, 'utf-8', 'hex'
 crypted += cipher.final 'hex'
+
 console.log crypted
 
 decipher = crypto.createDecipher 'aes-256-cbc', 'password'
 # decipher.update crypted, 'hex', 'utf-8'
 decode = decipher.update crypted, 'hex', 'utf-8'
 decode += decipher.final "utf-8"
+
 console.log decode
-###
 
 
 
