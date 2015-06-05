@@ -18,9 +18,15 @@ module.exports = (req, res)->
   
   # 複合
   if req.params.crypt?
-    decipher = require("crypto").createDecipheriv 'aes-256-cbc', getMD5Hash(), makeIV()
-    decode = decipher.update req.params.crypt, 'hex', 'utf-8'
-    decode += decipher.final "utf-8"
+    try
+      decipher = require("crypto").createDecipheriv 'aes-256-cbc', getMD5Hash(), makeIV()
+      decode = decipher.update req.params.crypt, 'hex', 'utf-8'
+      decode += decipher.final "utf-8"
+    catch
+      console.log "noi"
+      res.status 404 
+      res.end()
+      return
     
     filename = decode.split(",")[0]
     expire = decode.split(",")[1]
@@ -30,7 +36,8 @@ module.exports = (req, res)->
       console.log filename
       
       console.log "1"
-      res.header "Content-Disposition", "attachment; filename=" + filename
+      # res.header "Content-Disposition", "attachment; filename=" + filename
+      res.attachment filename
       res.type "mp3"
       req.pipe(require("request")("/source/" + filename)).pipe(res)
       # res.end 200
