@@ -1,8 +1,14 @@
 extends layout
 
+block js
+  script(type="text/javascript", src="/audiojs/audiojs/audio.min.js")
+  script(type="text/javascript", src="/javascript/audiojs.js")
+
 block content
   h1= title
   p Welcome to #{title}
   
   
-  a(href="./api/#{crypt_url}") ./api/#{crypt_url}
+  a(href="./api/#{crypt_url}") download
+  
+  audio#api(src="./api/#{crypt_url}" preload="auto")

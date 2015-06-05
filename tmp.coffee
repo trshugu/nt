@@ -1,6 +1,63 @@
 ###
 ###
 
+
+
+
+
+###
+# request再度
+require("request").get
+  url: "http://localhost:3000/json"
+  json:false
+  , (e,s,b)->
+    if e?
+      console.log e
+    else
+      console.log s
+      console.log b.asdf
+###
+
+
+
+###
+# デコエン3
+crypto = require 'crypto'
+
+# cryptkey作成
+getMD5Hash = -> 
+  cry = require("crypto").createHash 'MD5'
+  cry.update "randomToken", "utf8"
+  cry.digest 'hex'
+
+# IVの鍵作成
+hash = crypto.createHash 'md5'
+hash.update 'randomToken'
+ive = hash.digest()
+
+text = '共通鍵暗号方式'
+
+hash = "526b0e737e7ad6e3"
+# hash = getMD5Hash()
+# 526b0e737e7ad6e3
+# 344da44e56559ce5
+console.log getMD5Hash()
+
+cipher = crypto.createCipheriv 'aes-128-cbc', hash, ive
+crypted = cipher.update text, 'utf-8', 'hex'
+crypted += cipher.final 'hex'
+
+console.log crypted
+
+decipher = crypto.createDecipheriv 'aes-128-cbc', hash, ive
+# decipher.update crypted, 'hex', 'utf-8'
+decode = decipher.update crypted, 'hex', 'utf-8'
+decode += decipher.final "utf-8"
+
+console.log decode
+console.log new Date().getTime() + (60 * 60 * 1000)
+###
+
 ###
 getHash = -> 
   cry = require("crypto").createHash 'SHA256'
@@ -815,25 +872,27 @@ console.log c
 # デコエン2
 crypto = require 'crypto'
 
+# IVの鍵作成
 hash = crypto.createHash 'md5'
 hash.update 'randomToken'
 ive = hash.digest()
 
-cipher = crypto.createCipheriv 'aes-256-cbc', "b52c96bea30646abf8170f333bbd42b9", ive
 text = '共通鍵暗号方式'
+
+cipher = crypto.createCipheriv 'aes-256-cbc', "b52c96bea30646abf8170f333bbd42b9", ive
 crypted = cipher.update text, 'utf-8', 'hex'
 crypted += cipher.final 'hex'
+
 console.log crypted
 
 decipher = crypto.createDecipheriv 'aes-256-cbc', "b52c96bea30646abf8170f333bbd42b9", ive
 # decipher.update crypted, 'hex', 'utf-8'
 decode = decipher.update crypted, 'hex', 'utf-8'
 decode += decipher.final "utf-8"
+
 console.log decode
 ###
 
-
-###
 ###
 # デコエン
 crypto = require 'crypto'
@@ -852,6 +911,7 @@ decode = decipher.update crypted, 'hex', 'utf-8'
 decode += decipher.final "utf-8"
 
 console.log decode
+###
 
 
 
