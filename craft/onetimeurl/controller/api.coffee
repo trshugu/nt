@@ -36,25 +36,62 @@ module.exports = (req, res)->
       console.log filename
       
       console.log "1"
-      # res.header "Content-Disposition", "attachment; filename=" + filename
-      res.attachment filename
-      res.type "mp3"
-      req.pipe(require("request")("/source/" + filename)).pipe(res)
-      # res.end 200
-      ###
-      require("http").get("/source/" + filename).on "response", (s)->
-        console.log "2"
-        data = ""
-        s.on "data", (c)->
-          data += c
+      try
+        # res.header "Content-Disposition", "attachment; filename=" + filename
+        res.attachment filename
+        res.type "mp3"
+        res.status "206"
+        # noi = req.pipe(require("request")("test/source/" + filename))
+        # noi.pipe(res)
+        ###
+        q = require("request").get("test/source/" + filename)
+        q.on "response", (s)->
+          body = ""
+          s.on "data", (c)->
+            # body += c
+            res.write c
+          
+          s.on "end", ->
+            console.log "end!!"
+            res.end()
+        ###
         
-        s.on "end", ->
-          console.log "4"
-          # console.log data
-          res.type "mp3"
-          res.send data
-      ###
-      console.log "5"
+        # res.sendFile "test/source/" + filename
+        res.redirect "test/source/" + filename
+        
+        console.log "keizoku"
+        
+        
+        ###
+        noi.on "end", ->
+          console.log "end!!"
+          res.end()
+          return
+        
+        res.on "finish", ->
+          console.log "fion!!"
+          res.end()
+          return
+        ###
+        
+        # res.end 200
+        ###
+        require("http").get("/source/" + filename).on "response", (s)->
+          console.log "2"
+          data = ""
+          s.on "data", (c)->
+            data += c
+          
+          s.on "end", ->
+            console.log "4"
+            # console.log data
+            res.type "mp3"
+            res.send data
+        ###
+        console.log "5"
+      catch e
+        console.log "catch"
+        console.log e
     else
       console.log "有効期限ぎれ"
       res.send "passed away"
