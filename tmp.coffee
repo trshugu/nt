@@ -6,6 +6,329 @@
 
 
 ###
+# express-jwtその2
+app = require("express")()
+jwt= require "jsonwebtoken" 
+ejwt = require "express-jwt"
+
+
+SEC = "rexret"
+
+app.use "/api", ejwt secret:SEC
+
+app.get "/auth", (req,res)->
+  pro =
+    saf:"ichi"
+    werwer:"nii"
+    fefef:"sann"
+  
+  token = jwt.sign pro, SEC, {expiresInMinutes: 60*5}
+  
+  res.json {token:token}
+  console.log req.body
+  for i,j of res
+    console.log i
+  
+  if !req.body? or req.body.jjwwtt != "noi"
+    res.send "nothinn"
+    return
+  else
+    pro =
+      saf:"ichi"
+      werwer:"nii"
+      fefef:"sann"
+    
+    token = jwt.sign pro, SEC, {expiresInMinutes: 60*5}
+    
+    res.json {token:token}
+
+app.get "/",(req,res)->
+  # console.log req
+  # console.log res
+  res.json req
+
+require("http").createServer(app).listen 3000,-> console.log "go"
+###
+
+###
+# express-jwtその1
+app = require("express")()
+jwt = require "express-jwt"
+
+app.get "/",
+  jwt secret: "rexret"
+  (req,res)->
+    console.log req
+    console.log res
+    res.send "deash"
+
+
+require("http").createServer(app).listen 3000,-> console.log "go"
+###
+
+
+###
+# JWTその2 
+token = require("jsonwebtoken").sign
+  da: "taa"
+  , "secrett"
+
+require("jsonwebtoken").verify token, "secrett", (e, d)->
+  if e?
+    console.log e
+    console.log e.name
+    console.log e.message
+  else
+    console.log d
+    console.log d.da
+
+deco = require("jsonwebtoken").decode token, complete:true
+console.log deco
+console.log deco.header
+console.log deco.payload
+console.log deco.signature
+###
+
+
+
+###
+# JWTその1
+jwt = require "jsonwebtoken"
+
+data = da: "taa"
+# console.log data
+
+token = jwt.sign data, "secrett"
+# console.log token
+
+jwt.verify token, "secrett", (e, d)->
+  console.log d.da
+###
+
+###
+console.log "2015/06/11 00:00:00 -> " + (new Date("2015/06/11 00:00:00").getTime())
+console.log "2015/06/12 00:00:00 -> " + (new Date("2015/06/12 00:00:00").getTime())
+console.log "2015/06/12 10:30:00 -> " + (new Date("2015/06/12 10:30:00").getTime())
+console.log "2015/06/12 11:00:00 -> " + (new Date("2015/06/12 11:00:00").getTime())
+console.log "2015/06/12 12:00:00 -> " + (new Date("2015/06/12 12:00:00").getTime())
+###
+
+###
+console.log "2015/06/14 00:00:00 -> " + (new Date("2015/06/14 00:00:00").getTime())
+console.log "2015/06/16 00:00:00 -> " + (new Date("2015/06/16 00:00:00").getTime())
+console.log "2015/06/17 00:00:00 -> " + (new Date("2015/06/17 00:00:00").getTime())
+console.log "2015/06/18 00:00:00 -> " + (new Date("2015/06/18 00:00:00").getTime())
+console.log "2015/06/19 00:00:00 -> " + (new Date("2015/06/19 00:00:00").getTime())
+###
+
+###
+console.log (1433862000000 / 600000) % 60
+console.log (1433862600000 / 600000) % 60
+console.log 1433863200000 / 600000
+console.log 1433863800000 / 600000
+console.log 1433864400000 / 600000
+console.log 1433865000000 / 600000
+console.log 1433865600000 / 600000
+console.log 1433866200000 / 600000
+console.log 1433866800000 / 600000
+console.log 1433867400000 / 600000
+console.log 1433868000000 / 600000
+console.log 1433868600000 / 600000
+console.log 1433869200000 / 600000
+console.log 1433869800000 / 600000
+console.log 1433870400000 / 600000
+console.log 1433871000000 / 600000
+console.log 1433871600000 / 600000
+console.log 1433872200000 / 600000
+console.log 1433872800000 / 600000
+###
+
+###
+a=2
+switch
+  when 1>a then console.log "ichi"
+  when 2>a then console.log "ni"
+  when 3>a then console.log "san"
+  when 4>a then console.log "shi"
+  else console.log "death"
+###
+
+###
+# 時刻
+console.log "2015/06/10 00:00:00 -> " + (new Date("2015/06/10 00:00:00").getTime())
+console.log "2015/06/10 00:10:00 -> " + (new Date("2015/06/10 00:10:00").getTime())
+console.log "2015/06/10 00:20:00 -> " + (new Date("2015/06/10 00:20:00").getTime())
+console.log "2015/06/10 00:30:00 -> " + (new Date("2015/06/10 00:30:00").getTime())
+console.log "2015/06/10 00:40:00 -> " + (new Date("2015/06/10 00:40:00").getTime())
+console.log "2015/06/10 00:50:00 -> " + (new Date("2015/06/10 00:50:00").getTime())
+
+console.log "2015/06/10 01:00:00 -> " + (new Date("2015/06/10 01:00:00").getTime())
+console.log "2015/06/10 01:10:00 -> " + (new Date("2015/06/10 01:10:00").getTime())
+console.log "2015/06/10 01:20:00 -> " + (new Date("2015/06/10 01:20:00").getTime())
+console.log "2015/06/10 01:30:00 -> " + (new Date("2015/06/10 01:30:00").getTime())
+console.log "2015/06/10 01:40:00 -> " + (new Date("2015/06/10 01:40:00").getTime())
+console.log "2015/06/10 01:50:00 -> " + (new Date("2015/06/10 01:50:00").getTime())
+                                                               
+console.log "2015/06/10 02:00:00 -> " + (new Date("2015/06/10 02:00:00").getTime())
+console.log "2015/06/10 02:10:00 -> " + (new Date("2015/06/10 02:10:00").getTime())
+console.log "2015/06/10 02:20:00 -> " + (new Date("2015/06/10 02:20:00").getTime())
+console.log "2015/06/10 02:30:00 -> " + (new Date("2015/06/10 02:30:00").getTime())
+console.log "2015/06/10 02:40:00 -> " + (new Date("2015/06/10 02:40:00").getTime())
+console.log "2015/06/10 02:50:00 -> " + (new Date("2015/06/10 02:50:00").getTime())
+                                                               
+console.log "2015/06/10 03:00:00 -> " + (new Date("2015/06/10 03:00:00").getTime())
+console.log "2015/06/10 03:10:00 -> " + (new Date("2015/06/10 03:10:00").getTime())
+console.log "2015/06/10 03:20:00 -> " + (new Date("2015/06/10 03:20:00").getTime())
+console.log "2015/06/10 03:30:00 -> " + (new Date("2015/06/10 03:30:00").getTime())
+console.log "2015/06/10 03:40:00 -> " + (new Date("2015/06/10 03:40:00").getTime())
+console.log "2015/06/10 03:50:00 -> " + (new Date("2015/06/10 03:50:00").getTime())
+                                                               
+console.log "2015/06/10 04:00:00 -> " + (new Date("2015/06/10 04:00:00").getTime())
+console.log "2015/06/10 04:10:00 -> " + (new Date("2015/06/10 04:10:00").getTime())
+console.log "2015/06/10 04:20:00 -> " + (new Date("2015/06/10 04:20:00").getTime())
+console.log "2015/06/10 04:30:00 -> " + (new Date("2015/06/10 04:30:00").getTime())
+console.log "2015/06/10 04:40:00 -> " + (new Date("2015/06/10 04:40:00").getTime())
+console.log "2015/06/10 04:50:00 -> " + (new Date("2015/06/10 04:50:00").getTime())
+                                                               
+console.log "2015/06/10 05:00:00 -> " + (new Date("2015/06/10 05:00:00").getTime())
+console.log "2015/06/10 05:10:00 -> " + (new Date("2015/06/10 05:10:00").getTime())
+console.log "2015/06/10 05:20:00 -> " + (new Date("2015/06/10 05:20:00").getTime())
+console.log "2015/06/10 05:30:00 -> " + (new Date("2015/06/10 05:30:00").getTime())
+console.log "2015/06/10 05:40:00 -> " + (new Date("2015/06/10 05:40:00").getTime())
+console.log "2015/06/10 05:50:00 -> " + (new Date("2015/06/10 05:50:00").getTime())
+                                                               
+console.log "2015/06/10 06:00:00 -> " + (new Date("2015/06/10 06:00:00").getTime())
+console.log "2015/06/10 06:10:00 -> " + (new Date("2015/06/10 06:10:00").getTime())
+console.log "2015/06/10 06:20:00 -> " + (new Date("2015/06/10 06:20:00").getTime())
+console.log "2015/06/10 06:30:00 -> " + (new Date("2015/06/10 06:30:00").getTime())
+console.log "2015/06/10 06:40:00 -> " + (new Date("2015/06/10 06:40:00").getTime())
+console.log "2015/06/10 06:50:00 -> " + (new Date("2015/06/10 06:50:00").getTime())
+                                                               
+console.log "2015/06/10 07:00:00 -> " + (new Date("2015/06/10 07:00:00").getTime())
+console.log "2015/06/10 07:10:00 -> " + (new Date("2015/06/10 07:10:00").getTime())
+console.log "2015/06/10 07:20:00 -> " + (new Date("2015/06/10 07:20:00").getTime())
+console.log "2015/06/10 07:30:00 -> " + (new Date("2015/06/10 07:30:00").getTime())
+console.log "2015/06/10 07:40:00 -> " + (new Date("2015/06/10 07:40:00").getTime())
+console.log "2015/06/10 07:50:00 -> " + (new Date("2015/06/10 07:50:00").getTime())
+                                                               
+console.log "2015/06/10 08:00:00 -> " + (new Date("2015/06/10 08:00:00").getTime())
+console.log "2015/06/10 08:10:00 -> " + (new Date("2015/06/10 08:10:00").getTime())
+console.log "2015/06/10 08:20:00 -> " + (new Date("2015/06/10 08:20:00").getTime())
+console.log "2015/06/10 08:30:00 -> " + (new Date("2015/06/10 08:30:00").getTime())
+console.log "2015/06/10 08:40:00 -> " + (new Date("2015/06/10 08:40:00").getTime())
+console.log "2015/06/10 08:50:00 -> " + (new Date("2015/06/10 08:50:00").getTime())
+                                                               
+console.log "2015/06/10 09:00:00 -> " + (new Date("2015/06/10 09:00:00").getTime())
+console.log "2015/06/10 09:10:00 -> " + (new Date("2015/06/10 09:10:00").getTime())
+console.log "2015/06/10 09:20:00 -> " + (new Date("2015/06/10 09:20:00").getTime())
+console.log "2015/06/10 09:30:00 -> " + (new Date("2015/06/10 09:30:00").getTime())
+console.log "2015/06/10 09:40:00 -> " + (new Date("2015/06/10 09:40:00").getTime())
+console.log "2015/06/10 09:50:00 -> " + (new Date("2015/06/10 09:50:00").getTime())
+                                                               
+console.log "2015/06/10 10:00:00 -> " + (new Date("2015/06/10 10:00:00").getTime())
+console.log "2015/06/10 10:10:00 -> " + (new Date("2015/06/10 10:10:00").getTime())
+console.log "2015/06/10 10:20:00 -> " + (new Date("2015/06/10 10:20:00").getTime())
+console.log "2015/06/10 10:30:00 -> " + (new Date("2015/06/10 10:30:00").getTime())
+console.log "2015/06/10 10:40:00 -> " + (new Date("2015/06/10 10:40:00").getTime())
+console.log "2015/06/10 10:50:00 -> " + (new Date("2015/06/10 10:50:00").getTime())
+                                                               
+console.log "2015/06/10 11:00:00 -> " + (new Date("2015/06/10 11:00:00").getTime())
+console.log "2015/06/10 11:10:00 -> " + (new Date("2015/06/10 11:10:00").getTime())
+console.log "2015/06/10 11:20:00 -> " + (new Date("2015/06/10 11:20:00").getTime())
+console.log "2015/06/10 11:30:00 -> " + (new Date("2015/06/10 11:30:00").getTime())
+console.log "2015/06/10 11:40:00 -> " + (new Date("2015/06/10 11:40:00").getTime())
+console.log "2015/06/10 11:50:00 -> " + (new Date("2015/06/10 11:50:00").getTime())
+                                                               
+console.log "2015/06/10 12:00:00 -> " + (new Date("2015/06/10 12:00:00").getTime())
+console.log "2015/06/10 12:10:00 -> " + (new Date("2015/06/10 12:10:00").getTime())
+console.log "2015/06/10 12:20:00 -> " + (new Date("2015/06/10 12:20:00").getTime())
+console.log "2015/06/10 12:30:00 -> " + (new Date("2015/06/10 12:30:00").getTime())
+console.log "2015/06/10 12:40:00 -> " + (new Date("2015/06/10 12:40:00").getTime())
+console.log "2015/06/10 12:50:00 -> " + (new Date("2015/06/10 12:50:00").getTime())
+                                                               
+console.log "2015/06/10 13:00:00 -> " + (new Date("2015/06/10 13:00:00").getTime())
+console.log "2015/06/10 13:10:00 -> " + (new Date("2015/06/10 13:10:00").getTime())
+console.log "2015/06/10 13:20:00 -> " + (new Date("2015/06/10 13:20:00").getTime())
+console.log "2015/06/10 13:30:00 -> " + (new Date("2015/06/10 13:30:00").getTime())
+console.log "2015/06/10 13:40:00 -> " + (new Date("2015/06/10 13:40:00").getTime())
+console.log "2015/06/10 13:50:00 -> " + (new Date("2015/06/10 13:50:00").getTime())
+                                                               
+console.log "2015/06/10 14:00:00 -> " + (new Date("2015/06/10 14:00:00").getTime())
+console.log "2015/06/10 14:10:00 -> " + (new Date("2015/06/10 14:10:00").getTime())
+console.log "2015/06/10 14:20:00 -> " + (new Date("2015/06/10 14:20:00").getTime())
+console.log "2015/06/10 14:30:00 -> " + (new Date("2015/06/10 14:30:00").getTime())
+console.log "2015/06/10 14:40:00 -> " + (new Date("2015/06/10 14:40:00").getTime())
+console.log "2015/06/10 14:50:00 -> " + (new Date("2015/06/10 14:50:00").getTime())
+                                                               
+console.log "2015/06/10 15:00:00 -> " + (new Date("2015/06/10 15:00:00").getTime())
+console.log "2015/06/10 15:10:00 -> " + (new Date("2015/06/10 15:10:00").getTime())
+console.log "2015/06/10 15:20:00 -> " + (new Date("2015/06/10 15:20:00").getTime())
+console.log "2015/06/10 15:30:00 -> " + (new Date("2015/06/10 15:30:00").getTime())
+console.log "2015/06/10 15:40:00 -> " + (new Date("2015/06/10 15:40:00").getTime())
+console.log "2015/06/10 15:50:00 -> " + (new Date("2015/06/10 15:50:00").getTime())
+                                                               
+console.log "2015/06/10 16:00:00 -> " + (new Date("2015/06/10 16:00:00").getTime())
+console.log "2015/06/10 16:10:00 -> " + (new Date("2015/06/10 16:10:00").getTime())
+console.log "2015/06/10 16:20:00 -> " + (new Date("2015/06/10 16:20:00").getTime())
+console.log "2015/06/10 16:30:00 -> " + (new Date("2015/06/10 16:30:00").getTime())
+console.log "2015/06/10 16:40:00 -> " + (new Date("2015/06/10 16:40:00").getTime())
+console.log "2015/06/10 16:50:00 -> " + (new Date("2015/06/10 16:50:00").getTime())
+                                                               
+console.log "2015/06/10 17:00:00 -> " + (new Date("2015/06/10 17:00:00").getTime())
+console.log "2015/06/10 17:10:00 -> " + (new Date("2015/06/10 17:10:00").getTime())
+console.log "2015/06/10 17:20:00 -> " + (new Date("2015/06/10 17:20:00").getTime())
+console.log "2015/06/10 17:30:00 -> " + (new Date("2015/06/10 17:30:00").getTime())
+console.log "2015/06/10 17:40:00 -> " + (new Date("2015/06/10 17:40:00").getTime())
+console.log "2015/06/10 17:50:00 -> " + (new Date("2015/06/10 17:50:00").getTime())
+                                                               
+console.log "2015/06/10 18:00:00 -> " + (new Date("2015/06/10 18:00:00").getTime())
+console.log "2015/06/10 18:10:00 -> " + (new Date("2015/06/10 18:10:00").getTime())
+console.log "2015/06/10 18:20:00 -> " + (new Date("2015/06/10 18:20:00").getTime())
+console.log "2015/06/10 18:30:00 -> " + (new Date("2015/06/10 18:30:00").getTime())
+console.log "2015/06/10 18:40:00 -> " + (new Date("2015/06/10 18:40:00").getTime())
+console.log "2015/06/10 18:50:00 -> " + (new Date("2015/06/10 18:50:00").getTime())
+                                                               
+console.log "2015/06/10 19:00:00 -> " + (new Date("2015/06/10 19:00:00").getTime())
+console.log "2015/06/10 19:10:00 -> " + (new Date("2015/06/10 19:10:00").getTime())
+console.log "2015/06/10 19:20:00 -> " + (new Date("2015/06/10 19:20:00").getTime())
+console.log "2015/06/10 19:30:00 -> " + (new Date("2015/06/10 19:30:00").getTime())
+console.log "2015/06/10 19:40:00 -> " + (new Date("2015/06/10 19:40:00").getTime())
+console.log "2015/06/10 19:50:00 -> " + (new Date("2015/06/10 19:50:00").getTime())
+                                                               
+console.log "2015/06/10 20:00:00 -> " + (new Date("2015/06/10 20:00:00").getTime())
+console.log "2015/06/10 20:10:00 -> " + (new Date("2015/06/10 20:10:00").getTime())
+console.log "2015/06/10 20:20:00 -> " + (new Date("2015/06/10 20:20:00").getTime())
+console.log "2015/06/10 20:30:00 -> " + (new Date("2015/06/10 20:30:00").getTime())
+console.log "2015/06/10 20:40:00 -> " + (new Date("2015/06/10 20:40:00").getTime())
+console.log "2015/06/10 20:50:00 -> " + (new Date("2015/06/10 20:50:00").getTime())
+                                                               
+console.log "2015/06/10 21:00:00 -> " + (new Date("2015/06/10 21:00:00").getTime())
+console.log "2015/06/10 21:10:00 -> " + (new Date("2015/06/10 21:10:00").getTime())
+console.log "2015/06/10 21:20:00 -> " + (new Date("2015/06/10 21:20:00").getTime())
+console.log "2015/06/10 21:30:00 -> " + (new Date("2015/06/10 21:30:00").getTime())
+console.log "2015/06/10 21:40:00 -> " + (new Date("2015/06/10 21:40:00").getTime())
+console.log "2015/06/10 21:50:00 -> " + (new Date("2015/06/10 21:50:00").getTime())
+                                                               
+console.log "2015/06/10 22:00:00 -> " + (new Date("2015/06/10 22:00:00").getTime())
+console.log "2015/06/10 22:10:00 -> " + (new Date("2015/06/10 22:10:00").getTime())
+console.log "2015/06/10 22:20:00 -> " + (new Date("2015/06/10 22:20:00").getTime())
+console.log "2015/06/10 22:30:00 -> " + (new Date("2015/06/10 22:30:00").getTime())
+console.log "2015/06/10 22:40:00 -> " + (new Date("2015/06/10 22:40:00").getTime())
+console.log "2015/06/10 22:50:00 -> " + (new Date("2015/06/10 22:50:00").getTime())
+
+console.log "2015/06/10 23:00:00 -> " + (new Date("2015/06/10 23:00:00").getTime())
+console.log "2015/06/10 23:10:00 -> " + (new Date("2015/06/10 23:10:00").getTime())
+console.log "2015/06/10 23:20:00 -> " + (new Date("2015/06/10 23:20:00").getTime())
+console.log "2015/06/10 23:30:00 -> " + (new Date("2015/06/10 23:30:00").getTime())
+console.log "2015/06/10 23:40:00 -> " + (new Date("2015/06/10 23:40:00").getTime())
+console.log "2015/06/10 23:50:00 -> " + (new Date("2015/06/10 23:50:00").getTime())
+###
+
+
+
+
+
+###
 # request再度
 require("request").get
   url: "http://localhost:3000/json"
