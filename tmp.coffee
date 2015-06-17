@@ -6,6 +6,23 @@
 
 
 ###
+# 再帰的@→不可
+recu = (con, nene=null)->
+  console.log con
+  console.log nene
+  
+  console.log @
+  
+  if nene == null
+    recu "nikaime", "nini"
+
+console.log "start"
+recu "dodo"
+console.log "end"
+###
+
+
+###
 # express-jwtその2
 app = require("express")()
 jwt= require "jsonwebtoken" 
