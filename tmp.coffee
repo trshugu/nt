@@ -5,7 +5,17 @@
 
 
 
-
+###
+# コンソールを表示したときに演算が行われる
+a = {}
+ 
+setTimeout ->
+  a.hoge = "Hello world!"
+,1000
+ 
+console.log "output a ->", a
+console.log "output a.hoge ->", a.hoge
+###
 
 ###
 # jointjs
