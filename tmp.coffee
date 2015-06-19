@@ -5,6 +5,22 @@
 
 
 
+
+
+###
+# jointjs
+j = require "jointjs"
+g = new j.dia.Graph
+el1 = new j.shapes.basic.Rect
+  position:{x:50,y:50}
+  attrs:{text:{fill:"yellow"}}
+
+g.addCells [el1]
+
+console.log g.toJSON()
+###
+
+
 ###
 # 再帰的@→不可
 recu = (con, nene=null)->
