@@ -4,6 +4,17 @@
 
 
 
+###
+# NG
+num = Math.floor(Math.random() * 100)
+switch num
+  when [1...30].map((i)->i)
+    console.log "ture"
+  else
+    console.log "noi"
+
+console.log num
+###
 
 ###
 # コンソールを表示したときに演算が行われる
