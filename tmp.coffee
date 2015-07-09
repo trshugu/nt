@@ -1,7 +1,113 @@
+stdt = new Date()
 ###
 ###
 
 
+###
+# ランダムな数字がランダムに返ってくるのをソートする
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update Math.floor(Math.random() * 1000000).toString() + new Date().getTime().toString(), "utf8"
+  cry.digest 'hex'
+
+getRandomRandomList = ()->
+  list = []
+  
+  [0...Math.floor(Math.random() * 10)].forEach (i)->
+    obj = {}
+    obj.id = getHash()
+    obj.num = Math.floor(Math.random() * 1000000000000)
+    list.push obj
+  
+  return list
+
+sorting = (list)->
+  list.sort (a,b)-> 
+    return 1 if parseInt(a.num) < parseInt(b.num)
+    return -1 if parseInt(a.num) > parseInt(b.num)
+    return 0
+  return list
+###
+
+# getMax = (list, max)->
+#   sorting(list).splice(0, max)
+
+###
+list = []
+allcnt = 0
+# [0...10].forEach (i)->
+# while allcnt < 6500000
+# 一千万逐次処理なら80秒
+# while allcnt < 10000000
+while allcnt < 100000
+  grrl = getRandomRandomList()
+  allcnt = allcnt + grrl.length 
+  list = list.concat grrl
+  # list = getMax(list, 25)
+  # list = sorting(list).splice(0, 25)
+  list = sorting(list).splice(0, 100)
+###
+
+###
+# 一千万最後pop方式なら60秒
+list = []
+allcnt = 0
+while allcnt < 10000000
+  grrl = getRandomRandomList()
+  allcnt = allcnt + grrl.length 
+  grrl.forEach (i)->
+    if list.length >= 100
+      if i.num > list[99].num 
+        list.pop()
+        list.push i
+        list = sorting list
+    else
+      list.push i
+      list = sorting list
+
+console.log list.map((i)->i.num)
+console.log list.length
+console.log "allcnt:" + allcnt.toString()
+console.log "alltime:" + (new Date() - stdt).toString()
+###
+
+###
+getRandomList = (cnt = 10)->
+  list = []
+  
+  [0...cnt].forEach (i)->
+    obj = {}
+    obj.id = getHash()
+    obj.num = Math.floor(Math.random() * 100000000)
+    list.push obj
+  
+  return list
+###
+
+
+
+
+
+# 一千万ソートは無理がありそう
+# sorting getRandomList(10000000)
+
+###
+# ng
+list = []
+while list.length < 1000000
+  list = list.concat sorting getRandomRandomList()
+###
+
+
+###
+[0...5].forEach (i)->
+  return false if list.length > 10
+  
+  list = list.concat sorting getRandomRandomList()
+###
+
+# console.log list.length
+# console.log "alltime:" + (new Date() - stdt).toString()
 
 
 ###
