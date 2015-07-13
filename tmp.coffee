@@ -3,6 +3,35 @@ stdt = new Date()
 ###
 
 
+
+###
+interceptFilenameText = (filename, text)->
+  file = filename
+  splited = file.split(".")
+  if splited.length > 1
+    ext = splited.pop()
+    splited.push splited.pop() + text
+    splited.push ext
+    splited.join(".")
+  else
+    return "err"
+
+console.log interceptFilenameText "assadflj.jpg", "_20150101"
+###
+
+###
+# 拡張子の入れ替えパターン(splitしてpop)
+file = "asdfsdf.jpg"
+splited = file.split(".")
+ext = splited.pop()
+splited.push "_20150101"
+splited.push "."
+splited.push ext
+console.log splited.join("")
+###
+
+
+
 ###
 # ランダムな数字がランダムに返ってくるのをソートする
 getHash = -> 
