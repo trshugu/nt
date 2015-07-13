@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type="text/javascript", src="/coffee-script/extras/coffee-script.js")
+    script(type="text/javascript", src="/vue/dist/vue.min.js")
+    script(src="//localhost:3001/socket.io/socket.io.js")
+    script(type="text/javascript", src="/javascripts/sio.js")
+  body
+    #sio sio
+    #vue
+      span 接続：
+      span(v-text="conn")
+
