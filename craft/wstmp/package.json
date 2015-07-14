@@ -1,17 +1,15 @@
 {
-  "name": "socketiotmp",
+  "name": "wstmp",
   "version": "1.0.0",
   "description": "",
-  "main": "tmp.coffee",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jade": "^1.11.0",
-    "nodemon": "^1.3.7",
-    "socket.io": "^1.3.5",
-    "socket.io-redis": "^0.1.4"
+    "express": "^4.13.1",
+    "ws": "^0.7.2"
   }
 }

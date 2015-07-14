@@ -4,6 +4,252 @@ stdt = new Date()
 
 
 
+
+###
+# emitter5
+switch process.argv[2]
+  when "1"
+    console.log "1"
+    io = require('socket.io').listen(
+      require('http').createServer (req, res)-> 
+        res.writeHead 200, "Content-Type":"text/html"
+        res.end require('jade').compileFile("./index.jade")()
+      .listen(process.env.VMC_APP_PORT || 3001)
+    )
+    
+    io.adapter require("socket.io-redis")()
+    # io.set "transports",["websocket", "polling"]
+    
+    io.sockets.on "connection", (soc)->
+      console.log "server_conn"
+      soc.on "s",(d)->
+        console.log "s"
+        console.log d
+      
+      soc.on "ioemit",(data)-> io.emit "cast",(data)
+      soc.on 'broadcast', (data) -> soc.broadcast.emit "cast",(data)
+      soc.on 'socemit', (data) -> soc.emit "cast",(data)
+    
+  when "2"
+    console.log "2"
+    clisoc = require("socket.io-client").connect("http://localhost:3001")
+    clisoc.on 'c', (data) ->
+      console.log "c"
+      console.log data
+    
+    clisoc.on "c_emit",(v)-> clisoc.emit 's', v
+    
+  when "3"
+    console.log "3"
+    # redisの場所を指定
+    e = require("socket.io-emitter")("localhost")
+    e.emit "tofro3", "noifor"
+    e.emit "s", "tos"
+    e.emit "c", "toc"
+    e.emit "c_emit", "toc_tmi"
+  else
+    console.log "else"
+###
+
+
+
+
+
+
+###
+# emitter4
+io = require('socket.io').listen(
+  require('http').createServer (req, res)-> 
+    res.writeHead 200, "Content-Type":"text/html"
+    res.end require('jade').compileFile("./index.jade")()
+  .listen(process.env.VMC_APP_PORT || 3001)
+)
+
+io.adapter require("socket.io-redis")()
+# io.set "transports",["websocket", "polling"]
+
+io.sockets.on "connection", (soc)->
+  console.log "sev-conn"
+  soc.on "sev-emit",(d)->
+    console.log "rust"
+    console.log d
+  
+  soc.on "disconnect", ->
+    console.log "discon"
+  
+  soc.on 'ioemit', (data) -> io.emit "cast",(data)
+  soc.on 'broadcast', (data) -> soc.broadcast.emit "cast",(data)
+  soc.on 'socemit', (data) ->
+    console.log "check"
+    soc.emit "cast",(data)
+  
+  soc.on "tofro2",(v)->
+    console.log "nininini"
+    soc.emit 'tofro3', "eses"
+
+
+clisoc = require("socket.io-client").connect("http://localhost:3001")
+
+clisoc.on 'connect', -> console.log "cli-conn"
+
+clisoc.on 'cli-putter', (data) ->
+  console.log "putter"
+  console.log data
+  clisoc.emit "sev-emit", "severemit"
+
+clisoc.on "emitkeycli",(v)->
+  console.log "emitcli-kta"
+  console.log v
+  clisoc.emit "cli-putter", "puttau@tta"
+
+clisoc.on "tosev",(v)->
+  clisoc.emit 'ioemit', v
+
+clisoc.on "tofro1",(v)->
+  console.log "ichi"
+  clisoc.emit 'tofro2', "onono"
+
+
+
+# redisの場所を指定
+e = require("socket.io-emitter")("localhost")
+e.emit "cli-putter", "putted"
+e.emit "emitkeycli", "hakka"
+e.emit "tosev", "this is emittter"
+e.emit "socemit", "noi"
+e.emit "tofro3", "noifor"
+###
+
+
+###
+# emitter3
+io = require('socket.io').listen(
+  require('http').createServer (req, res)-> 
+    res.writeHead 200, "Content-Type":"text/html"
+    res.end require('jade').compileFile("./index.jade")()
+  .listen(process.env.VMC_APP_PORT || 3001)
+)
+
+io.adapter require("socket.io-redis")()
+# io.set "transports",["websocket", "polling"]
+
+# io.sockets.on "koreka", (d)->
+#   console.log "korenanone"
+ #  console.log d
+
+io.sockets.on "connection", (soc)->
+  console.log "conn-sev"
+  soc.on "koreka",(d)->
+    console.log "rust"
+    console.log d
+  
+  soc.on "emitkey", (d)->
+    console.log "emit-sev"
+    console.log d
+  
+  soc.on 'ioemit', (data) -> io.emit "cast",(data)
+  soc.on 'broadcast', (data) -> soc.broadcast.emit "cast",(data)
+  soc.on 'socemit', (data) -> soc.emit "cast",(data)
+  
+  soc.on "disconnect", ->
+    console.log "discon"
+
+clisoc = require("socket.io-client").connect("http://localhost:3001")
+
+clisoc.on 'cliioemit', (data) ->
+  console.log "emitnasi io"
+  clisoc.emit "cast",(data)
+  clisoc.emit "koreka",(data)
+
+# clisoc.on 'clibroadcast', (data) -> clisoc.broadcast.emit "cast",(data)
+
+clisoc.on 'clisocemit', (data) ->
+  console.log "emit nasi soc"
+  clisoc.emit "cast",(data)
+
+clisoc.on 'connection', (d)-> 
+  console.log "cli-conntion"
+
+clisoc.on 'connect', ()-> 
+  console.log "cli-conn"
+
+clisoc.on "emitkeycli",(v)->
+  console.log "emitcli-kta"
+  console.log v
+
+# redisの場所を指定
+e = require("socket.io-emitter")("localhost")
+e.emit "emitkeycli", "valVal"
+e.emit "ioemit", "emitter-io"
+e.emit "broadcast", "emitter-bc"
+e.emit "socemit", "emitter-se"
+e.emit "cliioemit", "emitter-io2"
+e.emit "clibroadcast", "emitter-bc2"
+e.emit "clisocemit", "emitter-se2"
+
+e.emit "koreka", "koreyooo-se"
+###
+
+
+###
+# emitter2
+server = require("http").createServer (q,s)->
+  s.writeHead 200, "Content-Type": "text/html"
+  s.end require('jade').compileFile("./index.jade")()
+
+io = require("socket.io").listen(server)
+server.listen 3001
+
+io.adapter require("socket.io-redis")()
+
+io.sockets.on "connection", (soc)->
+  console.log "conn-sev"
+  soc.on "emitkey", (d)->
+    console.log "emit-sev"
+    console.log d
+  
+  soc.on 'ioemit', (data) -> io.emit "cast",(data)
+  soc.on 'broadcast', (data) -> soc.broadcast.emit "cast",(data)
+  soc.on 'socemit', (data) -> soc.emit "cast",(data)
+  
+  soc.on "disconnect", ->
+    console.log "discon"
+
+clisoc = require("socket.io-client").connect("http://localhost:3001")
+
+# console.log clisoc
+clisoc.on 'ioemit', (data) -> clisoc.io.emit "cast",(data)
+# clisoc.on 'broadcast', (data) -> clisoc.broadcast.emit "cast",(data)
+clisoc.on 'socemit', (data) -> clisoc.emit "cast",(data)
+
+clisoc.on 'connection', (d)-> 
+  console.log "conntion"
+
+
+clisoc.on 'connect', (d)-> 
+  console.log "conn"
+  console.log d
+
+clisoc.on "emitkeycli",(v)->
+  console.log "emitcli-kta"
+  console.log v
+
+# redisの場所を指定
+e = require("socket.io-emitter")("localhost")
+e.emit "emitkeycli", "valVal"
+e.emit "ioemit", "emitter-io"
+e.emit "broadcast", "emitter-bc"
+e.emit "socemit", "emitter-se"
+###
+
+###
+# bind
+log = console.log.bind(console)
+
+log "noi"
+###
+
+
 ###
 interceptFilenameText = (filename, text)->
   file = filename

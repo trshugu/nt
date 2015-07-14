@@ -129,7 +129,7 @@ else
   if process.env.DEBUG? == false
     ###
     ###
-    console.log "user redis"
+    console.log "use redis"
     redisStore = require "socket.io-redis"
     io.adapter redisStore(
       host: "localhost"
