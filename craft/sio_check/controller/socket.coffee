@@ -13,7 +13,3 @@ module.exports = (io)->
       console.log d
       io.emit "sev", soc.client.conn.server.clientsCount
 
-
-
-
-    

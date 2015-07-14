@@ -2,17 +2,22 @@ doctype html
 html
   head
     meta(content="text/html" charset="utf-8")
-    script(type="text/javascript", src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+    script(type="text/javascript", src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
     script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/coffee-script/1.7.1/coffee-script.min.js')
-    script(src="/socket.io/socket.io.js")
+    script(src="//localhost:3000/socket.io/socket.io.js")
     
     script(type='text/coffeescript').
-      @s = io.connect('localhost')
-      s.on('cast', (data)->
-        console.log("cast")
-        $('#tmp').append("<div>" + data + "</div>")
-      )
+      @s = io.connect 'localhost:3000'
+      s.on 'cast', (data)->
+        $('#tmp').append "<div>" + data + "</div>"
+      
+      s.on "cnt", (cnt)->
+        $("#cnt").text(cnt)
+      
   body
-    input(type='button',value="pus",onClick="s.emit('mes','botobot')")
+    input(type='button',value="io.emit",onClick="s.emit('ioemit','cli_ioemit')")
+    input(type='button',value="broadcast",onClick="s.emit('broadcast','cli_broadcast')")
+    input(type='button',value="soc.emit",onClick="s.emit('socemit','cli_socemit')")
+    #cnt
     p#tmp
     
