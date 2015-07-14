@@ -4,11 +4,11 @@ html
     meta(content="text/html" charset="utf-8")
     script(type="text/javascript", src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
     script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/coffee-script/1.7.1/coffee-script.min.js')
-    script(src="//localhost:3001/socket.io/socket.io.js")
+    script(src="https://cdn.socket.io/socket.io-1.3.5.js")
     
     script(type='text/coffeescript').
       # @s = io.connect 'localhost:3001', { transports: [ 'websocket', 'polling' ] }
-      @s = io 'localhost:3001', transports: [ 'websocket', 'polling' ]
+      @s = io 'localhost:3002', transports: [ 'websocket', 'polling' ]
       s.on 'cast', (data)->
         $('#tmp').append "<div>" + data + "</div>"
       

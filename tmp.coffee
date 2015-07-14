@@ -5,6 +5,31 @@ stdt = new Date()
 
 
 
+
+
+
+
+###
+# socket分離
+switch process.argv[2]
+  when "1"
+    console.log "1"
+    require('http').createServer (req, res)-> 
+      res.writeHead 200, "Content-Type":"text/html"
+      res.end require('jade').compileFile("./index.jade")()
+    .listen(process.env.VMC_APP_PORT || 3001)
+  when "2"
+    console.log "2"
+    io = require('socket.io').listen(3002)
+    io.adapter require("socket.io-redis")()
+    
+    io.sockets.on "connection", (soc)->
+      console.log "server_conn"
+      soc.on "ioemit",(data)-> io.emit "cast",(data)
+      soc.on 'broadcast', (data) -> soc.broadcast.emit "cast",(data)
+      soc.on 'socemit', (data) -> soc.emit "cast",(data)
+###
+
 ###
 # emitter5
 switch process.argv[2]
@@ -47,6 +72,10 @@ switch process.argv[2]
     e.emit "s", "tos"
     e.emit "c", "toc"
     e.emit "c_emit", "toc_tmi"
+    
+    e.emit "ion", "ion!"
+    e.emit "son", "son!"
+    e.emit "socon", "socon!"
   else
     console.log "else"
 ###
