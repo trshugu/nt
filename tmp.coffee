@@ -4,9 +4,35 @@ stdt = new Date()
 
 
 
+###
+# 次の処理渡しの設計
+log = console.log.bind(console)
 
+createCb = (cb)->
+  return (str)->
+    str = str + "dfdf"
+    cb(str)
 
+postCb = (cb)->
+  log "posted"
+  cb("possss")
 
+render = (str)->
+  log "render no game:" + str
+
+env = "debag"
+if env == "debag"
+  log "debug mode"
+  postCb createCb (st)->
+    render st
+  # postCb (str)->
+  #   str = str + "dfdf"
+  #   render str
+  
+else
+  log "not debug"
+  render "noi"
+###
 
 
 ###
