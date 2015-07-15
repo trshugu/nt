@@ -5,6 +5,20 @@ stdt = new Date()
 
 
 ###
+# 配列メソッド
+log = console.log.bind(console)
+
+am = 
+  a: -> log "is a"
+  b: -> log "is b"
+  c: -> log "is c"
+
+am.a()
+log am
+###
+
+
+###
 # 次の処理渡しの設計
 log = console.log.bind(console)
 
