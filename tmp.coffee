@@ -4,6 +4,21 @@ stdt = new Date()
 
 
 
+
+###
+# fluent6
+f = require('fluent-logger-node')
+l = f.createLogger
+  host: "192.168.59.103"
+  port: 8888
+  tagPrefix: "tag"
+
+obj = {}
+obj.joi = "npoi"
+
+l.post {"":""}
+###
+
 ###
 # 配列メソッド
 log = console.log.bind(console)
