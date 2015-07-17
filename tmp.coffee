@@ -6,6 +6,28 @@ stdt = new Date()
 
 
 
+###
+arr = [ 1, 3, 4, 5, 4, 4, 6, 76 ]
+
+# どれか一つでもtrueならtrue
+console.log arr.some( (e,i)-> e > 70 )
+
+# すべてtrueならtrue
+console.log arr.every( (e,i)-> e > 0 )
+
+en = arr.entries()
+console.log en.next()
+
+readEntry = (en)->
+  i = en.next()
+  if i.done
+    return
+  else
+    console.log i.value[1]
+    readEntry en
+
+readEntry arr.entries()
+###
 
 
 
