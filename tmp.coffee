@@ -5,6 +5,232 @@ stdt = new Date()
 
 
 
+
+
+
+
+###
+# ログもDBも同期的再帰処理で
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update Math.floor(Math.random() * 1000000).toString() + new Date().getTime().toString(), "utf8"
+  cry.digest 'hex'
+
+
+# fluent check 5 
+cnt = 0
+putter = ->
+  obj = {}
+  obj.id = getHash()
+  obj.date = new Date().getTime().toString()
+
+  require("request").post
+    uri: "http://192.168.59.103:8888/debug.test" + cnt
+    json: obj
+    , (e,r,b)->
+      if e?
+        console.log e
+      else
+        # console.log r
+        # console.log b
+        console.log process.pid + ":" + (new Date() - stdt).toString() + ":"+ cnt.toString()
+        cnt = cnt + 1
+        
+        if cnt >= 100000
+          console.log "end!" + process.pid + ":" + (new Date() - stdt).toString() + ":"+ cnt.toString()
+        else
+          putter()
+  
+  # console.log process.pid + ":" + (new Date() - stdt).toString() + ":"+ cnt.toString()
+
+# putter()
+
+cluster = require "cluster"
+if cluster.isMaster
+  for i in [0...(require("os").cpus().length)]
+    w = cluster.fork()
+    console.log "fork:" + w.process.pid
+else
+  putter()
+
+
+# async = require "async"
+# async.forever (cb)->
+#   putter()
+#   setTimeout cb, 10
+###
+
+
+
+###
+console.log "2015/07/17 20:00:00 -> " + (new Date("2015/07/17 20:00:00").getTime())
+console.log "2015/07/17 11:00:00 -> " + (new Date("2015/07/17 11:00:00").getTime())
+console.log "2015/07/17 10:30:00 -> " + (new Date("2015/07/17 10:30:00").getTime())
+console.log "2015/07/17 10:15:00 -> " + (new Date("2015/07/17 10:15:00").getTime())
+console.log new Date().getTime()
+###
+
+
+
+###
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update Math.floor(Math.random() * 1000000).toString() + new Date().getTime().toString(), "utf8"
+  cry.digest 'hex'
+
+
+# fluent check 4 -> 10ミリ待つとうまくいった
+cnt = 0
+putter = ->
+  obj = {}
+  obj.id = getHash()
+  obj.date = new Date().getTime().toString()
+
+  cnt = cnt + 1
+  require("request").post
+    uri: "http://192.168.59.103:8888/debug.test" + cnt
+    json: obj
+
+  console.log process.pid + ":" + (new Date() - stdt).toString() + ":"+ cnt.toString()
+
+
+async = require "async"
+async.forever (cb)->
+  putter()
+  setTimeout cb, 10
+###
+
+
+###
+# fluent check 3 -> 多すぎて死
+cnt = 0
+blm = false
+putter = ->
+  if cnt >= 100000
+    # process.exit()
+    if blm == false
+      console.log process.pid + ":para end:" + (new Date() - stdt).toString()
+      blm = true
+    else
+      return
+  else
+    obj = {}
+    obj.id = getHash()
+    obj.date = new Date().getTime().toString()
+    
+    [0...100].forEach (i)->
+      require('http').get "http://192.168.59.103:8888/debug.test" + cnt + "_" + i + "?json=" + encodeURIComponent(JSON.stringify(obj))
+    
+    cnt = cnt + 1
+    console.log process.pid + ":" + (new Date() - stdt).toString() + ":"+ cnt.toString()
+    if cnt % 1000 == 0
+      true
+      # console.log cnt
+      # console.log process.pid + ":" + (new Date() - stdt).toString() + ":"+ cnt.toString()
+      # console.log new Date() - stdt
+
+async = require "async"
+
+# async.forever (cb)-> putter(); cb()
+
+cluster = require "cluster"
+if cluster.isMaster
+  for i in [0...(require("os").cpus().length)]
+    w = cluster.fork()
+    console.log "fork:" + w.process.pid
+else
+  async.forever (cb)-> putter(); cb()
+###
+
+###
+# fluent check 2 ->30秒で死
+cnt = 0
+blm = false
+putter = ->
+
+  if cnt >= 100000
+    # process.exit()
+    if blm == false
+      console.log process.pid + ":para end:" + (new Date() - stdt).toString()
+      blm = true
+    else
+      return
+  else
+    obj = {}
+    obj.id = getHash()
+    obj.date = new Date().getTime().toString()
+    
+    require("request").post
+      uri: "http://192.168.59.103:8888/debug.test" + cnt
+      json: obj
+    
+    cnt = cnt + 1
+    console.log process.pid + ":" + (new Date() - stdt).toString() + ":"+ cnt.toString()
+    if cnt % 1000 == 0
+      true
+      # console.log cnt
+      # console.log process.pid + ":" + (new Date() - stdt).toString() + ":"+ cnt.toString()
+      # console.log new Date() - stdt
+
+async = require "async"
+async.forever (cb)-> putter(); cb()
+###
+
+###
+# fluent check 1 ->1万件あたりで死にはじめる
+[0...30000].forEach (i)->
+  obj = {}
+  obj.id = getHash()
+  obj.date = new Date().getTime().toString()
+
+  require("request").post
+    uri: "http://192.168.59.103:8888/debug.test" + i
+    json: obj
+
+  console.log i + ":" + (new Date() - stdt).toString()
+###
+
+
+
+###
+# fluentd2post
+req = require "request"
+
+obj = {}
+obj.nopoaspo = "suststa"
+
+req.post
+  uri: "http://192.168.59.103:8888/debug.test"
+  json: obj
+  , (e,r,b)->
+    console.log e
+    # console.log r
+    console.log b
+###
+
+###
+# fluentd2get
+obj = {}
+obj.noi = "berg"
+
+require('http').get "http://192.168.59.103:8888/debug.test?json=" + encodeURIComponent(JSON.stringify(obj)), (res)->
+  # console.log res
+  body = ''
+  res.on 'data', (c)->
+    console.log "data!"
+    console.log c
+    body += c
+  
+  
+  res.on 'end',(res)->
+    console.log "end!"
+    console.log res
+    console.log(body)
+  
+  console.log("test")
+###
+
+
 ###
 # fluent6
 f = require('fluent-logger-node')
@@ -1331,7 +1557,7 @@ t.sendMail mailOptions, (e, i)->
 ###
 nm = require "nodemailer"
 t= nm.createTransport smtpTransport, {host : "localhost", post : 25}
-
+# post?
 mailOptions =
     from: ""
     to: ""
