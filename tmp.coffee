@@ -7,6 +7,31 @@ stdt = new Date()
 
 
 ###
+console.log stdt-0
+console.log stdt-1
+###
+
+###
+# 明示的な型指定
+kaisu = 2000000000
+stdt1 = new Date()
+i = 0
+n = 0
+while i < kaisu
+  n = 1 + n|0
+  i = 1 + i|0
+console.log new Date() - stdt1
+
+stdt2 = new Date()
+i = 0
+n = 0
+while i < kaisu
+  n = 1 + n
+  i = 1 + i
+console.log new Date() - stdt2
+###
+
+###
 arr = [ 1, 3, 4, 5, 4, 4, 6, 76 ]
 
 # どれか一つでもtrueならtrue
