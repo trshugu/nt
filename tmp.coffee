@@ -137,7 +137,7 @@ checker = ->
   
   # 重複確認
   if list.map((i,ind)->list.indexOf(i)!=ind).every((i)->!i)
-    console.log "non duple"
+    console.log "non duplex"
   else
     console.log "is duplex"
   
