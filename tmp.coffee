@@ -2,9 +2,216 @@ stdt = new Date()
 ###
 ###
 
+# 一千万件オブジェクト結合
 
 
 
+
+
+###
+# 10ケタでも重複しないか確認
+uuid = require "node-uuid"
+# console.log uuid.v1()
+# console.log uuid.v4()
+
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  # cry.update Math.floor(Math.random() * 1000000000000000000).toString(), "utf8"
+  cry.update uuid.v4(), "utf8"
+  cry.digest 'hex'
+
+
+sikou = 0
+checker = ->
+  stdt1 = new Date()
+  cnt = 20000000
+  list = []
+  i = 0
+  
+  while i < cnt
+    hash = getHash().slice(0,10)
+    if list.indexOf(hash) == -1
+      list.push hash
+    else
+      console.log "duplex!"
+      process.exit()
+    
+    i = 1 + i|0
+    
+    if i % 10000 == 0
+      console.log i
+  
+  
+  # console.log process.pid + ":" + (Object.keys(list).length).toString() + "/" + cnt.toString()
+  
+  console.log new Date().getTime() - stdt1
+  
+  sikou = 1 + sikou|0
+  if sikou >= 5
+    console.log new Date().getTime() - stdt
+    process.exit()
+###
+
+
+###
+sikou = 0
+checker = ->
+  stdt1 = new Date()
+  cnt = 20000000
+  list = {}
+  i = 0
+  
+  while i < cnt
+    # list.push getHash()
+    
+    # list[getHash()] = null
+    # list[getHash().slice(0,10)] = null
+    hash = getHash().slice(0,10)
+    if list[hash]?
+      console.log "duplex"
+      process.exit()
+    else
+      list[hash] = null
+    
+    i = 1 + i|0
+    
+    if i % 100000 == 0
+      console.log i
+  
+  # if Object.keys(list).length != cnt
+  #   console.log "duplex!"
+  
+  # console.log process.pid + ":" + (Object.keys(list).length).toString() + "/" + cnt.toString()
+  
+  console.log new Date().getTime() - stdt1
+  
+  sikou = 1 + sikou|0
+  if sikou >= 5
+    console.log new Date().getTime() - stdt
+    process.exit()
+###
+
+
+###
+cluster = require "cluster"
+if cluster.isMaster
+  # for i in [0...require("os").cpus().length]
+  for i in [0...1]
+    w = cluster.fork()
+    console.log "fork:" + w.process.pid
+else
+  require("async").forever (cb)-> checker(); cb()
+###
+# require("async").forever (cb)-> checker(); cb()
+
+
+###
+# メモリがリークする
+[0...2000].forEach (i)->
+  # console.log i.toString() + "回目"
+  checker()
+###
+
+
+
+###
+checker = ->
+  # cnt = 10000000 # いったんこれで様子見
+  cnt = 100000
+  list = {}
+  i = 0
+  
+  while i < cnt
+    # list.push getHash()
+    hash = getHash()
+    list[hash] = 0
+    i = 1 + i|0
+    
+    if i % 100000 == 0
+      console.log i
+  
+  console.log list.length
+  console.log new Date().getTime() - stdt
+  
+  # console.log list.map((i,ind)->list.indexOf(i)!=ind|0).every((i)->!i)
+  
+  # 重複確認
+  if list.map((i,ind)->list.indexOf(i)!=ind).every((i)->!i)
+    console.log "non duple"
+  else
+    console.log "is duplex"
+  
+  console.log new Date().getTime() - stdt
+
+[0...1].forEach (i)->
+  # console.log i.toString() + "回目"
+  checker()
+###
+
+###
+# こりはダメだ・・・
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update Math.floor(Math.random() * 1000000000000000000).toString(), "utf8"
+  cry.digest 'hex'
+###
+
+
+###
+checker = ->
+  # cnt = 10000000 # いったんこれで様子見
+  cnt = 100000
+  list = {}
+  i = 0
+  # [0...cnt].forEach (i)->
+  while i < cnt
+    # list[getHash().slice(0,10)] = i|0
+    hash = getHash()
+    # hash = Math.floor(Math.random() * 1000000000000000000).toString()
+    # hash = Math.random().toString()
+    
+    # if list[hash]?
+    #   console.log "ari!"
+    #   console.log list
+    #   console.log hash
+    #   process.exit()
+    # else
+    #   list[hash] = i|0
+    #   list[Math.floor(Math.random() * 1000000000000000000).toString()] = i|0
+    
+    # list[hash] = i|0
+    list[hash] = 0
+    i = 1 + i|0
+    
+    if i % 100000 == 0
+      console.log i
+  
+  # console.log list
+  # listcount = 0
+  # for i of list
+  #   # console.log i
+  #   listcount = 1 + listcount|0
+  
+  
+  # if cnt != listcount
+  #   console.log "diff!!"
+  #   console.log listcount.toString() + "/" + cnt.toString()
+  #   console.log new Date().getTime() - stdt
+  # else
+    # console.log "noi"
+    # console.log list
+    # console.log new Date().getTime() - stdt
+###
+
+
+###
+[0...1].forEach (i)->
+  # console.log i.toString() + "回目"
+  checker()
+###
+
+# checker()
+# console.log getHash().slice(0,10)
 
 ###
 console.log stdt-0
