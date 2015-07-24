@@ -9,6 +9,15 @@ stdt = new Date()
 
 
 ###
+# 逐次にファイルに出力
+[0...10].forEach (i)->
+  require("fs").appendFile "output.txt", "nakami\n",(e)->
+    if e?
+      console.log e
+###
+
+
+###
 # 10ケタでも重複しないか確認
 uuid = require "node-uuid"
 # console.log uuid.v1()
