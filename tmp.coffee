@@ -11,6 +11,52 @@ stdt = new Date()
 
 
 
+###
+# async.map2
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+checkList = (a)->
+  j = 0
+  for i,ind in a
+    if i != a[ind]
+      console.log "ari"
+    # else
+    #   console.log "nasi"
+    
+    # if checkDuple(a, i)
+    #   console.log "ari"
+    j=1+j
+    console.log j if j % 100000 == 0
+  
+  console.log new Date() - stdt
+
+arr = []
+dt1 = new Date()
+require("async").map [0...10000000], (i)->
+  if i % 100000 == 0
+    console.log new Date() - dt1
+    console.log i
+    dt1 = new Date()
+  
+  arr.push getHash()
+
+checkList arr
+###
+
+###
+# async.map
+ite = (i)->
+  console.log i
+  return i
+
+require("async").map [0...10], ite, (e,r)->
+  console.log e if e?
+  console.log r
+  console.log "end"
+###
 
 ###
 getHash = -> 
