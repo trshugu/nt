@@ -2,13 +2,36 @@ stdt = new Date()
 ###
 ###
 
-# 一千万件オブジェクト結合
 
 
 
 
 
 
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+
+i = 0
+while 10000000000 > i|0
+  i=1+i|0
+  # console.log i
+
+console.log  new Date() - stdt
+
+
+###
+cluster = require "cluster"
+if cluster.isMaster
+  # for i in [0...require("os").cpus().length]
+  for i in [0...1]
+    w = cluster.fork()
+    console.log "fork:" + w.process.pid
+else
+  require("async").forever (cb)-> checker(); cb()
+###
 
 ###
 # 本来はこうやるのが正しいログイン
