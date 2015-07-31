@@ -8,19 +8,280 @@ stdt = new Date()
 
 
 
+
+
+
+
+###
 getHash = -> 
   cry = require("crypto").createHash 'SHA256'
   cry.update require("node-uuid").v4(), "utf8"
   cry.digest 'hex'
 
+createList = (count)->
+  i=0
+  a=[]
+  dt1 = new Date()
+  # while 10000000 > i
+  while count > i
+    a.push getHash()
+    i=1+i
+    if i % 100000 == 0
+      console.log new Date() - dt1
+      console.log i 
+      dt1 = new Date()
+  a
 
+checkList = (a)->
+  j = 0
+  for i,ind in a
+    if i != a[ind]
+      console.log "ari"
+    # else
+    #   console.log "nasi"
+    
+    # if checkDuple(a, i)
+    #   console.log "ari"
+    j=1+j
+    console.log j if j % 100000 == 0
+  
+  console.log new Date() - stdt
+
+# checkList createList(10000000)
+
+# 一件ずつに変更
+cluster = require "cluster"
+if cluster.isMaster
+  child = []
+  arr = []
+  # for i in [0...require("os").cpus().length]
+  for i in [0...4]
+    w = cluster.fork()
+    console.log "fork:" + w.process.pid
+    child.push w.process.pid
+    
+    w.on "message", (msg)->
+      # console.log "concat"
+      # console.log msg.length
+      
+      # console.log msg
+      # dt1 = new Date()
+      
+      arr.push msg
+      # arr = arr.concat msg
+      # Array.prototype.push.apply(arr, msg);
+      
+      # console.log new Date() - dt1
+    
+    w.on "exit", (w)->
+      console.log child
+      child.pop()
+      if child.length == 0
+        checkList arr
+        console.log "end"
+        console.log new Date() - stdt
+else
+  # require("async").forever (cb)-> checker(); cb()
+  # process.send createList(2500000)
+  # process.send createList(5)
+  i = 0
+  while 1000000 > i
+    process.send getHash()
+    i=1+i
+    if i % 100000 == 0
+      console.log new Date() - dt1
+      console.log i 
+      dt1 = new Date()
+  
+  process.exit(process.pid)
+###
+
+###
+cluster = require "cluster"
+if cluster.isMaster
+  child = []
+  arr = []
+  # for i in [0...require("os").cpus().length]
+  for i in [0...4]
+    w = cluster.fork()
+    console.log "fork:" + w.process.pid
+    child.push w.process.pid
+    
+    w.on "message", (msg)->
+      console.log "concat"
+      console.log msg.length
+      
+      # console.log msg
+      dt1 = new Date()
+      
+      arr = arr.concat msg
+      # Array.prototype.push.apply(arr, msg);
+      
+      console.log new Date() - dt1
+    
+    w.on "exit", (w,c,s,i)->
+      console.log child
+      child.pop()
+      if child.length == 0
+        checkList arr
+        console.log "end"
+        console.log new Date() - stdt
+else
+  # require("async").forever (cb)-> checker(); cb()
+  process.send createList(2500000)
+  # process.send createList(5)
+  process.exit(process.pid)
+###
+
+
+###
+# async再度
+async = require 'async'
+
+# parallel->非同期関数を利用できるというだけ
+cntval = 5000000
+async.parallel [
+  (cb)->
+    console.log "s1"
+    setTimeout ->
+      console.log "1"
+      cb null, createList(cntval),
+    ,1
+  (cb)->
+    console.log "s3"
+    setTimeout ->
+      console.log "2"
+      cb null, createList(cntval),
+    ,1
+  (cb)->
+    console.log "s3"
+    setTimeout ->
+      console.log "3"
+      cb null, createList(cntval),
+    ,1
+  (cb)->
+    console.log "s4"
+    setTimeout ->
+      console.log "4"
+      cb null, createList(cntval),
+    ,1
+],(e,v)->
+  console.log e if e?
+  # console.log v
+  
+  # マージする
+  console.log "==checkstart=="
+  arr = []
+  dt1 = new Date()
+  for i in v
+    arr = arr.concat i
+    # Array.prototype.push.apply(arr, i);
+    
+    console.log new Date() - dt1
+    dt1 = new Date()
+
+  # console.log arr
+  checkList arr
+###
+
+
+###
+# series
+cntval = 50000
+async.series [
+  (cb)->
+    console.log "1"
+    cb null, createList(cntval),
+  (cb)->
+    console.log "2"
+    cb null, createList(cntval),
+  (cb)->
+    console.log "3"
+    cb null, createList(cntval),
+  (cb)->
+    console.log "4"
+    cb null, createList(cntval),
+],(e,v)->
+  console.log e if e?
+  # console.log v
+  
+  # マージする
+  console.log "==checkstart=="
+  arr = []
+  dt1 = new Date()
+  for i in v
+    arr = arr.concat i
+    # Array.prototype.push.apply(arr, i);
+    
+    console.log new Date() - dt1
+    dt1 = new Date()
+
+  # console.log arr
+  checkList arr
+###
+
+
+
+###
+# parallel
+async.parallel [
+  (cb)->
+    setTimeout ->
+      [0...4].forEach (i)->
+        console.log "a"+ i.toString()
+      cb null, "1"
+    ,1
+  (cb)->
+    setTimeout ->
+      [0...4].forEach (i)->
+        console.log "b"+ i.toString()
+      cb null, "2"
+    ,1
+],(e,v)->
+  console.log v
+
+###
+
+
+###
+# チェックの関数を作り一件ずつループ
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+checkDuple = (list, value)-> list.indexOf(value) != list.lastIndexOf(value)
+
+# i = 0
+# while 3000000000 > i
+#   i=1+i
+#   # console.log i
+
+# 14800000件までのは1秒だったのにそこから75秒かかるようになった
 i = 0
-while 10000000000 > i|0
-  i=1+i|0
-  # console.log i
+a=[]
+dt1 = new Date()
+# while 10000000 > i
+while 40000000 > i
+  a.push getHash()
+  i=1+i
+  if i % 100000 == 0
+    console.log new Date() - dt1
+    console.log i 
+    dt1 = new Date()
+
+j = 0
+for i,ind in a
+  if i != a[ind]
+    console.log "ari"
+    
+  # if checkDuple(a, i)
+  #   console.log "ari"
+  j=1+j
+  console.log j if j % 100000 == 0
 
 console.log  new Date() - stdt
-
+###
 
 ###
 cluster = require "cluster"
