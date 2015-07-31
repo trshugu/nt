@@ -6,8 +6,22 @@ stdt = new Date()
 
 
 
+###
+# nactor
+nactor = require "nactor"
+actor = nactor.actor
+  hell:(msg)->
+    console.log msg
+    return "death"
 
 
+actor.init()
+
+actor.ask "hell", "dead"
+
+actor.hell "deadman", (rep)->
+  console.log rep
+###
 
 ###
 getHash = -> 
