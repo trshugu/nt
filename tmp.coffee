@@ -8,6 +8,30 @@ stdt = new Date()
 
 
 
+
+
+###
+# 本来はこうやるのが正しいログイン
+redis = require "redis"
+
+client = redis.createClient()
+
+client.set "exp", "ireire", (e,d)->
+  console.log e if e?
+  console.log d
+
+  client.expire "exp", 20, (e,d)->
+    console.log e if e?
+    console.log d
+    client.end()
+
+
+# client.get "exp", (e,d)->
+#   console.log d
+#   client.end()
+###
+
+
 ###
 # 逐次にファイルに出力
 [0...10].forEach (i)->
