@@ -8,8 +8,30 @@ stdt = new Date()
 
 
 
+clo = (list)->
+  list=[]
+  return 
+    a:(arr)->
+      list = list.concat arr
+    
 
 
+reki = clo()
+reki.a [1,2,3]
+
+###
+para = (cb)->
+  setTimeout ->
+    cb "asdf"
+  ,1000
+
+console.log "start"
+para (str)-> console.log str
+para (str)-> console.log str
+para (str)-> console.log str
+para (str)-> console.log str
+console.log "end"
+###
 
 ###
 # async.map2
