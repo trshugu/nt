@@ -8,16 +8,61 @@ stdt = new Date()
 
 
 
+
+###
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+createList = (count)->
+  i=0
+  a=[]
+  dt1 = new Date()
+  # while 10000000 > i
+  while count > i
+    a.push getHash()
+    i=1+i
+    if i % 100000 == 0
+      console.log new Date() - dt1
+      console.log i 
+      dt1 = new Date()
+  a
+
+para2 = (cb)->
+  setTimeout ->
+    j = "ok"
+    createList 10000000
+    
+    cb j
+  ,1
+
+console.log "s"
+para2 (j)-> console.log j
+para2 (j)-> console.log j
+para2 (j)-> console.log j
+para2 (j)-> console.log j
+console.log "e"
+###
+
+###
 clo = (list)->
   list=[]
-  return 
-    a:(arr)->
-      list = list.concat arr
-    
+  
+  a:(arr)->
+    list = list.concat arr
+  
+  b:->
+    console.log list
 
 
 reki = clo()
-reki.a [1,2,3]
+# console.log reki
+reki.a([1,2,3])
+reki.b()
+###
+
+
 
 ###
 para = (cb)->
