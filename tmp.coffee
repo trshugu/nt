@@ -7,7 +7,7 @@ stdt = new Date()
 
 
 ###
-# fat allow 2
+# fat arrow 2
 module.exports.tfunc = ->
   console.log "tfunc!"
 
@@ -27,7 +27,7 @@ sa "ssvv"
 ###
 
 ###
-# fat allow 1
+# fat arrow 1
 fa = (fv)=>
   console.log @
   console.log fv
