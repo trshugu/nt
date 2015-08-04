@@ -5,6 +5,45 @@ stdt = new Date()
 
 
 
+
+###
+# fat allow 2
+module.exports.tfunc = ->
+  console.log "tfunc!"
+
+# 使える
+fa = (fv)=>
+  this.tfunc()
+  console.log fv
+
+fa "ffvv"
+
+# 使えない
+sa = (sv)->
+  # this.tfunc()
+  console.log sv
+
+sa "ssvv"
+###
+
+###
+# fat allow 1
+fa = (fv)=>
+  console.log @
+  console.log fv
+
+# console.log fa
+fa()
+
+sa = (sv)->
+  # console.log @
+  console.log sv
+
+# console.log sa
+sa()
+###
+
+
 ###
 # null value logic
 nvl = (v)-> if v? then return v else return ""
