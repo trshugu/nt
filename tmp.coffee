@@ -5,6 +5,17 @@ stdt = new Date()
 
 
 
+###
+# null value logic
+nvl = (v)-> if v? then return v else return ""
+
+console.log "OK1" if nvl("") == ""
+console.log "OK2" if nvl(undefined) == ""
+console.log "OK3" if nvl(null) == ""
+console.log "OK4" if nvl("nanika") == "nanika"
+console.log "OK5" if nvl(0) == 0
+###
+
 
 ###
 # nactor
