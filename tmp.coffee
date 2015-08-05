@@ -1,10 +1,24 @@
-stdt = new Date()
 ###
 ###
 
 
 
 
+
+###
+# stdtいらない
+# stdt = new Date()
+
+console.time "tmp"
+console.timeEnd "tmp"
+
+
+console.time "a"
+console.time "b"
+[0...100000].forEach (i)->
+console.timeEnd "b"
+console.timeEnd "a"
+###
 
 ###
 # fat arrow 2
