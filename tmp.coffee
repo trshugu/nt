@@ -5,6 +5,36 @@
 
 
 
+
+###
+obj = {}
+
+ichi = {}
+ichi.one = 1
+ichi.one2 = 2
+ichi.one3 = 3
+ni = {}
+ni.nii1 = ichi
+ni.nii2 = 5
+ni.nii3 = ichi
+san = {}
+san.thu = 7
+san.thu2 = 8
+san.thu3 = ni
+ni.nii4 = ichi
+
+obj.a = ichi
+obj.i = ni
+obj.u = san
+
+# 変わらない・・・
+console.log obj
+console.dir obj
+console.log obj.u
+console.dir obj.u
+###
+
+
 ###
 # stdtいらない
 # stdt = new Date()
