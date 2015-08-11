@@ -1,39 +1,25 @@
 helper = require "./helper"
 
-module.exports = (req, res, next)->
-  location = req.protocol + "://" + req.headers.host + req.path
-  redirect_url = "/auth/twitter"
-  redirect_url = redirect_url + "?location=" + encodeURIComponent(location) if location != ""
-  oa = helper.getOauth(location)
-  
-  console.log req.session
-  
-  if req.session.oauth
-    if req.session.oauth.access_token
-      next()
-    else
-      req.session.oauth.verifier = req.query.oauth_verifier
-      oauth = req.session.oauth
-      
-      oa.getOAuthAccessToken oauth.token, oauth.token_secret, oauth.verifier, (error, oauth_access_token, oauth_access_token_secret, results)->
-        if (error)
-          console.log error
-          # res.send "yeah something broke."
-          # ƒLƒƒƒ“ƒZƒ‹‚È‚Ç‚Åtoken‚ª–³Œø‚Ìê‡‚ÍÄ“x”FØ‰æ–Ê‚É”ò‚Î‚·
-          res.redirect redirect_url
-        else
-          req.session.oauth.access_token = oauth_access_token
-          req.session.oauth.access_token_secret = oauth_access_token_secret
-          console.log 'access token: ' + oauth_access_token
-          console.log 'access token secret: ' + oauth_access_token_secret
-          console.log results
-          # res.send "worked. nice one."
-          next()
-        
-      
+module.exports = (req, res)->
+  if req.session.oauth? && req.session.oauth.request_token? && req.session.oauth.request_token_secret
+    oa = helper.getOauth(req.protocol + "://" + req.headers.host + "/callback")
+    oa.getOAuthAccessToken req.session.oauth.request_token, req.session.oauth.request_token_secret, req.query.oauth_verifier, (e, accessToken, accessTokenSecret, results)->
+      if e?
+        console.log "atã§ã‚¨ãƒ©ãƒ¼"
+        console.log e
+        res.send e
+        # topã¸é£›ã°ã™ã®ãŒå¦¥å½“
+      else
+        console.log results
+        client = helper.getTwitterClient accessToken, accessTokenSecret
+        client.get "account/verify_credentials", {}, (e,t,r)->
+          if e?
+            console.log "verifyã§ã‚¨ãƒ©ãƒ¼"
+            console.log e
+            res.send e
+          else
+            res.send t
+            # ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆæ¨å¥¨ã ãŒã€ã“ã“ã§ç™»éŒ²oræ–°è¦
   else
-    res.redirect redirect_url
-    # next new Error("you're not supposed to be here.")
-
-  # res.render 'twitter', { title:"twitter" }
-
+    res.send "null"
+    # topã¸
