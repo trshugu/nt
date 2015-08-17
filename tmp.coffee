@@ -4,6 +4,162 @@
 
 
 
+###
+# toMap
+hashlist = {}
+hashlist.yndi = undefined
+hashlist.nunll = null
+hashlist.strl = "string"
+hashlist.suuji = 34598
+hashlist.suuti = 3093
+hashlist.renso = {asdf:"asdf",suuji:2123,nanigasi:null,unden:undefined,"234234":3434,"aa":"ee"}
+hashlist.hauire = [1,3,5,"asdf",null,undefined,{rendo:"hairetu"}]
+
+toList = (arr)->
+  list = []
+  for v in arr
+    if !v? || v == null
+      list.push NULL: true
+      continue
+    
+    if Array.isArray(v)
+      list.push toList(v)
+      continue
+    
+    switch typeof(v)
+      when "string" then list.push S: v
+      when "number" then list.push N: v
+      when "boolean" then list.push BOOL: v
+      when "object" then list.push toMap(v)
+  
+  L: list
+
+toMap = (hl)->
+  map = {}
+  for k,v of hl
+    if !v? || v == null
+      map[k] = {NULL: true} 
+      continue
+    
+    if Array.isArray(v)
+      map[k] = toList(v)
+      continue
+    
+    switch typeof(v)
+      when "string" then  map[k] = S: v
+      when "number" then  map[k] = N: v
+      when "boolean" then  map[k] = BOOL: v
+      when "object" then  map[k] = toMap(v)
+  
+  M: map
+
+res = toMap hashlist
+
+console.log res.M
+console.log res.M.renso.M
+console.log res.M.hauire.L[6]
+###
+
+
+###
+# startsWith
+startsWith = (a,b)-> a.lastIndexOf(b, 0) == 0
+
+console.log startsWith "anokutra", "ano"
+console.log startsWith "anokutra", "noi"
+###
+
+
+
+###
+try
+  require("request")
+    .get "httahoo.co.jp"
+    
+    .on "response", (response) ->
+      # ダウンロード結果を取得する
+      console.log response.headers["content-type"]
+      console.log response.statusCode
+      # 200かつ画像でなければ削除
+      if response.headers["content-type"].lastIndexOf("image/", 0) == 0 && response.statusCode == 200
+        console.log "ok"
+      else
+        require("fs").unlinkSync './saved.jpg'
+    
+    .on "error", (e)->
+      console.log e
+      require("fs").unlinkSync './saved.jpg'
+    
+    .on "end", ->
+      console.log "end"
+    
+    .pipe require("fs").createWriteStream('./saved.jpg')
+catch e
+  console.log "無効なURLなど"
+  console.log e
+###
+
+
+###
+data = path: './saved.jpg'
+
+# クローズ
+ch = () ->
+  console.log "null,data返却"
+
+file = require("fs").createWriteStream('./saved.jpg')
+file.on "close", ch
+
+# リクエスト実行
+require("request").get("http://asdfasdf.com")
+  .on "response", (response) ->
+    # ダウンロード結果を取得する
+    data.contentType = response.headers["content-type"]
+    data.status = response.statusCode
+  
+  .on "error", (e) ->
+    # closeハンドラを解除しないとここのcloseでハンドラを呼んでしまう
+    file.removeListener "close", ch
+    file.close()
+    
+    # ファイル削除
+    require("fs").unlinkSync filePath
+    
+    # エラーとしてハンドラを呼び出す
+    console.log "error,data返却"
+  
+  .pipe file
+###
+
+###
+# 画像DL ng
+require("request").get "ng"
+  , (e,res,body)->
+    if e?
+      console.log e
+      console.log res.statusCode
+    else
+      # console.log s
+      console.log body
+      
+      w = require("fs").createWriteStream './saved.jpg'
+      w.write body
+###
+
+###
+require("request")
+  .get "noinio"
+  .pipe require("fs").createWriteStream('./saved2.jpg')
+###
+
+###
+require("request")
+  .get "naimon"
+  .on "response", (r)->
+    console.log 'statusCode: ', r.statusCode
+    console.log 'content-length: ', r.headers['content-length']
+  .pipe require("fs").createWriteStream('./saved.jpg')
+###
 
 
 ###

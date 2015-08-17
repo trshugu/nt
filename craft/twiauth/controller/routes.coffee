@@ -2,13 +2,26 @@
 # twittercheck = require "./callback"
 
 module.exports = (app)->
+  # ログインフォーム
   app.get "/", require "./index"
-  # app.get "/user", twittercheck, require("./user")
-  app.get "/home", require("./home")
-  app.get "/user", require("./user")
+  
+  # twitterログイン画面
   app.get "/twitter", require "./twitter"
-  # app.get "/twitter_login", require "./twitter_login"
+  
+  # コールバックのアクション
   app.get "/callback", require "./callback"
+  
+  # マイページ
+  app.get "/home", require("./home")
+  
+  # ユーザーページ
+  app.get "/user", require("./user")
+  
+  
+  
+  
+  # app.get "/user", twittercheck, require("./user")
+  # app.get "/twitter_login", require "./twitter_login"
   
   # ログインボタン押下
   
