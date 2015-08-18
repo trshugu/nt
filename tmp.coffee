@@ -4,6 +4,21 @@
 
 
 
+
+
+###
+# cbGet
+require("request").get
+  uri: "http://:8092/beer-sample/_design/test_ddn/_view/test_view"
+  json: true # defaultでfalse
+  , (e,r,b)->
+    if e?
+      console.log e
+    else
+      # console.log r
+      console.log b.rows.filter((i)->i.id.lastIndexOf("ty", 0) == 0).map((i)->i.id.toUpperCase())
+###
+
 ###
 # toMap
 hashlist = {}
@@ -73,7 +88,7 @@ console.log startsWith "anokutra", "noi"
 
 ###
 try
-  require("request")
+  downloadsuest")
     .get "httahoo.co.jp"
     
     .on "response", (response) ->
@@ -111,7 +126,7 @@ file = require("fs").createWriteStream('./saved.jpg')
 file.on "close", ch
 
 # リクエスト実行
-require("request").get("http://asdfasdf.com")
+downloadsuest").get("http://asdfasdf.com")
   .on "response", (response) ->
     # ダウンロード結果を取得する
     data.contentType = response.headers["content-type"]
@@ -133,7 +148,7 @@ require("request").get("http://asdfasdf.com")
 
 ###
 # 画像DL ng
-require("request").get "ng"
+downloadsuest").get "ng"
   , (e,res,body)->
     if e?
       console.log e
@@ -147,13 +162,13 @@ require("request").get "ng"
 ###
 
 ###
-require("request")
+downloadsuest")
   .get "noinio"
   .pipe require("fs").createWriteStream('./saved2.jpg')
 ###
 
 ###
-require("request")
+downloadsuest")
   .get "naimon"
   .on "response", (r)->
     console.log 'statusCode: ', r.statusCode
@@ -972,7 +987,7 @@ putter = ->
   obj.id = getHash()
   obj.date = new Date().getTime().toString()
 
-  require("request").post
+  downloadsuest").post
     uri: "http://192.168.59.103:8888/debug.test" + cnt
     json: obj
     , (e,r,b)->
@@ -1035,7 +1050,7 @@ putter = ->
   obj.date = new Date().getTime().toString()
 
   cnt = cnt + 1
-  require("request").post
+  downloadsuest").post
     uri: "http://192.168.59.103:8888/debug.test" + cnt
     json: obj
 
@@ -1108,7 +1123,7 @@ putter = ->
     obj.id = getHash()
     obj.date = new Date().getTime().toString()
     
-    require("request").post
+    downloadsuest").post
       uri: "http://192.168.59.103:8888/debug.test" + cnt
       json: obj
     
@@ -1131,7 +1146,7 @@ async.forever (cb)-> putter(); cb()
   obj.id = getHash()
   obj.date = new Date().getTime().toString()
 
-  require("request").post
+  downloadsuest").post
     uri: "http://192.168.59.103:8888/debug.test" + i
     json: obj
 
