@@ -62,7 +62,7 @@ else
   app.use express.static(path.join(__dirname, 'bower_components'))
 
   # use coffeescript
-  app.use require('coffee-middleware')
+  app.use require('iced-coffee-middleware')
     src: path.join(__dirname, "public")
     compress: true
     bare: true

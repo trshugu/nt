@@ -18,7 +18,7 @@
   "dependencies": {
     "body-parser": "~1.8.1",
     "bower": "*",
-    "coffee-middleware": "^0.2.1",
+    "iced-coffee-middleware": "^0.2.1",
     "coffee-script": "*",
     "config": "^1.12.0",
     "connect-redis": "^2.2.0",
