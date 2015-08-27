@@ -1,10 +1,206 @@
 ###
 ###
+console.time "tmp"
 
 
 
+###
+couchbase = require "couchbase"
+cluster = new couchbase.Cluster "couchbase://54.64.140.92"
+bucket = cluster.openBucket "mfm_test"
+
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+###
 
 
+###
+# ランダムに関連情報を取得
+require("request").get
+  uri: "http://:8092/mfm_test/_design/docy/_view/user"
+  json: true # defaultでfalse
+  , (e,r,b)->
+    if e?
+      console.log e
+    else
+      # ランダムにユーザーを取得
+      rand_user = b.rows.map((i)->{key:i.key, value:i.value}).splice( Math.floor(Math.random() * b.total_rows), 1 )[0]
+      rand_key = rand_user.key
+      
+      console.log rand_user
+      
+      # 紐づけ検索
+      require("request").get
+        uri: "http://:8092/mfm_test/_design/docy/_view/c_src"
+        json: true
+        , (e,r,b)->
+          if e?
+            console.log e
+          else
+            # 複数ある可能性
+            pos =  b.rows.filter( (i)-> i.key == rand_key )
+            if pos.length != 0
+              # 保持するもの検索
+              require("request").get
+                uri: "http://:8092/mfm_test/_design/docy/_view/src"
+                json: true
+                , (e,r,b)->
+                  if e?
+                    console.log e
+                  else
+                    pos.forEach (p)->
+                      console.log b.rows.filter( (i)-> i.key == p.value.src_id )[0].value
+                      console.log "hojari"
+                      console.timeEnd "tmp"
+                      process.exit()
+            else
+              console.log "hojinasi"
+              console.timeEnd "tmp"
+              process.exit()
+###
+
+
+###
+# 保持するものを作成
+# userリストを保持する
+user = undefined
+require("request").get
+  uri: "http://:8092/mfm_test/_design/docy/_view/user"
+  json: true # defaultでfalse
+  , (e,r,b)->
+    if e?
+      console.log e
+    else
+      user = b
+      
+      put = 10000
+      [0...put].forEach (i)->
+        srcid = getHash()
+        bucket.insert getHash(),
+          table_name: "r_src"
+          id: srcid
+          hojisuru: "hojihijo:" + i.toString()
+          hojisareta: "sadfihijo:" + i.toString()
+          , (e,r)->
+            if e?
+              console.log "error!"
+              console.log e
+              # process.exit()
+            else
+              # ランダムに保持者を決定
+              rand_key = user.rows.map((i)->{key:i.key, value:i.value}).splice( Math.floor(Math.random() * user.total_rows), 1 )[0].key
+              
+              # 保持者と保持するものを紐づけ
+              bucket.insert getHash(),
+                table_name: "c_src"
+                user_id: rand_key
+                src_id: srcid
+                , (e,r)->
+                  if e?
+                    console.log "error!"
+                    console.log e
+                    # process.exit()
+                  else
+                    if i == put - 1
+                      console.log "owari"
+                      console.timeEnd "tmp"
+                      # process.exit()
+              
+###
+
+
+
+###
+put = 1
+[0...put].forEach (i)->
+  bucket.insert getHash(),
+    table_name: "r_user"
+    id: getHash()
+    nanka: "nanigasi:" + i.toString()
+    ,(e,r)->
+      if e?
+        console.log e
+      else
+        console.log r
+        if i == put - 1
+          console.log "owari"
+          console.timeEnd "tmp"
+          # process.exit()
+###
+
+
+###
+require("request").get
+  uri: "http://:8092/mfm_test/_design/docy/_view/user"
+  json: true # defaultでfalse
+  , (e,r,b)->
+    if e?
+      console.log e
+    else
+      # console.log r
+      # console.log b.total_rows
+      # console.log b.rows.map((i)->{key:i.key, value:i.value})
+      
+      # ランダムにIDを取得
+      rand_key = b.rows.map((i)->{key:i.key, value:i.value}).splice( Math.floor(Math.random() * b.total_rows), 1 )[0].key
+      
+      # 保持者と保持するものを紐づけ
+      bucket.insert getHash(),
+        table_name: "c_src"
+        user_id: rand_key
+        src_id: srcid
+        , (e,r)->
+          if e?
+            console.log "error!"
+            console.log e
+            # process.exit()
+          else
+            if i == put - 1
+              console.log "owari"
+              console.timeEnd "tmp"
+              # process.exit()
+###
+
+
+###
+# bucket.insert "id01",
+# bucket.upsert "id01",
+bucket.replace "id02",
+  a: "taaable"
+  b: "valjvalu"
+  e: 100
+  , (e,r)->
+    if e?
+      console.log "error!"
+      console.log e
+      process.exit()
+    else
+      console.log r
+      
+      # console.log "nexttt"
+      bucket.get "id01", (e,r)->
+        if e?
+          console.log "error!"
+          console.log e
+        else
+          console.log r.value
+        
+        process.exit()
+###
+
+
+###
+bucket.get "test0", (e,r)->
+  if e?
+    console.log "error!"
+    console.log e
+  else
+    console.log r
+  
+  process.exit()
+###
 
 ###
 # cbGet
