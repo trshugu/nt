@@ -4,6 +4,139 @@ console.time "tmp"
 
 
 
+
+# stream
+fs = require('fs')
+_ = require('lodash')
+JSONStream = require('JSONStream')
+map = require('event-stream').map
+th = require "through2"
+
+
+fs.createReadStream('./test_suzuki.txt')
+  .pipe(JSONStream.parse('Items.*'))
+  .pipe(require("fs").createWriteStream("test_suzuki.log"))
+
+
+
+###
+# transform NG
+idSt = th(
+  transform: (ch, en, ne)->
+    console.log "1"
+    console.log ch
+    console.log en
+    # console.log en
+    # console.log ne
+    # da = ch.id.S
+    ne(null, "asdf")
+  
+  flush: (cb)->
+    console.log "2"
+    this.push "noinoi"
+    console.log "3"
+    cb()
+    console.log "4"
+)
+
+###
+
+
+
+###
+fs.createReadStream('./test_suzuki.txt')
+  .pipe(JSONStream.parse('Items.*'))
+  .pipe(map( (data, callback)->
+    console.log data
+    callback(null, data.id.S + "\n")
+  ))
+  .pipe(require("fs").createWriteStream("test_suzuki.log"))
+###
+
+###
+# pipeイベント
+r = require("fs").createReadStream("test_log.txt")
+w = require("fs").createWriteStream("test_log.log")
+w.on "pipe", (src)->
+  console.log "piping"
+  src.pipe process.stdout
+
+r.pipe w
+###
+
+
+
+###
+# 出力先のend()は入力元の"end"が生成されたときに呼び出される。
+r = require("fs").createReadStream("test_log.txt")
+w = require("fs").createWriteStream("test_log.log")
+r.pipe w, end:false
+r.on "end", ->
+  w.end "enddddd\n"
+###
+
+
+
+###
+process.stdin
+.pipe process.stdout
+###
+
+
+
+# require("fs").createReadStream("test_log.txt")
+# .pipe( require("JSONStream").parse("Items.*").pipe( process.stdout ) )
+
+###
+# catエミュレート
+process.stdin.pipe process.stdout
+###
+
+
+###
+# gzip圧縮
+r = require("fs").createReadStream("test_log.txt")
+z = require("zlib").createGzip()
+w = require("fs").createWriteStream("test_log.txt.gz")
+
+# r.pipe(z).pipe(w)
+r
+.pipe z
+.pipe w
+###
+
+
+
+
+###
+stream = require("fs").createReadStream "test_log.txt"
+stream
+.pipe(JSONStream.parse("Count"))
+.pipe(map( (d,c)->c(null,d.toString() + "\n") ))
+.pipe(process.stdout)
+###
+
+
+
+
+
+# fs.createReadStream('./test_log.txt').pipe( fs.createWriteStream("./ws.txt")  )
+# fs.createReadStream('./test_log.txt').pipe( process.stdout )
+
+
+###
+fs.createReadStream('./test_log.txt')
+  .pipe(JSONStream.parse('Items.*'))
+  .pipe(map( (data, callback)->
+    console.log data
+    callback(null, _.values(data).join("\t") + "\n")
+  ))
+  # .pipe(process.stdout)
+###
+
+
+
+
 ###
 couchbase = require "couchbase"
 cluster = new couchbase.Cluster "couchbase://54.64.140.92"
