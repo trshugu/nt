@@ -5,6 +5,140 @@ console.time "tmp"
 
 
 
+###
+rs = require("fs").createReadStream('./.txt')
+data = ""
+
+drainwait = false
+rs.on "readable", ->
+  console.log "readを明示的にコール"
+  data = rs.read()
+
+rs.on "end", ->
+  console.log "完了"
+###
+
+###
+# NG
+rs = require("fs").createReadStream('./.txt')
+ws = require("fs").createWriteStream('./_write.txt')
+data = ""
+
+drainwait = false
+rs.on "readable", ->
+  console.log "readを明示的にコール"
+  data = rs.read()
+  if data?
+    # 失敗の場合false
+    drainwait = ws.write(data) == false
+
+rs.on "end", ->
+  console.log "完了"
+  ws.end()
+
+ws.on "drain", ->
+  console.log "write可能"
+  if drainwait
+    if data?
+      drainwait = ws.write(data) == false
+      return
+    
+    drainwait = !drainwait
+###
+
+
+###
+rs = require("fs").createReadStream('./_sort.txt')
+rs.pipe require("fs").createWriteStream('./_sort_write.txt')
+###
+
+###
+# stream2-3
+rs = require("fs").createReadStream('./.txt')
+ws = require("fs").createWriteStream('./_write.txt')
+data = ""
+
+rs.on "readable", ->
+  console.log "readを明示的にコール"
+
+rs.on "end", ->
+  console.log "完了"
+  ws.end()
+
+ws.on "drain", ->
+  console.log "write可能"
+  data = rs.read()
+  if data?
+    # 失敗の場合false
+    ws.write data
+
+bl = true
+require("async").forever (cb)->
+  if bl
+    console.log "p"
+    rs.pause()
+  else
+    console.log "r"
+    rs.resume()
+  
+  bl = !bl
+  setTimeout cb, 1000
+###
+
+
+###
+# stream2-2
+rs = require("fs").createReadStream('./.txt')
+ws = require("fs").createWriteStream('./_write.txt')
+data = ""
+
+rs.on "readable", ->
+  console.log "readを明示的にコール"
+  data = rs.read()
+  if data?
+    # 失敗の場合false
+    ws.write data
+
+rs.on "end", ->
+  console.log "完了"
+  ws.end()
+
+ws.on "drain", ->
+  console.log "write可能"
+
+
+# rs.pause()
+# rs.resume()
+###
+
+
+###
+# stream2
+data = ""
+rs = require("fs").createReadStream('./.txt')
+
+rs.on "readable", ->
+  console.log "readを明示的にコール"
+  data = rs.read()
+
+rs.on "end", ->
+  console.log "完了"
+
+
+rs.pause()
+rs.resume()
+
+ws = require("fs").createWriteStream('./_write.txt')
+
+ws.write data
+ws.end()
+
+ws.on "drain", ->
+  console.log "write可能"
+###
+
+
+###
 # stream
 fs = require('fs')
 _ = require('lodash')
@@ -13,10 +147,10 @@ map = require('event-stream').map
 th = require "through2"
 
 
-fs.createReadStream('./test_suzuki.txt')
+fs.createReadStream('./.txt')
   .pipe(JSONStream.parse('Items.*'))
-  .pipe(require("fs").createWriteStream("test_suzuki.log"))
-
+  .pipe(require("fs").createWriteStream(".log"))
+###
 
 
 ###
@@ -44,13 +178,13 @@ idSt = th(
 
 
 ###
-fs.createReadStream('./test_suzuki.txt')
+fs.createReadStream('./.txt')
   .pipe(JSONStream.parse('Items.*'))
   .pipe(map( (data, callback)->
     console.log data
     callback(null, data.id.S + "\n")
   ))
-  .pipe(require("fs").createWriteStream("test_suzuki.log"))
+  .pipe(require("fs").createWriteStream(".log"))
 ###
 
 ###
