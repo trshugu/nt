@@ -5,6 +5,310 @@ console.time "tmp"
 
 
 
+# jsonの破片とparse
+
+
+
+
+
+
+###
+# Use the Simplified Constructor API
+stream = require "stream"
+writable = new stream.Writable(
+  write: (chunk, encoding, next)->
+    console.log chunk.toString()
+    next()
+)
+
+rs = require("fs").createReadStream "./txt.txt", encoding: "utf-8"
+rs.pipe writable
+###
+
+###
+# stream実装 OK
+stream = require "stream"
+util = require "util"
+
+st = ->
+  stream.Writable.call @
+
+util.inherits st, stream.Writable
+
+st.prototype._write = (ch,end,done)->
+  console.log ch.toString()
+  done()
+
+i = new st()
+
+# process.stdin.pipe i
+
+file = "txt"
+rs = require("fs").createReadStream "./" + file + ".txt", encoding: "utf-8"
+rs.pipe i
+###
+
+
+###
+# stream2で同期なし
+param = 
+  encoding: "utf-8"
+  # highWaterMark: 1
+
+file = "txt_large"
+rs = require("fs").createReadStream "./" + file + ".txt", param
+ws = require("fs").createWriteStream "./" + file + ".log"
+
+rs.on "readable", ->
+  data = rs.read()
+  if data?
+    ws.write(data)
+###
+
+###
+# stream2で
+param = 
+  encoding: "utf-8"
+  # highWaterMark: 1
+
+file = "txt_large"
+rs = require("fs").createReadStream "./" + file + ".txt", param
+ws = require("fs").createWriteStream "./" + file + ".log"
+
+rs.on "readable", ->
+  console.log "in readable"
+  data = rs.read()
+  # 失敗の場合false
+  if data?
+    console.log data.length
+    bl = ws.write(data)
+    console.log bl
+    if bl == false
+      console.log "pause!"
+      rs.pause()
+
+ws.on "drain", ->
+  console.log "in drain"
+  rs.resume()
+###
+
+
+
+###
+# streamの実装 NG
+stream = require "stream"
+util = require "util"
+
+st = ->
+  this.writable = true
+  this.buf = []
+  
+  write: (d)->
+    console.log "write"
+    console.log d.toString().trim()
+    this.buf.push d.toString().trim()
+    return true
+  
+  end: (d)->
+    console.log "end"
+    if d?
+      this.write d
+    
+    this.writable = false
+  
+  finish:->
+  error:->
+  drain:->
+  pipe:->
+  unpipe:->
+  destroy:->
+  destroySoon:->
+
+util.inherits(st, stream.Stream)
+
+# console.log st
+# console.log new st
+# console.log new st()
+
+process.stdin.pipe st
+process.stdin.resume()
+###
+
+
+###
+# writeがfalseの場合の処理2
+param = 
+  encoding: "utf-8"
+  # bufferSize: 1 # もうサポートされていない
+  highWaterMark: 1
+
+file = "txt_large"
+rs = require("fs").createReadStream "./" + file + ".txt", param
+ws = require("fs").createWriteStream "./" + file + ".log"
+rs.on "data", (d)-> rs.pause() if ws.write(d) == false
+ws.on "drain", -> rs.resume()
+###
+
+
+
+###
+# writeがfalseの場合の処理
+param = 
+  encoding: "utf-8"
+  # bufferSize: 1 # もうサポートされていない
+  # highWaterMark: 1
+
+file = "txt_65537"
+rs = require("fs").createReadStream "./" + file + ".txt", param
+ws = require("fs").createWriteStream "./" + file + ".log"
+
+# ws false→rs pause→ ws drain→rs resume
+rs.on "data", (d)->
+  console.log d.length
+  # console.log ws
+  if ws.write d
+    # 余裕あり
+    console.log "true"
+  else
+    # バッファがフル
+    rs.pause()
+    console.log "false"
+  # console.log ws
+  
+
+rs.on "end", -> console.log "end"
+
+ws.on "drain", ->
+  # console.log ws
+  console.log "drain"
+  # ここでresume
+  rs.resume()
+
+ws.on "end", (d)->
+  console.log "endddd"
+  console.log d
+###
+
+###
+# 書き込む
+param = 
+  encoding: "utf-8"
+  # bufferSize: 1 # もうサポートされていない
+  # highWaterMark: 1
+
+rs = require("fs").createReadStream "./txt.txt", param
+ws = require("fs").createWriteStream "./txt.log"
+
+rs.on "data", (d)->
+  console.log d.length
+  # console.log ws
+  [0...1].forEach (i)->
+    console.log ws.write d
+  # console.log ws
+  
+  rs.pause()
+  setTimeout ->
+    console.log "resuming"
+    rs.resume()
+  , 1000
+  
+rs.on "end", -> console.log "end"
+
+ws.on "drain", ->
+  # console.log ws
+  console.log "drain"
+
+ws.on "end", (d)->
+  console.log "endddd"
+  console.log d
+###
+
+###
+# pauseとresume
+param = 
+  encoding: "utf-8"
+  # bufferSize: 1 # もうサポートされていない
+  # highWaterMark: 1
+
+rs = require("fs").createReadStream "./txt_65537.txt", param
+rs.on "data", (d)->
+  console.log d.length
+  rs.pause()
+  setTimeout ->
+    console.log "resuming"
+    rs.resume()
+  , 1000
+  
+rs.on "end", -> console.log "end"
+###
+
+###
+param = 
+  # encoding: "utf-8"
+  # bufferSize: 1 # もうサポートされていない
+  highWaterMark: 1
+
+rs = require("fs").createReadStream "./txt.txt", param
+rs.on "data", (d)->
+  console.log d
+rs.on "end", -> console.log "end"
+###
+
+###
+# strategy
+func = (action)->
+  switch action
+    when "ichi" then -> console.log "one"
+    when "ni" then -> console.log "two"
+    when "san" then -> console.log "thlree"
+    when "si" then -> console.log "foor"
+
+func("ni")()
+###
+
+###
+# cb(strResult)
+func = (str,cb)->
+  console.log "this func"
+  console.log str
+  cb "func pathes"
+
+func "tekitou", (strResult)->
+  console.log "this tekito"
+  console.log strResult
+###
+
+
+###
+# 拡張子あるなし判定
+aru = "as.sdfa/asdf.abc"
+nasi = "as.sdfa/asdfabc"
+
+getExt = (str)->
+  filename = str.match(/(.*)(?:\/([^/]+$))/)[2]
+  if filename.match(/(.*)(?:\.([^.]+$))/)? && filename.match(/(.*)(?:\.([^.]+$))/)[2]?
+    filename.match(/(.*)(?:\.([^.]+$))/)[2]
+  else
+    ""
+
+console.log getExt(aru)
+console.log getExt(nasi)
+###
+
+
+# getExt = (str)-> if str.toLowerCase().match(/(.*)(?:\.([^.]+$))/)? && str.toLowerCase().match(/(.*)(?:\.([^.]+$))/)[2]? then str.toLowerCase().match(/(.*)(?:\.([^.]+$))/)[2] else null
+
+# スラッシュ以降にピリオド判定
+# getFilename = (str)-> str.toLowerCase().match(/(.*)(?:\/([^/]+$))/)[2]
+
+# file = "as.sdfa/asdf.abc"
+# ext = file.match(/[.].*/)[0].slice 1
+# console.log ext
+# console.log checkExt(file)
+# fn = getFilename(file)
+# console.log getExt(fn)
+
+
 ###
 rs = require("fs").createReadStream('./.txt')
 data = ""
