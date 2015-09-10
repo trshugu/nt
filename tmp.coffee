@@ -9,6 +9,9 @@ console.time "tmp"
 
 
 
+
+
+###
 console.log "start"
 
 console.log Math.floor(Math.random() * 4)
@@ -17,17 +20,15 @@ console.log Math.floor(Math.random() * 4)
 # 1/nで死ぬ処理
 death = (n)->  throw "dead" if Math.floor(Math.random() * n) == 0
 
-###
 fiftyDeath = ->
   switch Math.floor(Math.random() * 2)
     when 0
       throw "dead"
-###
 
 death 1
 
 console.log "end"
-
+###
 
 ###
 # Use the Simplified Constructor API
