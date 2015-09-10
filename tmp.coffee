@@ -9,7 +9,24 @@ console.time "tmp"
 
 
 
+console.log "start"
 
+console.log Math.floor(Math.random() * 4)
+
+# console.log Math.floor(Math.random() * 2)
+# 1/nで死ぬ処理
+fiftyDeath = (n)->  throw "dead" if Math.floor(Math.random() * n) == 0
+
+###
+fiftyDeath = ->
+  switch Math.floor(Math.random() * 2)
+    when 0
+      throw "dead"
+###
+
+fiftyDeath 4
+
+console.log "end"
 
 
 ###
