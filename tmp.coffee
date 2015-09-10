@@ -11,6 +11,41 @@ console.time "tmp"
 
 
 
+
+###
+# こうかく2
+meso = (param, cb)->
+  if param.bool
+    d = param.bool.toUpperCase()
+  else
+    e = "error"
+  
+  cb(e,d)
+
+meso
+  bool: "doiasnoNONOjijoi"
+  ,(e,d)->
+    if e?
+      console.log e
+    else
+      console.log d
+###
+
+###
+# こうかく1
+meso = (cb)->
+  e = null
+  d = "data"
+  cb(e,d)
+
+meso (e,d)->
+  if e?
+    console.log e
+  else
+    console.log d
+###
+
+
 ###
 console.log "start"
 
