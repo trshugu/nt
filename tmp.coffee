@@ -1,15 +1,222 @@
 ###
 ###
 console.time "tmp"
+# console.timeEnd "tmp"
 
 
 
 
+
+
+###
+# jsonを検索(逆)
+JSONStream = require('JSONStream')
+
+param = 
+  encoding: "utf-8"
+
+ichi = require("fs").createReadStream "./" + "test_suzuki_ni" + ".json", param
+ni = require("fs").createReadStream "./" + "test_suzuki" + ".json", param
+
+# ni の取得と検索
+niSt = JSONStream.parse() 
+niList = []
+niSt.on 'data', (data)->
+  niList.push data.id.S
+
+ni.pipe(niSt)
+ni.on "end", ->
+  # console.log niList
+  
+  # ichi の取得
+  ichiSt = JSONStream.parse() 
+  ichiSt.on 'data', (ichiData)->
+    # ichiData.id.S で検索
+    if niList.indexOf(ichiData.ichi_id.S) == -1
+      console.log ichiData.id.S
+    
+  ichi.pipe(ichiSt)
+###
+
+
+
+###
+# jsonを検索
+JSONStream = require('JSONStream')
+
+param = 
+  encoding: "utf-8"
+
+ichi = require("fs").createReadStream "./" + "test_suzuki" + ".json", param
+ni = require("fs").createReadStream "./" + "test_suzuki_ni" + ".json", param
+
+# ni の取得と検索
+niSt = JSONStream.parse() 
+niList = []
+niSt.on 'data', (data)->
+  niList.push data.ichi_id.S
+
+ni.pipe(niSt)
+ni.on "end", ->
+  # console.log niList
+  
+  # ichi の取得
+  ichiSt = JSONStream.parse() 
+  ichiSt.on 'data', (ichiData)->
+    # ichiData.id.S で検索
+    if niList.indexOf(ichiData.id.S) == -1
+      console.log ichiData.id.S
+    
+  ichi.pipe(ichiSt)
+###
+
+
+
+###
+# 読み取れるjsonのパターン
 # jsonの破片とparse
+# JSONStreamを利用
+JSONStream = require('JSONStream')
+
+param = 
+  encoding: "utf-8"
+  highWaterMark: 3
+
+file = "test_suzuki"
+rs = require("fs").createReadStream "./" + file + ".json", param
+
+# これで行ごとに投入可能
+stream = JSONStream.parse() 
+stream.on 'data', (data)->
+  console.log 'received:', data.id.S
+  console.timeEnd "tmp"
+
+rs.pipe(stream)
+###
+
+
+
+###
+# このままではjsonとして処理できない
+param = 
+  encoding: "utf-8"
+  highWaterMark: 333
+
+file = "test_suzuki"
+rs = require("fs").createReadStream "./" + file + ".json", param
+ws = require("fs").createWriteStream "./" + file + ".log"
+
+# readが読み込めるようになった
+rs.on "readable", ->
+  data = rs.read()
+  
+  # 失敗の場合false
+  if data?
+    console.log data
+    
+    bl = ws.write(data)
+    rs.pause() if bl == false
+
+# writeが書き込めるようになった
+ws.on "drain", -> rs.resume()
+###
 
 
 
 
+
+
+###
+createWSJson = (fileName, cb) ->
+  ws = require("fs").createWriteStream fileName + ".json"
+  cb(ws)
+
+# 正しいjsonではないがこれでいいかも
+createWSJson "cwsj", (ws)->
+  [0...100].forEach ->
+    [0...10000].forEach (i)->
+      ws.write "nanigasi" + "\n"
+      console.timeEnd "tmp" # tmp: 36085ms
+###
+
+
+###
+# cwsを都度作ってみる ->メモリリークでNG
+[0...100].forEach ->
+  [0...10000].forEach (i)->
+    console.log i
+    ws = require("fs").createWriteStream "fileName" + ".json"
+    ws.write "nanigsi" + i.toString() + "\n"
+    ws.end()
+    ws.close()
+    console.timeEnd "tmp"
+###
+
+
+
+###
+# cwsで対応する
+ws = require("fs").createWriteStream "fileName" + ".json"
+
+[0...100].forEach ->
+  [0...10000].forEach (i)->
+    console.log i
+    ws.write "nanigsi" + i.toString() + "\n"
+    console.timeEnd "tmp" # tmp: 64403ms
+###
+
+###
+# 書き込みの後に書き込むようにする(通常は難しい)
+writeJson = (fileName, value, cb) ->
+  require("fs").appendFile fileName + ".json", value + "\n",(e)->
+    cb(e)
+
+recursiveWrite = (total, cnt = 1) ->
+  if total >= cnt
+    writeJson "name", "ippai" + cnt.toString(), (e)->
+      if e?
+        # ここで終了
+        console.log "wrriteerrorr"
+        console.log e
+      else
+        # 次の処理
+        console.log "ok" + cnt.toString()
+        recursiveWrite total, cnt + 1
+  else
+    console.log "end"
+    console.timeEnd "tmp" # tmp: 117175ms
+
+[0...100].forEach (i)->
+  recursiveWrite 10000
+###
+
+
+
+###
+# 分割しても同じ
+[0...10000].forEach (i)->
+  require("fs").appendFile "mokkai" + ".json", "doi" + "\n",(e)->
+    if e?
+      console.log "wrriteerrorr"
+      console.log e
+    else
+      console.log "ok"
+###
+
+###
+# 連続すぎてopenできない
+writeJson = (fileName, value, cb) ->
+  require("fs").appendFile fileName + ".json", value + "\n",(e)->
+    cb(e)
+
+[0...10000].forEach (i)->
+  writeJson "fairumei", "kakumono" + i.toString(), (e)->
+    if e?
+      console.log "wrriteerrorr"
+      console.log e
+    else
+      console.log "ok"
+###
 
 
 ###
@@ -79,7 +286,7 @@ rs.pipe writable
 ###
 
 ###
-# stream実装 OK
+# write stream実装 OK
 stream = require "stream"
 util = require "util"
 
