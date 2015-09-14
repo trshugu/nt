@@ -8,6 +8,42 @@ console.time "tmp"
 
 
 
+
+###
+# streamの次のpipeが作れればうまくいくかも
+# →write stream実装 解析 & transform実装
+getWS = ->
+  st = -> require("stream").Writable.call @
+  require("util").inherits st, require("stream").Writable
+  
+  st.prototype._write = (ch, enc, cb)->
+    console.log "write:", ch.toString()
+    cb()
+  
+  new st()
+
+getTS = ->
+  st = -> require("stream").Transform.call @
+  require("util").inherits st, require("stream").Transform
+  
+  st.prototype._transform = (ch, enc, cb)->
+    console.log "trans:", ch.toString()
+    @.push ch
+    @.push ch
+    cb()
+  
+  new st()
+
+# process.stdin.pipe i
+
+file = "txt"
+rs = require("fs").createReadStream "./" + file + ".txt", 
+  encoding: "utf-8"
+  highWaterMark: 16
+rs.pipe(getTS()).pipe(getWS())
+###
+
+
 ###
 # jsonを検索(逆)
 JSONStream = require('JSONStream')
