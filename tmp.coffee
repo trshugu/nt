@@ -10,6 +10,211 @@ console.time "tmp"
 
 
 ###
+cluster = require "cluster"
+
+# pidからワーカーを返却
+getWorker = (workers, pid, cb)->
+  resWorker = null
+  workers.forEach (w)->
+    if w.process.pid == pid
+      resWorker = w
+  
+  cb resWorker
+
+# action check
+check = (process)->
+  if lock == false
+    lock = true
+    process.send
+      action : "check"
+      state : "OK"
+      pid : process.pid
+  else
+    process.send
+      action : "check"
+      state : "NG"
+      pid : process.pid
+
+# マスターの処理
+execMaster = ->
+  workers = []
+  for i in [0...require("os").cpus().length]
+    w = cluster.fork()
+    w.on "message", (msg)->
+      console.log msg
+      switch msg.action
+        when "check"
+          if msg.state == "OK"
+            console.log "OKdatta.PIDnitaisitesyori"
+            getWorker workers, msg.pid, (w)->
+              # console.log w
+              w.send action : "check"
+              # w.send
+              #   action : "omoi"
+              #   value : "nimotu"
+            
+          else
+            console.log "damedatta"
+    
+    workers.push w
+  
+  workers[0].send
+    action : "check"
+  
+
+
+# スレーブの処理
+execSlave = ->
+  # 自分の状態を保持することが必要
+  lock = false
+  process.on "message", (msg)->
+    switch msg.action
+      when "check" then check(process)
+    
+
+if cluster.isMaster
+  execMaster()
+else
+  execSlave()
+###
+
+
+###
+# ng
+cluster = require "cluster"
+
+if cluster.isMaster
+  wokers = []
+  kikulock = false
+  
+  for i in [0...require("os").cpus().length]
+    w = cluster.fork()
+    console.log "fork:" + w.process.pid
+    
+    w.on "message", (msg)->
+      console.log "kokara"
+      console.log kikulock
+      if kikulock == false
+        if msg == "okey"
+          console.log "OKkita"
+          kikulock = true
+    
+    wokers.push w
+  
+  exec = (w)->
+    # きく
+    w.send "kiku"
+  
+  
+  wokers.forEach (w)->
+    exec w
+  
+  
+  
+  # 終了を受け取って再起動する
+  # cluster.on 'exit',(worker, code, signal)->
+  #   console.log worker.process.pid + ' exit:' + worker.id
+  #   cluster.fork()
+else
+  # console.log "oiodi"
+  # process.send "jijiji"
+  # process.exit()
+  process.on "message", (msg)->
+    console.log "s"
+    if msg == "kiku"
+      console.log "kikareta"
+      process.send "okey"
+    
+    console.log "e"
+###
+
+###
+# nactor4
+actor = require("nactor").actor (opt)->
+  @seq = 0
+  @timeout = opt.timeout
+  
+  return {
+    ping : (d, a) ->
+      a.enable()
+      setTimeout ->
+        a.replay "done!!!"
+      , @timeout
+  }
+
+actor.init
+  timeout : 200
+
+actor.ping (msg)->
+  console.log msg
+###
+
+
+
+###
+# nactor3
+actor = require("nactor").actor
+  fun:(msg)->
+    console.log msg
+    # return "noi:"
+
+actor2 = require("nactor").actor
+  ctio:(msg)->
+
+actor.init()
+actor2.init()
+
+[0...10000000].forEach (i)->
+  actor.fun "jijiji" + i.toString()
+    # , (d)->
+    # console.log "res:",d
+###
+
+
+###
+# nactor2
+console.log "1"
+actor = require("nactor").actor
+  metho:(msg)->
+    actor2.ni msg, (d)->
+      console.log d
+
+actor2 = require("nactor").actor
+  ni:(msg)->
+    console.log msg
+    return "noi"
+
+console.log "6"
+actor.init()
+actor2.init()
+
+actor.metho "ichiban", (d)->
+  console.log "ichiret"
+  console.log d
+
+console.log "7"
+
+
+# actor.metho "deadman", (d)-> console.log d
+# actor2.ni "deadman", (d)-> console.log d
+###
+
+
+###
+# 垂直タブのトリム
+console.log "start"
+virtab = "\t  \v "
+console.log virtab
+console.log "a" + virtab.toString() + "b"
+console.log virtab.toString("utf8")
+console.log "a" + virtab.toString().trim() + "b"
+console.log "a" + virtab.toString().replace("\v","") + "b"
+console.log "end"
+###
+
+
+
+###
 # streamの次のpipeが作れればうまくいくかも
 # →write stream実装 解析 & transform実装
 getWS = ->
