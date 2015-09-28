@@ -7,6 +7,141 @@ console.time "tmp"
 
 
 
+# cilentの解析
+net = require "net"
+
+net3004 = net.createServer (c)->
+  c.setEncoding "utf8"
+  
+  console.log "net300004"
+  c.on "data", (d)->
+    console.log "kantai"
+    console.log d
+    c.write "re@eeee" + d
+    c.end()
+  
+  c.on "close", ->
+    console.log "cccccliccclicli"
+.listen 3004
+
+
+# client
+cli = new net.Socket()
+
+cli.setEncoding "utf8"
+
+cli.connect "3004", "localhost", ->
+  console.log "cli cone!"
+  cli.write "clicone write!!"
+
+process.stdin.resume()
+
+process.stdin.on "data", (d)->
+  cli.write d
+
+cli.on "data", (d)->
+  console.log "cli->" + d
+
+cli.on "close", ->
+  console.log "clitheereere clicli"
+
+
+
+###
+net = require "net"
+http = require "http"
+tcp = require "net"
+
+# net
+netser = net.createServer (res)-> 
+  # res.writeHead 200, "Content-Type":"text/html"
+  # console.log res
+  res.write "write "
+  res.end "net desu"
+
+netser.listen 3001, ->
+  console.log "net done",  netser.address().port
+
+# http
+httpser = http.createServer (req, res)-> 
+  res.writeHead 200, "Content-Type":"text/html"
+  res.end "http desu"
+
+httpser.listen 3002, ->
+  console.log "http done", httpser.address().port
+
+# tcp デフォルトでは入っていない。なおかつ非推奨
+tcpser = tcp.createServer (soc)-> 
+  # res.writeHead 200, "Content-Type":"text/html"
+  # console.log soc
+  # soc.write "write "
+  # soc.end "tcp desu"
+  
+  # soc は streamらしい
+  # ない
+  # soc.addListener "connection", ->
+  #   console.log "wantyai"
+  #   soc.write "conne: "
+  
+  soc.addListener "data", (d)->
+    soc.write "data:"
+    soc.write d
+    soc.end " kan"
+  
+  # endは存在しない
+  # soc.addListener "end", ->
+  #   soc.write "enddd "
+  #   soc.end " kan"
+  
+  console.log "kita"
+
+tcpser.on "close", ->
+  console.log "real clotheeee"
+
+tcpser.on "connection", ->
+  console.log "konekuto"
+
+tcpser.listen 3003, ->
+  console.log "tcp done", tcpser.address().port
+
+
+
+net3004 = net.createServer (c)->
+  c.setEncoding "utf8"
+  
+  console.log "net300004"
+  c.on "data", (d)->
+    console.log "kantai"
+    console.log d
+    c.write "re@eeee" + d
+    c.end()
+  
+  c.on "close", ->
+    console.log "cccccliccclicli"
+.listen 3004
+
+
+# client
+cli = new net.Socket()
+
+cli.setEncoding "utf8"
+
+cli.connect "3004", "localhost", ->
+  console.log "cli cone!"
+  cli.write "clicone write!!"
+
+process.stdin.resume()
+
+process.stdin.on "data", (d)->
+  cli.write d
+
+cli.on "data", (d)->
+  console.log "cli->" + d
+
+cli.on "close", ->
+  console.log "clitheereere clicli"
+###
+
 
 
 ###
