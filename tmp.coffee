@@ -5,47 +5,254 @@ console.time "tmp"
 
 
 
+###
+net = require "net"
 
 
+sev = net.createServer (c)->
+  c.on "data", (d)->
+    console.log "doi"
+  
+  c.on "error", (e)->
+    console.log e
+  
+  c.pipe(process.stdout)
+
+sev.listen 0,->
+  # console.log "port is :" + sev.address().port
+  console.log sev.address()
+  
+
+
+# net.connect ->
+#   console.log "connetcteeed"
+###
+
+
+###
+net = require "net"
+
+have = 0
+net.createServer (c)->
+  console.log "come server1"
+  c.on "data", (d)->
+    cli = new net.Socket()
+    cli.setEncoding "utf8"
+    cli.connect "3002", "localhost", ->
+      setTimeout ->
+        cli.write d
+      , ((Math.floor(Math.random() * 5)) * 1000) + 1
+      # randomWrite()
+    
+    cli.on "data", (d)->
+      have = have + 1
+      c.end d + " : "+ have
+    
+.listen 3001, ->
+  console.log "start 3001"
+
+have2 = 0
+net.createServer (c)->
+  console.log "come server2"
+  c.on "data", (d)->
+    setTimeout ->
+      res = d + "resuponsu"
+      have2 = have2 + 1
+      c.end res + " : "+ have2
+    , ((Math.floor(Math.random() * 120)) * 1000) + 1
+  
+.listen 3002, ->
+  console.log "start 3002"
+
+randomWrite = (i=0)->
+  console.time "cli" + i.toString()
+  setTimeout ->
+    cli = new net.Socket()
+    cli.setEncoding "utf8"
+    cli.connect "3001", "localhost", ->
+      cli.write "fromClient"  
+      randomWrite i + 1
+    
+    cli.on "data", (d)->
+      console.log "response->" + d
+      console.timeEnd "cli" + i.toString()
+  , 1000
+  # , ((Math.floor(Math.random() * 5)) * 1000) + 1
+
+randomWrite()
+###
+
+
+
+###
+require("net").createServer((c)->c.on("data", (d)->c.end(d))).listen(3001,->console.log "start")
+require("http").createServer((a,b)->b.end("sdf" + a.url)).listen(3000,->console.log "start")
+###
+
+###
+# cilentの解析4
+net = require "net"
+
+# server
+sev = net.createServer (c)->
+  c.on "data", (d)->
+    c.write "sever data:" + d
+    c.end "emd"
+  
+sev.listen 3001
+
+# client
+cli = new net.Socket()
+cli.connect "3001", "localhost", -> cli.write "cliesite"
+cli.on "data", (d)-> console.log "response->" + d
+###
+
+
+###
+# cilentの解析3
+net = require "net"
+
+# server
+sev = net.createServer (c)->
+  c.setEncoding "utf8"
+  
+  c.on "data", (d)->
+    c.write "sever data:" + d
+    c.end "emd"
+  
+  c.on "close", -> console.log "server closing"
+
+sev.listen 3001
+
+# client
+process.stdin.resume()
+process.stdin.on "data", (inp)->
+  cli = new net.Socket()
+  cli.setEncoding "utf8"
+  cli.connect "3001", "localhost", -> cli.write inp
+  cli.on "data", (d)-> console.log "response->" + d
+  cli.on "close", -> console.log "client closing"
+###
+
+
+
+###
+# cilentの解析2
+net = require "net"
+
+# server
+console.log "1"
+sev = net.createServer (c)->
+  console.log "2 createsever"
+  c.setEncoding "utf8"
+  
+  c.on "data", (d)->
+    console.log "3 server data start"
+    console.log "sds:" + d + ":boibio:"
+    console.log "3.1 server data start"
+    c.write "sever data:" + d
+    console.log "3.2 server data start"
+    c.end()
+    console.log "3.3 server data start"
+    console.log "4 serber data end"
+  
+  c.on "close", ->
+    console.log "5 server clo str"
+    console.log "server closing"
+    console.log "6 server clo end"
+.listen 3001
+
+# client
+console.log "11"
+process.stdin.resume()
+console.log "12"
+
+process.stdin.on "data", (inp)->
+  console.log "13 pro data s"
+  
+  console.log "7 cli init"
+  cli = new net.Socket()
+
+  cli.setEncoding "utf8"
+
+  console.log "8"
+  cli.connect "3001", "localhost", ->
+    console.log "9 conn start"
+    cli.write "clicone write!!"
+    console.log "10 con end"
+  
+  cli.on "data", (d)->
+    console.log "15 cli data"
+    console.log "data cli->" + d
+
+  cli.on "close", ->
+    console.log "17"
+    console.log "client closing"
+  
+  cli.write inp
+  console.log "14 pro data e"
+
+
+console.log "18 endin"
+
+###
+
+
+
+###
 # cilentの解析
 net = require "net"
 
-net3004 = net.createServer (c)->
+# server
+console.log "1"
+sev = net.createServer (c)->
+  console.log "2 createsever"
   c.setEncoding "utf8"
   
-  console.log "net300004"
   c.on "data", (d)->
-    console.log "kantai"
-    console.log d
-    c.write "re@eeee" + d
+    console.log "3 server data start"
+    c.write "sever data:" + d
     c.end()
+    console.log "4 serber data end"
   
   c.on "close", ->
-    console.log "cccccliccclicli"
-.listen 3004
-
+    console.log "5 server clo str"
+    console.log "server closing"
+    console.log "6 server clo end"
+.listen 3001
 
 # client
+console.log "7 cli init"
 cli = new net.Socket()
 
 cli.setEncoding "utf8"
 
-cli.connect "3004", "localhost", ->
-  console.log "cli cone!"
+console.log "8"
+cli.connect "3001", "localhost", ->
+  console.log "9 conn start"
   cli.write "clicone write!!"
+  console.log "10 con end"
 
+console.log "11"
 process.stdin.resume()
+console.log "12"
 
 process.stdin.on "data", (d)->
+  console.log "13 pro data s"
   cli.write d
+  # ここでエラー
+  console.log "14 pro data e"
 
 cli.on "data", (d)->
-  console.log "cli->" + d
+  console.log "15 cli data"
+  console.log "data cli->" + d
 
 cli.on "close", ->
-  console.log "clitheereere clicli"
+  console.log "17"
+  console.log "client closing"
 
-
+console.log "18 endin"
+###
 
 ###
 net = require "net"
@@ -1491,7 +1698,7 @@ console.log startsWith "anokutra", "noi"
 
 ###
 try
-  downloadsuest")
+  require("request")
     .get "httahoo.co.jp"
     
     .on "response", (response) ->
@@ -1529,7 +1736,7 @@ file = require("fs").createWriteStream('./saved.jpg')
 file.on "close", ch
 
 # リクエスト実行
-downloadsuest").get("http://asdfasdf.com")
+require("request").get("http://asdfasdf.com")
   .on "response", (response) ->
     # ダウンロード結果を取得する
     data.contentType = response.headers["content-type"]
@@ -1551,7 +1758,7 @@ downloadsuest").get("http://asdfasdf.com")
 
 ###
 # 画像DL ng
-downloadsuest").get "ng"
+require("request").get "ng"
   , (e,res,body)->
     if e?
       console.log e
@@ -1565,13 +1772,13 @@ downloadsuest").get "ng"
 ###
 
 ###
-downloadsuest")
+require("request")
   .get "noinio"
   .pipe require("fs").createWriteStream('./saved2.jpg')
 ###
 
 ###
-downloadsuest")
+require("request")
   .get "naimon"
   .on "response", (r)->
     console.log 'statusCode: ', r.statusCode
@@ -2390,7 +2597,7 @@ putter = ->
   obj.id = getHash()
   obj.date = new Date().getTime().toString()
 
-  downloadsuest").post
+  require("request").post
     uri: "http://192.168.59.103:8888/debug.test" + cnt
     json: obj
     , (e,r,b)->
@@ -2453,7 +2660,7 @@ putter = ->
   obj.date = new Date().getTime().toString()
 
   cnt = cnt + 1
-  downloadsuest").post
+  require("request").post
     uri: "http://192.168.59.103:8888/debug.test" + cnt
     json: obj
 
@@ -2526,7 +2733,7 @@ putter = ->
     obj.id = getHash()
     obj.date = new Date().getTime().toString()
     
-    downloadsuest").post
+    require("request").post
       uri: "http://192.168.59.103:8888/debug.test" + cnt
       json: obj
     
@@ -2549,7 +2756,7 @@ async.forever (cb)-> putter(); cb()
   obj.id = getHash()
   obj.date = new Date().getTime().toString()
 
-  downloadsuest").post
+  require("request").post
     uri: "http://192.168.59.103:8888/debug.test" + i
     json: obj
 
