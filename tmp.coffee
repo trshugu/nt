@@ -4,6 +4,278 @@ console.time "tmp"
 # console.timeEnd "tmp"
 
 
+###
+# json取得3 gzip
+request = require "request"
+http = require "http"
+through2 = require "through2"
+
+s = http.createServer (req, res)-> 
+  console.time "dl"
+  res.writeHead 200,
+    "Content-Type": "multipart/mixed"
+    "Content-Encoding": "gzip"
+    "Transfer-Encoding": "chunked"
+    "Content-Disposition": "attachment; filename=dlz.txt"
+    
+  z = require("zlib").createGzip()
+  z.on "data", (d)->
+    res.write d
+    
+  
+  z.on "end", ->
+    console.timeEnd "dl"
+    res.end()
+  
+  stm = through2( (c,e,n)->
+    this.push c
+    n()
+  )
+  
+  jst = require('JSONStream').parse()
+  jst.on "data", (d)->
+    z.write JSON.stringify d
+    
+  jst.on "end", -> z.end()
+  
+  request.get("http://localhost:3001/testlargetrue").pipe(stm).pipe(jst)
+
+s.listen 3002
+###
+
+
+###
+# json取得2
+request = require "request"
+http = require "http"
+through2 = require "through2"
+
+s = http.createServer (req, res)-> 
+  console.time "dl"
+  res.writeHead 200,
+    "Content-Type": "multipart/mixed"
+    "Content-Disposition": "attachment; filename=notgzip.txt"
+  
+  stm = through2( (c,e,n)->
+    this.push c
+    n()
+  )
+  
+  jst = require('JSONStream').parse()
+  jst.on "data", (d)->
+    res.write JSON.stringify d
+    
+  jst.on "end", ->
+    console.timeEnd "dl"
+    res.end()
+  
+  request.get("http://localhost:3001/testlargetrue").pipe(stm).pipe(jst)
+
+s.listen 3002
+###
+
+
+###
+# json取得
+request = require "request"
+http = require "http"
+through2 = require "through2"
+
+s = http.createServer (req, res)-> 
+  stm = through2( (c,e,n)->
+    console.log "transss2"
+    this.push c
+    n()
+  )
+  
+  jst = require('JSONStream').parse()
+  jst.on "data", (d)->
+    console.log "data"
+    # console.log d
+    # console.log "data/////endddddddd"
+    res.write JSON.stringify d
+  
+  jst.on "end", ->
+    console.log "end"
+    res.end()
+  
+  request.get("http://localhost:3001/testlargetrue").pipe(stm).pipe(jst)
+
+s.listen 3002
+###
+
+
+
+###
+# ng
+s = http.createServer (req, res)-> 
+  stm = through2( (c,e,n)->
+    console.log "transss"
+    # chunkではparseできない事象発生
+    j = JSON.parse c
+    this.push c
+    n()
+  )
+  
+  # request.get("http://localhost:3001/don").pipe(stm).pipe(res)
+  # request.post("http://localhost:3001/pika").pipe(res)
+  # request.post("http://localhost:3001/pika").form(
+  #   form: 
+  #     kkk:"vvv"
+  # )
+  
+  request.get("http://localhost:3001/testlarge").pipe(stm).pipe(res)
+  
+
+s.listen 3002
+###
+
+
+
+###
+# Streamを使ってレスポンスデータを加工する3
+request = require "request"
+http = require "http"
+through2 = require "through2"
+
+
+s = http.createServer (req, res)-> 
+  stm = through2( (c,e,n)->
+    console.log "transss"
+    console.log c.toString()
+    this.push c
+    n()
+  )
+  
+  # request.get("http://localhost:3001/don").pipe(stm).pipe(res)
+  # request.post("http://localhost:3001/pika").pipe(res)
+  request.post("http://localhost:3001/pika").form(
+    form: 
+      kkk:"vvv"
+  )
+  
+
+s.listen 3002
+###
+
+###
+# express response2
+a = require("express")()
+a.get "/",(q,s)->
+  console.log "get"
+  s.header "nai": "denndenn"
+  s.set "saf": "etset"
+  s.set "Pragma": "no-cache"
+  s.status "200"
+  s.end("ex end")
+  
+
+a.listen 3003,->
+  console.log "on"
+###
+
+###
+# Streamを使ってレスポンスデータを加工する2
+request = require "request"
+http = require "http"
+through2 = require "through2"
+
+
+s = http.createServer (req, res)-> 
+  stm = through2( (c,e,n)->
+    console.log "transss"
+    console.log c.toString()
+    this.push c
+    n()
+  )
+  
+  request.get("http://localhost:3001").pipe(stm).pipe(res)
+  
+  # res.writeHead 418, "Content-Type":"text/html"
+  # res.end "tea pot"
+
+s.listen 3002
+###
+
+###
+# Streamを使ってレスポンスデータを加工する 
+request = require "request"
+http = require "http"
+through2 = require "through2"
+
+
+s = http.createServer (req, res)-> 
+  stm = through2(
+    transform: (c,e,n)->
+      console.log "transss"
+      console.log c
+      console.log e
+      console.log n
+      n("aa")
+    
+    flush: (cb)->
+      console.log "kita"
+      this.push("qqqq")
+      cb()
+  )
+  
+  request.get("http://localhost:3001").pipe(stm).pipe(res)
+  
+  # res.writeHead 418, "Content-Type":"text/html"
+  # res.end "tea pot"
+
+s.listen 3002
+###
+
+###
+request = require "request"
+http = require "http"
+
+s = http.createServer (req, res)-> 
+  request.get("https://www.google.co.jp/images/nav_logo231.png").pipe(res)
+  
+  # res.writeHead 418, "Content-Type":"text/html"
+  # res.end "tea pot"
+
+s.listen 3001
+###
+
+###
+request = require "request"
+fs = require "fs"
+
+# request("http://localhost:3001").pipe(fs.createWriteStream("dondon.txt"))
+fs.createReadStream("dondon.txt").pipe(request.put("http://localhost:3001"))
+###
+
+
+
+###
+request = require "request"
+
+request "http://localhost:3001", (e,r,b)->
+  if e?
+    console.log e
+  else
+    console.log r.statusCode
+    console.log r
+    console.log b
+###
+
+
+###
+http = require "http"
+
+s = http.createServer (req, res)-> 
+  console.log req
+  res.writeHead 418, "Content-Type":"text/html"
+  res.end "tea pot"
+
+s.listen 3001
+###
+
+
+
 
 ###
 net = require "net"
