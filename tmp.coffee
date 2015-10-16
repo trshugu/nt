@@ -4,6 +4,80 @@ console.time "tmp"
 # console.timeEnd "tmp"
 
 
+
+
+###
+# bylineに鞍替え
+bl = require("byline")(require("fs").createReadStream("memo.txt"))
+
+stm = require("through2")( (c,e,n)->
+    this.push c
+    n()
+  )
+
+# bl.pipe require("fs").createWriteStream("memo_copy.txt")
+bl.pipe(stm).pipe(require("fs").createWriteStream("memo_copy.txt"))
+###
+
+###
+stm = require("through2")( (c,e,n)->
+    this.push c
+    n()
+  )
+
+# readlineに鞍替え NG
+rs = require("fs").createReadStream("memo.txt")
+ws = require("fs").createWriteStream("memo_copy.txt")
+
+rl = require("readline").createInterface(rs, stm)
+
+rl.on "pause",->
+  console.log "pause"
+
+rl.on "resume",->
+  console.log "resume"
+
+rl.on "line",(l)->
+  # console.log l
+  rl.write l
+
+rl.on "close",->
+  console.log "close"
+
+rl.resume()
+###
+
+
+
+
+###
+require("http").get "http://www.yahoo.co.jp/", (d)->
+  d.on "data", (c)->
+    console.log c.toString()
+###
+
+
+###
+# stmの制御
+stm = require("through2")( (c,e,n)->
+    this.push c
+    n()
+  )
+
+stm.write "d"
+stm.on "data", (a,b,c)->
+  console.log a
+
+stm.write "dopdio"
+stm.write "d"
+stm.write "dere"
+stm.write "dereijife"
+
+process.stdin.resume()
+process.stdin.pipe(stm).pipe(process.stdout)
+###
+
+
 ###
 # json取得3 gzip
 request = require "request"
