@@ -7,6 +7,18 @@ console.time "tmp"
 
 
 ###
+# randomな文字列をn文字生成する
+idgen = (cnt)->
+  str = ""
+  [0...cnt].forEach ->
+    str += require("node-uuid").v4()[0]
+  
+  return str
+
+console.log idgen 35
+###
+
+###
 # bylineに鞍替え
 bl = require("byline")(require("fs").createReadStream("memo.txt"))
 
