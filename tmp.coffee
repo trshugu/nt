@@ -7,6 +7,33 @@ console.time "tmp"
 
 
 ###
+# stringをbufferにしてサイズを出す
+obj = {}
+obj.ichi = "one"
+obj.ni = "twr"
+buf = new Buffer(JSON.stringify(obj))
+console.log buf.length
+console.log buf.toString()
+###
+
+###
+# bylineに鞍替え2
+rs = require("fs").createReadStream("memo.txt")
+bl = require("byline").createStream(rs)
+
+stm = require("through2")( (c,e,n)->
+    this.push c
+    n()
+  )
+
+# bl.pipe require("fs").createWriteStream("memo_copy.txt")
+bl.pipe(stm).pipe(require("fs").createWriteStream("memo_copy.txt"))
+###
+
+
+
+
+###
 # randomな文字列をn文字生成する
 idgen = (cnt)->
   str = ""
