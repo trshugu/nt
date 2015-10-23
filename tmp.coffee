@@ -7,6 +7,25 @@ console.time "tmp"
 
 
 ###
+# 複数リストを複数プロセスにやらせる
+list = [1,4,9,5,4,3,5,6,4,6,7,6,9]
+
+cluster = require "cluster"
+if cluster.isMaster
+  list.forEach (i)->
+    w = cluster.fork()
+    w.send i
+else
+  console.log "kopurodayo"
+  process.on "message", (msg)->
+    console.log msg * 123
+    process.exit()
+###
+
+
+
+
+###
 # stringをbufferにしてサイズを出す
 obj = {}
 obj.ichi = "one"
