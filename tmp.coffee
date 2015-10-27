@@ -4,6 +4,40 @@ console.time "tmp"
 # console.timeEnd "tmp"
 
 
+###
+# parseの返却値
+json = '{"asdf":24,"asdff":234,"ff":"boo'
+
+try
+  console.log JSON.parse json
+catch e
+  console.log "catch"
+  console.log e
+###
+
+
+
+###
+# ユニット合わせ
+b1 = 1023
+b2 = 1024
+b3 = 1025
+
+b4 = 2047
+b5 = 2048
+b6 = 2049
+
+computeCapUni = (b, name)->
+  console.log name, Math.ceil( b/1024 )
+
+computeCapUni b1, "b1"
+computeCapUni b2, "b2"
+computeCapUni b3, "b3"
+
+computeCapUni b4, "b4"
+computeCapUni b5, "b5"
+computeCapUni b6, "b6"
+###
 
 
 ###
