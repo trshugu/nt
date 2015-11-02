@@ -4,6 +4,151 @@ console.time "tmp"
 # console.timeEnd "tmp"
 
 
+
+
+###
+# (10回実行したら終了)
+limi = (cnt = 0)->
+  console.log "don", cnt
+  if cnt < 10
+    limi cnt + 1
+
+limi()
+###
+
+
+
+###
+# スワイプサンプル
+start = Bacon.fromEventTarget el,'touchstart'
+move  = Bacon.fromEventTarget el,'touchmove'
+end   = Bacon.fromEventTarget el,'touchend'
+
+moving = start.flatMap (init) ->
+  return move
+    .takeUntil end
+    .scan({}, (acc, move)->
+      return
+        init : acc.init || init.changedTouches[0],
+        curt : move.changedTouches[0]
+    ).skip(1)
+
+swipeLeft = moving.filter (moves) ->
+  init = moves.init
+  curt = moves.curt
+  delta = init.clientX - curt.clientX
+  return delta > 50
+
+swipeLeft.onValue ->
+  # swipe left
+
+###
+
+
+
+###
+rx = require "rx"
+rx.Observable.of 1, 2, 3
+  .map (x)->
+    throw new Error() if x == 2
+    x
+  .onErrorResumeNext rx.Observable.of 4, 5, 6
+  .subscribe (v)->
+    console.log v
+###
+
+###
+rx.Observable.of 1, 2, 3
+  .map (x)->
+    console.log "mapyo"
+    throw new Error() if x == 2
+    x
+  .catch (e)->
+    console.log "catyo"
+    rx.Observable.return e instanceof Error
+  .subscribe (v)->
+    console.log "subyo"
+    console.log v
+###
+
+###
+rx.Observable.of 1, 2, 3
+  .flatMap (x)->
+    rx.Observable.of x, x * x
+  .subscribe (v)->
+    console.log v
+###
+
+###
+# ng
+a = rx.Observable.fromEvent(el,"click").map("a")
+b = rx.Observable.fromEvent(el,"click").map("b")
+
+a.merge(b).subscribe (v)->
+  console.log v
+###
+
+
+
+
+###
+rx.Observable.range 1, 7
+  .filter (x)->
+    x % 2 == 0
+  .subscribe (v)->
+    console.log v
+###
+
+
+###
+rx.Observable.of 1, 2, 3
+  .map (x)->
+    x * x
+  .subscribe (v)->
+    console.log v
+###
+
+
+
+###
+# baconjs
+beats = (you, opponent)->
+  if you is 'rock'
+    if opponent is 'scissors'
+      return true
+    else
+      return false 
+  else if you is 'paper'
+    if opponent is 'rock'
+      return true
+    else
+      return false
+  else if you is 'scissors'
+    if opponent is 'paper'
+      return true
+    else
+      return false
+  else
+    throw new Error("your hand is unexpected: #{you}")
+
+Bacon = require "baconjs"
+you = new Bacon.Bus()
+opponent = new Bacon.Bus()
+
+res = you.toProperty()
+  .combine opponent.toProperty(), beats
+  .onValue (d)-> console.log d
+
+
+you.push "paper"
+opponent.push "paper"
+opponent.push "rock"
+you.push "scissors"
+opponent.push "paper"
+###
+
+
+
 ###
 # parseの返却値
 json = '{"asdf":24,"asdff":234,"ff":"boo'
