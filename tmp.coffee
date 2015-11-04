@@ -6,6 +6,48 @@ console.time "tmp"
 
 
 
+
+
+###
+# クラスターは中止したものの、一個流しはできるようにする
+getLists = (cb) ->
+  arr = []
+  [0...10].forEach (i)->
+    arr.push i
+  
+  cb(null, arr)
+
+ikko = (msg, cb)->
+  cb(null, msg + "dondake")
+
+cluster = require "cluster"
+if cluster.isMaster
+  getLists (e,d)->
+    # forEachではダメ
+    # d.forEach (i)->
+    #   switch i
+    #     when ""
+    #       console.log "skip:", i
+    #     else
+    #       console.log "buckup:",i
+    #       w = cluster.fork()
+    #       w.send i
+    
+    forkin = (i)-> cluster.fork().send i
+    forkin d.shift() if d.length != 0
+    cluster.on "exit", -> forkin d.shift() if d.length != 0
+else
+  process.on "message", (msg)->
+    ikko msg, (e,d)->
+      if e?
+        console.log e
+      else
+        console.log d
+        console.timeEnd "tmp"
+        process.exit()
+###
+
+
 ###
 # (10回実行したら終了)
 limi = (cnt = 0)->
