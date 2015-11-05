@@ -7,6 +7,321 @@ console.time "tmp"
 
 
 
+###
+# 2つの非同期処理をつなげる
+hidoki = (v, cb)->
+  console.log "dokidokicon", v
+  cb new Date().getTime()
+
+dokidon = (v, cb)->
+  console.log "hudatmer", v
+  cb new Date().getTime()
+
+
+arr = []
+arr.push asdfdfas:3
+arr.push asdfdf:4
+arr.push asdf:56
+
+seri = (array)->
+  if array.length != 0
+    val = array.shift()
+    require("async").parallel [
+      (cb)->
+        hidoki val, (v)->
+          console.log v, "henkyaku"
+          cb null, "hido" + v
+      (cb)->
+        dokidon val, (v)->
+          console.log v, "henkyakudokik"
+          cb null, "doki" + v
+    ], (e, r) ->
+      if e?
+        throw e
+      else
+        # 順序は担保される模様
+        console.log "all done:", r
+        seri array
+  else
+    console.log "iwata"
+
+seri arr
+###
+
+
+
+###
+# parallel
+require("async").parallel [
+  (cb)->
+    console.log "seri 1"
+    setTimeout ->
+      console.log "seri 1 out"
+      cb null, 1
+    , 5000
+  (cb)->
+    console.log "seri 2"
+    setTimeout ->
+      console.log "seri 2 out"
+      cb null, 2
+    , 1000
+  (cb)->
+    console.log "seri 3"
+    setTimeout ->
+      console.log "seri 3 out"
+      cb null, 3
+    , 1000
+], (e, r) ->
+  if e?
+    throw e
+  else
+    # 順序は担保される模様
+    console.log "all done:", r
+###
+
+
+###
+# series
+require("async").series [
+  (cb)->
+    console.log "seri 1"
+    cb null, 1
+  (cb)->
+    console.log "seri 2"
+    cb null, 2
+  (cb)->
+    console.log "seri 3"
+    cb null, 3
+], (e, r) ->
+  if e?
+    throw e
+  else
+    console.log "all done:", r
+###
+
+
+
+###
+# waterfall
+require("async").waterfall [
+  (callback) ->
+    console.log "waterfall 1"
+    setTimeout ->
+      console.log "waterfall 1 done."
+      callback null, 10, "strr"
+    , 500
+  (arg, str, callback) ->
+    console.log "waterfall 2"
+    
+    # 複数回呼ぶと後続が複数回よばれる
+    callback null, "bonbon"
+    setTimeout ->
+      console.log "waterfall 2 done."
+      console.log str
+      callback null, arg + 1
+    , 300
+  (arg, callback) ->
+    console.log "waterfall 3"
+    setTimeout ->
+      console.log "waterfall 3 done."
+      callback null, arg + 100
+    , 100
+], (err, result) ->
+  throw err if err
+  console.log "waterfall all done." + result
+###
+
+
+
+
+###
+# 非同期な処理を直列につなぐ配列
+hidoki = (v, cb)->
+  console.log "dokidokicon", v
+  cb new Date().getTime()
+
+arr = []
+arr.push asdfdfas:3
+arr.push asdfdf:4
+arr.push asdf:56
+
+seri = (array)->
+  if array.length != 0
+    
+    hidoki array.shift(), (v)->
+      console.log v, "henkyaku"
+      setTimeout ->
+        seri array
+      , 1000
+  else
+    console.log "iwata"
+
+seri arr
+###
+
+
+
+
+###
+console.log "2015/10/13 00:00:00 -> " + (new Date("2015/10/13 00:00:00").getTime())
+console.log "2015/10/30 00:00:00 -> " + (new Date("2015/10/30 00:00:00").getTime())
+console.log "2015/11/13 00:00:00 -> " + (new Date("2015/11/13 00:00:00").getTime())
+###
+
+
+###
+# for ofは微妙 NG
+o = {}
+o.a = 1
+o.d = 2
+o.fe = 4
+o.s = 4
+o.cf = 3
+
+doi = (k, cb)->
+  cb(k + "no:")
+
+for k,v of o
+  console.log "1", k
+  setTimeout ->
+    console.log "2", k
+    doi k, (d)->
+      console.log "3", k
+      console.log d
+  , 1000
+  
+###
+
+###
+# 10万件のデータと1万件のIDをメモリ内でサマリする 関数2
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+ids = [0...100000].map(->getHash())
+data = [0...10000000].map(->ids[Math.floor(Math.random() * 10000)])
+
+# console.log data
+
+
+summary = {}
+data.forEach (i)-> summary[i] = if summary[i]? then summary[i] + 1 else 1
+
+# summary = data.reduce( ((p,c)->
+#   p[c] = if p[c]? then p[c] + 1 else 1
+#   return p)
+#   ,{} )
+
+
+console.timeEnd "tmp"
+# console.log summary
+
+# for k,v of summary
+#   console.log k,v if v > 20
+###
+
+
+
+###
+# 10万件のデータと1万件のIDをメモリ内でサマリする 関数
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+ids = [0...10000].map(->getHash())
+data = [0...100000].map(->ids[Math.floor(Math.random() * 10000)])
+
+# console.log data
+
+# summary = {}
+# data.forEach (i)-> summary[i] = if summary[i]? then summary[i] + 1 else 1
+
+
+# イマイチ
+summary = data.reduce( ((p,c)->
+  p[c] = if p[c]? then p[c] + 1 else 1
+  return p)
+  ,{} )
+
+# console.log summary
+
+for k,v of summary
+  console.log k,v if v > 20
+###
+
+###
+# 10万件のデータと1万件のIDをメモリ内でサマリする
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+ids = []
+[0...10000].forEach (i)->
+  ids.push getHash()
+
+# console.log ids.length
+
+# Math.floor(Math.random() * 10000)
+data = []
+[0...100000].forEach (i)->
+  data.push ids[Math.floor(Math.random() * 10000)]
+
+# console.log data
+
+summary = {}
+data.forEach (i)->
+  if summary[i]?
+    # console.log summary[i]
+    summary[i] = summary[i] + 1
+  else
+    # console.log summary[i]
+    summary[i] = 1
+    # console.log i
+    # console.log summary[i]
+    # console.log summary[i]?
+
+# cnt = 0
+for k,v of summary
+  # cnt = cnt + 1
+  # console.log cnt
+  if v > 1
+    console.log k,v
+
+###
+
+
+
+###
+# 間違い
+summary = {}
+for k,v of data
+  # console.log k
+  # console.log summary[k]
+  # console.log summary[k]?
+  
+  if summary[k]?
+    console.log summary[k]
+    summary[k] = summary[k] + 1
+  else
+    # console.log summary[k]
+    summary[k] = 1
+    # console.log k
+    # console.log summary[k]
+    # console.log summary[k]?
+
+cnt = 0
+for k,v of summary
+  cnt = cnt + 1
+  # console.log cnt
+  if v != 1
+    console.log k,v
+###
+
+
+
 
 ###
 # クラスターは中止したものの、一個流しはできるようにする
@@ -10708,8 +11023,9 @@ async.parallel [
   console.log "parallel all done. " + results
   return
 
-console.log "done."
 ###
+
+console.log "done."
 
 
 
