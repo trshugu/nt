@@ -7,6 +7,125 @@ console.time "tmp"
 
 
 
+
+
+###
+# Arrar.applyの場合
+getArg = ->
+  # console.log arguments
+  console.log Array.apply(null, arguments)
+
+getArg()
+getArg 5 # lengthとして認識されるためNG
+getArg "1"
+getArg 1,2,"sadf"
+###
+
+###
+getArg = ->
+  console.log arguments
+  console.log [].slice.call(arguments)[0]
+  console.log [].slice.call(arguments, 1)[1]
+
+getArg()
+getArg 1
+getArg "1"
+getArg 1,2,"sadf"
+###
+
+###
+# JSONをPrettyPrintする
+obj =
+  7: 'zero'
+  1: 'one'
+  2: 'two'
+  3: 'three'
+  4: 'four'
+  length: 9
+
+# 2スペースでインデントされたJSON形式
+console.log JSON.stringify(obj, null, 2); 
+
+# 小数点以下を指定(近似値が返却される)
+console.log 123.456.toFixed(2) # 123.5
+###
+
+
+###
+# 配列のコピーなど
+obj =
+  7: 'zero'
+  1: 'one'
+  2: 'two'
+  3: 'three'
+  4: 'four'
+  length: 9
+
+# arrayライクなものを変換
+console.log Array.prototype.slice.call(obj)
+console.log [].slice.call(obj)
+###
+
+
+
+
+###
+# FRP2
+Bacon = require "baconjs"
+client = require "cheerio-httpcli"
+
+list = [
+  'http://qiita.com/advent-calendar/2011'
+  'http://qiita.com/advent-calendar/2012'
+  'http://qiita.com/advent-calendar/2013'
+  'http://qiita.com/advent-calendar/2014'
+]
+
+# stream = Bacon.fromArray(list)
+# stream.log()
+
+console.log "1"
+
+fetchFromUrl = (url)->
+  console.log "2"
+  Bacon.fromCallback (cb)->
+    console.log "3"
+    client.fetch url, {}, (e,$,r)->
+      console.log "4"
+      cb $
+      console.log "5"
+
+console.log "6"
+
+getTitle = ($)->
+  console.log "7"
+  $("title").text()
+console.log "8"
+
+stream = Bacon.fromArray(list)
+stream
+  .bufferingThrottle 1000
+  .flatMap fetchFromUrl
+  .map getTitle
+  .log()
+
+console.log "9"
+###
+
+
+
+###
+# 検索
+client.fetch 'http://www.google.com/search', {q: 'node.js'}, (err, $, res)->
+  console.log res.headers
+  console.log $('title')
+  console.log $('title').text()
+  
+  $('a').each (idx) ->
+    console.log $(this).attr('href')
+###
+
+
 ###
 # 2つの非同期処理をつなげる
 hidoki = (v, cb)->
