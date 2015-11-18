@@ -6,6 +6,198 @@ console.time "tmp"
 
 
 
+###
+# HTTP GetのAsync
+promise = require "bluebird"
+request = require "request"
+
+console.log "1"
+get_http1 = new promise (resolve, reject)->
+  console.log "2"
+  console.log 'start http get to google...'
+  request 'http://google.co.jp/', (error, response)->
+    console.log "3"
+    if !error && response.statusCode == 200
+      console.log "4"
+      resolve response
+    else
+      console.log "5"
+      reject response
+    console.log "6"
+
+console.log "7"
+get_http1
+  .then (response)->
+    console.log "8"
+    console.log 'http get to google done! '
+    console.log response.statusCode
+  .catch (error)->
+    console.log "9"
+    console.log 'http get failed...'
+    console.log error.statusCode
+
+console.log "10"
+###
+
+###
+# promise all3 async.eachEachの代替 NG
+Promise = require "bluebird"
+
+[1,2,3,4,5].reduce (p,n)->
+  return new p.then (v)->
+    return new Promise (f,r)->
+      setTimeout ->
+        console.log n
+        f n
+      ,1000
+, Promise.resolve()
+  .then (v)->
+    console.log "end", v
+###
+
+
+
+###
+# promise all2 async.eachの代替
+Promise = require "bluebird"
+
+Promise.all [1,2,3,4,5].map (num)->
+  new Promise (f,r)->
+    setTimeout ->
+      console.log num
+      f num
+    ,1000
+  .then (v)->
+    console.log "end", v
+###
+
+
+
+###
+# promise race
+Promise = require "bluebird"
+
+p1 = new Promise (f,r)->
+  setTimeout ->
+    f 1
+  ,1000
+
+p2 = new Promise (f,r)->
+  setTimeout ->
+    f 2
+  ,2000
+
+Promise.race([p1,p2])
+  .then (v)->
+    console.log v
+###
+
+###
+# promise all
+Promise = require "bluebird"
+
+p1 = new Promise (f,r)->
+  setTimeout ->
+    f 1
+  ,1000
+
+p2 = new Promise (f,r)->
+  setTimeout ->
+    f 2
+  ,2000
+
+Promise.all([p1,p2])
+  .then (v)->
+    console.log v
+###
+
+###
+# promise3
+fs = require "fs"
+Promise = require "bluebird"
+Promise.promisifyAll fs
+
+fs.readFileAsync "memo.txt", "utf-8"
+  .then (v)->
+    console.log v
+    new Promise (f,r)->
+      setTimeout ->
+        # f "timeoute"
+        r new Error("timeoutafiel")
+      .1000
+    
+  .then (v)->
+    console.log v, "thenのほう1"
+  .then (v)->
+    console.log v, "thenのほう2"
+  .then (v)->
+    console.log v, "thenのほう3"
+  .then (v)->
+    console.log v, "thenのほう4"
+  .then (v)->
+    console.log v, "thenのほう5"
+  .catch (e)->
+    console.log e, "errorのほう"
+  .catch (e)->
+    console.log e, "errorのほう2"
+###
+
+###
+# promise2
+fs = require "fs"
+Promise = require "bluebird"
+Promise.promisifyAll fs
+
+fs.readFileAsync "memo.txt", "utf-8"
+  .then (v)->
+    new Promise (f,r)->
+      setTimeout ->
+        f "timeoute"
+      , 1000
+  .then (v)->
+    console.log v
+  , (e)->
+    console.log e
+###
+
+###
+# promise
+fs = require "fs"
+Promise = require "bluebird"
+
+Promise.promisifyAll fs
+
+fs.readFileAsync "memo.txt", "utf-8"
+  .then (v)->
+    console.log v
+  , (e)->
+    console.log e
+###
+
+
+
+
+###
+# dirExistsは必要か->必要だった
+require("fs").appendFile()
+###
+
+###
+console.log "2015/11/15 23:59:59 -> " + (new Date("2015/11/15 23:59:59").getTime())
+console.log "2015/11/22 23:59:59 -> " + (new Date("2015/11/22 23:59:59").getTime())
+console.log "2015/11/24 23:59:59 -> " + (new Date("2015/11/24 23:59:59").getTime())
+console.log "2015/12/06 23:59:59 -> " + (new Date("2015/12/06 23:59:59").getTime())
+console.log "2015/12/13 23:59:59 -> " + (new Date("2015/12/13 23:59:59").getTime())
+console.log "2015/12/20 23:59:59 -> " + (new Date("2015/12/20 23:59:59").getTime())
+console.log "2015/12/23 23:59:59 -> " + (new Date("2015/12/23 23:59:59").getTime())
+# 2015/11/15 23:59:59 -> 1447599599000
+# 2015/11/22 23:59:59 -> 1448204399000
+# 2015/11/24 23:59:59 -> 1448377199000
+# 2015/12/06 23:59:59 -> 1449413999000
+# 2015/12/13 23:59:59 -> 1450018799000
+# 2015/12/20 23:59:59 -> 1450623599000
+# 2015/12/23 23:59:59 -> 1450882799000
+###
 
 
 
