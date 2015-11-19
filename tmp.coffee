@@ -9,6 +9,35 @@ console.time "tmp"
 
 
 
+
+###
+# promiseによる並列処理
+promise = require "bluebird"
+
+promise.all [
+  new promise (f)->
+    f "aaa"
+  new promise (f)->
+    f "bbbb"
+  ]
+  .then (v)->
+    console.log "all promiss done:", v
+###
+
+
+###
+require("async").parallel [
+  (cb)->
+      cb null, "aaa"
+  (cb)->
+      cb null, "bbbb"
+], (e, r) ->
+  if e?
+    throw e
+  else
+    console.log "all done:", r
+###
+
 ###
 # sortの分解
 cnt = 0
