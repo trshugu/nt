@@ -137,8 +137,8 @@ Promise.all([p1,p2])
   .then (v)->
     console.log v
 ###
-
 ###
+
 # promise3
 fs = require "fs"
 Promise = require "bluebird"
@@ -149,12 +149,14 @@ fs.readFileAsync "memo.txt", "utf-8"
     console.log v
     new Promise (f,r)->
       setTimeout ->
-        # f "timeoute"
-        r new Error("timeoutafiel")
+        f "timeoute"
+        # r new Error("timeoutafiel")
       .1000
     
   .then (v)->
     console.log v, "thenのほう1"
+    new Promise (f,r)->
+      f "ninini"
   .then (v)->
     console.log v, "thenのほう2"
   .then (v)->
@@ -168,6 +170,8 @@ fs.readFileAsync "memo.txt", "utf-8"
   .catch (e)->
     console.log e, "errorのほう2"
 ###
+
+
 
 ###
 # promise2
