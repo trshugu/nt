@@ -6,6 +6,33 @@ console.time "tmp"
 
 
 
+
+
+
+###
+# sortの分解
+cnt = 0
+console.log [4,2,2,2,25,3,2,2,2,6,6,6,2,2,6,8,54,6].sort (a,b)->
+  cnt += 1
+  console.log "a",a
+  console.log "b",b
+  console.log a < b
+  console.log cnt
+  if a > b
+    1
+  else
+    -1
+###
+
+
+
+###
+# すべてfalseにするものである
+ted.sort (a,b)->
+  console.log a > b
+  a > b
+###
+
 ###
 # HTTP GetのAsync
 promise = require "bluebird"
