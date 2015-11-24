@@ -9,6 +9,19 @@ console.time "tmp"
 
 
 
+###
+# 個別のpromise allは配列を返さない
+Promise = require "bluebird"
+
+Promise.all [1,2,3,4,5].map (num)->
+  new Promise (f,r)->
+    setTimeout ->
+      console.log num
+      f num
+    ,1000
+.then (v)->
+  console.log v
+###
 
 ###
 # promiseによる並列処理
@@ -166,6 +179,9 @@ Promise.all([p1,p2])
   .then (v)->
     console.log v
 ###
+
+
+
 ###
 
 # promise3
