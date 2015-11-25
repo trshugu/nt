@@ -5,7 +5,23 @@ console.time "tmp"
 
 
 
+###
+# 期間のリストを算出
+epoch2date = (d)->
+  d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2)
 
+sDate = new Date("2015/07/01")
+eDate = new Date("2015/11/25")
+
+dateList = []
+while epoch2date(sDate) != epoch2date(eDate)
+  dateList.push epoch2date(sDate).replace(/\//g, "")
+  sDate.setDate(sDate.getDate()+1)
+
+console.log dateList
+###
 
 
 
