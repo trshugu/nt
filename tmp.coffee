@@ -5,6 +5,66 @@ console.time "tmp"
 
 
 
+
+
+
+###
+# 日付バリデーション2 yyyy-mm-dd hh:mi:ss
+chai = require "chai"
+
+reg = new RegExp(/^\d{4}-\d{2}-\d{2}\s{1}\d{2}:\d{2}:\d{2}$/)
+
+chai.assert.isTrue reg.test "2016-23-11 23:32:23"
+chai.assert.isTrue reg.test "2016-23-11 23:02:00"
+chai.assert.isTrue reg.test "2016-01-01 23:02:00"
+chai.assert.isNotTrue reg.test "2016/23/11 23:32:23"
+chai.assert.isNotTrue reg.test "2016/23/1123:32:23"
+chai.assert.isNotTrue reg.test "2016/23/11 23:32"
+chai.assert.isNotTrue reg.test "2016/2/1 3:3"
+###
+
+
+###
+# 日付バリデーション yyyy-mm-dd hh:mi:ss
+chai = require "chai"
+chai.assert true
+chai.assert !false
+
+datevali = (str)->
+  reg = new RegExp(/^\d{4}-\d{2}-\d{2}\s{1}\d{2}:\d{2}:\d{2}$/)
+  # console.log reg.test str
+  
+  if reg.test str
+    console.log "aru"
+    return true
+  else
+    console.log "nai"
+    return false
+
+datevali "20162311"
+datevali "2016-23-11 23:32:23"
+datevali "2016-23-11"
+datevali "2016-23-11 "
+datevali "2016-23-11  "
+datevali "2016-23-11 00"
+
+
+datevali "a20162311"
+datevali "a2016-23-11 23:32:23"
+datevali "a2016-23-11"
+datevali "a2016-23-11 "
+datevali "a2016-23-11  "
+
+
+chai.assert.isTrue datevali "2016-23-11 23:32:23"
+chai.assert.isTrue datevali "2016-23-11 23:02:00"
+chai.assert.isTrue datevali "2016-01-01 23:02:00"
+chai.assert.isNotTrue datevali "2016/23/11 23:32:23"
+chai.assert.isNotTrue datevali "2016/23/1123:32:23"
+chai.assert.isNotTrue datevali "2016/23/11 23:32"
+chai.assert.isNotTrue datevali "2016/2/1 3:3"
+###
+
 ###
 # 期間のリストを算出
 epoch2date = (d)->
