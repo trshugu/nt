@@ -7,6 +7,54 @@ console.time "tmp"
 
 
 
+###
+# クラスタリングチェック
+promise = require "bluebird"
+throng = require "throng"
+
+start = ->
+  console.log "start worker"
+  
+  process.on "SIGTERM",->
+    console.log "death"
+    process.exit()
+  
+  promise.all [
+    new promise (f)->
+      count1 = 0
+      while count1 < 1000 * 1000 * 1000 * 1
+        count1++
+      
+      console.timeEnd "tmp"
+      f "1"
+    # =========================================
+    new promise (f)-> 
+      count1 = 0
+      while count1 < 1000 * 1000 * 1000 * 1
+        count1++
+      
+      console.timeEnd "tmp"
+      f "2"
+    # =========================================
+    new promise (f)-> 
+      count1 = 0
+      while count1 < 1000 * 1000 * 1000 * 1
+        count1++
+      
+      console.timeEnd "tmp"
+      f "3"
+  ]
+  .then (v)->
+    console.log "all promiss done:", v
+    console.timeEnd "tmp"
+    process.exit()
+  .catch (e)->
+    console.log "error", e
+
+throng start, workers: 3
+###
+
+
 
 ###
 # 日付バリデーション2 yyyy-mm-dd hh:mi:ss
