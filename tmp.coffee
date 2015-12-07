@@ -7,6 +7,97 @@ console.time "tmp"
 
 
 
+
+###
+# リバースプロキシ ng
+px = require "http-proxy"
+
+ps = px.createServer
+  hostnameOnly: true
+  router:
+    "lw-api.cloud.recochoku.jp": "127.0.0.1"
+
+ps.listen 80
+console.log "ok"
+###
+
+
+
+
+###
+# 配列操作の拡張メソッド
+Array.prototype.nanka = (cb)->
+  O = Object this
+  len = O.length >>> 0
+  A = new Array(len)
+  
+  k = 0
+  while(k < len)
+    if (k of O)
+      kValue = O[ k ]
+      mappedValue = cb.call(null, kValue + 1)
+      console.log mappedValue
+      A[ k ] = mappedValue
+    k++
+  
+  return A
+
+
+arr = [1,2,4,2,23]
+console.log arr.nanka((i)->i)
+###
+
+
+
+###
+# map
+Array.prototype.mape = (cb, thisArg)->
+  throw new TypeError(" this is null or not defined") if (this == null)
+  O = Object this
+  len = O.length >>> 0
+  
+  throw new TypeError(cb + " is not a function") if ({}.toString.call(cb) != "[object Function]")
+  
+  T = thisArg if (thisArg)
+  
+  A = new Array(len)
+  k = 0
+  while(k < len)
+    if (k of O)
+      kValue = O[ k ]
+      mappedValue = cb.call(T, kValue, k, O)
+      A[ k ] = mappedValue
+    k++
+  
+  return A
+
+arr = [1,2,4,2,23]
+console.log arr.map((i)->i)
+console.log arr.mape((i)->i)
+###
+
+
+
+###
+# ベーシック認証
+a = require("express")()
+b = require "basic-auth-connect"
+
+a.use b("user", "pass")
+
+a.get "/",(q,s)->
+  console.log "get"
+  s.header "nai": "denndenn"
+  s.set "saf": "etset"
+  s.set "Pragma": "no-cache"
+  s.status "200"
+  s.end("ex end")
+  
+
+a.listen 3003,->
+  console.log "on"
+###
+
 ###
 # クラスタリングチェック
 promise = require "bluebird"
