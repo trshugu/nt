@@ -7,6 +7,387 @@ console.time "tmp"
 
 
 
+
+
+
+
+
+
+###
+# bluebirdのyield
+Promise = require 'bluebird'
+
+console.log "1@@"
+timer = (str, ms) =>
+  console.log "2@@"
+  return new Promise (resolve) =>
+    console.log "3@@"
+    console.log str 
+    setTimeout () =>
+      console.log "4@@"
+      resolve()
+    , ms
+
+console.log "5@@"
+Promise.coroutine(->
+  console.log "6@@"
+  yield timer('1', 1000)
+  yield timer('2', 1000)
+  # 並列処理
+  yield Promise.all([timer('3', 1000), timer('4', 1000), timer('5', 1000)])
+  yield timer('6', 1000)
+)()
+###
+
+
+
+
+
+###
+http = require "http"
+get = require 'get'
+co  = require 'co'
+console.log "1"
+###
+
+
+
+###
+http.get 'http://google.com', (a,b,c)->
+  console.log a
+  console.log b
+  console.log c
+###
+
+###
+co ->
+  console.log "2"
+  a = yield http.get('http://google.com')
+  console.log "3"
+  b = yield http.get('http://yahoo.com')
+  c = yield http.get('http://cloudup.com')
+  console.log(a.status)
+  console.log(b.status)
+  console.log(c.status)
+.then (v)->
+###
+
+###
+co ->
+  console.log "2"
+  a = get('http://google.com')
+  b = get('http://yahoo.com')
+  c = get('http://cloudup.com')
+  res = yield [a, b, c]
+  console.log(res)
+###
+
+
+###
+fun = ->
+  console.log "bobo"
+  @.next()
+  return "doi"
+
+
+require("co") ->
+  console.log "a"
+  yield Promise.resolve(1)
+  console.log "b"
+  yield fun
+  console.log "c"
+  return 99
+.then (v)->
+  console.log v
+  return "omake"
+.then (v)->
+  console.log v
+###
+
+
+###
+co = require "co"
+
+sleep = (ms) ->
+  new Promise (done) ->
+    setTimeout (-> done ms), ms
+
+co ->
+  console.log 'sleep 1'
+  a = yield sleep(1000)
+  console.log 'sleep 2'
+  b = yield sleep(500)
+  console.log 'sleep 3'
+  console.log a, b
+  return "vvvv"
+.then (v)->
+  console.log "modottekita"
+  console.log v
+  "dajio"
+.then (v)->
+  console.log "nikai"
+  console.log v
+###
+
+
+###
+# do
+x = do ->
+  yield 0
+  yield 1
+  yield 2
+
+# gen = x() # generatorを生成
+console.log x.next().value
+console.log x.next().value
+console.log x.next().value
+###
+
+
+
+###
+# readdir2
+co = require "co"
+fs = require "fs"
+Promise = require "bluebird"
+Promise.promisifyAll fs
+
+co ->
+  f = yield fs.readdirAsync "."
+  console.log f
+###
+
+
+
+###
+# readdir
+require("fs").readdir ".",(e,f)->
+  console.log typeof f
+  console.log f.map((i)->i)
+###
+
+
+
+###
+# フィボナッチ2
+fib = ->
+  a = 0
+  b = 1
+  while true
+    yield a
+    tmp = b
+    b = a + b
+    a = tmp
+
+gen = fib()
+[0...100].forEach ->
+  console.log gen.next()
+###
+
+
+
+###
+yi = ->
+  i = 1
+  yield "bon"
+  i++
+  yield i
+  i++
+  yield "don"
+  i++
+  yield i
+  i++
+  yield 99
+  i++
+  yield i
+  i++
+
+console.log typeof yi()
+console.log yi()
+
+yy = yi()
+
+console.log "a"
+console.log yy.next(20)
+console.log "b"
+console.log yy.next(30)
+console.log "c"
+console.log yy.next(40)
+console.log "d"
+console.log yy.next(50)
+console.log "e"
+console.log yy.next(60)
+console.log "f"
+console.log yy.next(70)
+console.log "g"
+console.log yy.next(70)
+console.log "h"
+console.log yy.next(70)
+###
+
+###
+yi = ->
+  i = 1
+  while 1
+    yield "bon"
+    console.log "nikaimenotugi"
+    i++
+    return 99
+
+yy = yi()
+
+console.log "a"
+console.log yy.next(20)
+console.log "b"
+console.log yy.next(30)
+console.log "c"
+console.log yy.next(40)
+console.log "d"
+console.log yy.next(50)
+console.log "e"
+###
+
+###
+# yieldを使ったフィボナッチ
+fib = (n)->
+  i1 = 0
+  i2 = 1
+  while(1)
+    yield "asdf"
+    console.log i1
+    i1 = i2
+    i2 = i1+i2
+
+
+f = fib(10)
+console.log f
+
+f.next (n) -> console.log n
+f.next (n) -> console.log n
+f.next (n) -> console.log n
+f.next (n) -> console.log n
+f.next (n) -> console.log n
+f.next (n) -> console.log n
+f.next (n) -> console.log n
+###
+
+
+###
+# ama3
+i = 1
+g = ->
+  while(1)
+    yield i
+    i++
+
+a = g()
+
+console.log a
+
+console.log i
+a.next i
+console.log a
+a.next i
+console.log a
+console.log i
+###
+
+###
+# ama2
+console.log "1@@"
+i = 1
+g = ((l)->
+  console.log "2@@"
+  console.log l
+  while(1)
+    console.log "3@@"
+    yield(l)
+    console.log "4@@"
+    i++
+    console.log "5@@")("dan")
+
+console.log "6@@"
+console.log i
+console.log "7@@"
+g.next("doi")
+console.log "8@@"
+g.next()
+console.log "9@@"
+console.log i
+console.log "10@@"
+###
+
+
+###
+# ama
+i = 1
+g = (->
+  while(1)
+    yield i
+    i++)()
+
+
+console.log i
+g.next i
+g.next i
+console.log i
+###
+
+
+###
+# koa2
+koa = require "koa"
+app = koa()
+
+app.use *()->
+  this.body = "hell"
+
+app.listen 3000
+###
+
+###
+# koa
+koa = require "koa"
+app = koa()
+
+console.log "1"
+app.use (n) ->
+  console.log "2"
+  st = new Date
+  yield n
+  console.log "3"
+  ms = new Date - st
+  @set "X-Response-Time", "#{ms}ms"
+
+console.log "4"
+app.use (n) ->
+  console.log "5"
+  st = new Date
+  yield n
+  console.log "6"
+  ms = new Date - st
+  console.log "#{@method} #{@url} - #{ms}"
+
+console.log "7"
+app.use (n) ->
+  console.log "8"
+  @body = 'Hello World'
+  yield n
+console.log "9"
+
+app.listen 3000
+
+console.log "10"
+###
+
+
+
+###
+yy = (n)->
+  yield n
+###
+
+
 ###
 # jsonを一行ずつ読む
 rs = require("fs").createReadStream "aaa.json", encoding: "utf-8"
