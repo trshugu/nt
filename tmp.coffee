@@ -7,6 +7,23 @@ console.time "tmp"
 
 
 
+###
+# jsonを一行ずつ読む
+rs = require("fs").createReadStream "aaa.json", encoding: "utf-8"
+js = require('JSONStream').parse() 
+
+arrJson = []
+js.on "data", (d)-> arrJson.push d
+
+js.on "end", ->
+  console.log "end"
+  console.log arrJson.filter((i)->i.platform.S == "APP").map((i)->i.user_agent.S )
+
+js.on "close", ->
+  console.log "close"
+
+rs.pipe js
+###
 
 ###
 # リバースプロキシ ng
