@@ -10,7 +10,114 @@ console.time "tmp"
 
 
 
+Promise.race [
+  new Promise (f)->
+    console.log "1"
+    setTimeout ->
+      console.log "ichi"
+      f 1
+    ,2000
+  new Promise (f)->
+    console.log "2"
+    setTimeout ->
+      console.log "ni"
+      f 2
+    ,3000
+  new Promise (f)->
+    console.log "3"
+    setTimeout ->
+      console.log "san"
+      f 3
+    ,800
+  new Promise (f)->
+    console.log "4"
+    setTimeout ->
+      console.log "shi"
+      f 4
+    ,2000
+]
+.then (v)->
+  console.log "end"
+  console.log v
 
+  
+###
+Promise.all [
+  new Promise (f)-> f "1"
+  new Promise (f)-> f "2"
+  new Promise (f)-> f "3"
+  new Promise (f)-> f "4"
+]
+.then (v)-> console.log v
+###
+
+###
+spawn = (generatorFunc) ->
+  continuer = (verb, arg) ->
+    result
+    try
+      result = generator[verb](arg)
+    catch err
+      return Promise.reject(err)
+    
+    
+    if (result.done)
+      return result.value
+    else
+      return Promise.resolve(result.value).then(onFulfilled, onRejected)
+    
+  
+  generator = generatorFunc();
+  onFulfilled = continuer.bind(continuer, "next");
+  onRejected = continuer.bind(continuer, "throw");
+  return onFulfilled();
+
+
+a = spawn ->
+  console.log "asdf"
+
+console.log a
+console.log a.next
+###
+
+
+###
+# 標準promise
+console.log "s"
+p = new Promise (f,r)->
+  f "kitreru"
+
+p.then (v)->
+  console.log "thene"
+  console.log v
+
+console.log "e"
+###
+
+
+###
+http = require('http')
+koa = require('koa')
+app = koa()
+
+app.use ->
+  this
+  this.request
+  this.response
+
+http.createServer(app.callback()).listen(3000)
+###
+
+
+###
+# multiple addresses
+http = require('http')
+koa = require('koa')
+app = koa()
+
+http.createServer(app.callback()).listen(3000)
+http.createServer(app.callback()).listen(3001)
+###
 
 
 ###
