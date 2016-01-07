@@ -1,4 +1,5 @@
 ###
+
 ###
 console.time "tmp"
 # console.timeEnd "tmp"
@@ -7,9 +8,116 @@ console.time "tmp"
 
 
 
+###
+# 処理速度を測る
+while true
+  console.time "measurement"
+  count1 = 0
+  while count1 < 1000 * 1000 * 1000 * 1
+    count1++
+  
+  console.timeEnd "measurement"
+
+# [0...3000000].filter((i)->i % 2 == 0 ).map((i)->i * 2).sort((a,b)-> b-a)
+###
+
+
+###
+# 一括で返すには再帰的呼び出しが不可欠ではなかった
+scanData = (filename, cb)->
+  data = []
+  
+  stream = require('JSONStream').parse() 
+  stream.on 'data', (r)-> data.push r
+  stream.on 'close', -> cb data
+  
+  rs = require("fs").createReadStream filename + ".json", "utf-8"
+  rs.pipe(stream)
+
+scanData "db", (d)-> console.log d
+###
+
+
+###
+# 一括で返すには再帰的呼び出しが不可欠？
+scanData = (cb)->
+  data = []
+  rs = require("fs").createReadStream "db.json", "utf-8"
+  stream = require('JSONStream').parse() 
+  
+  stream.on 'data', (r)->
+    console.log "int", r
+    data.push r
+  
+  stream.on 'close', ->
+    # ここで返却すればいい
+    console.log "close"
+    cb data
+  
+  rs.pipe(stream)
+
+scanData (d)->
+  console.log d
+###
 
 
 
+
+###
+# jsonDB #
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+
+# C
+createData = (obj)->
+  # 書き込み
+  data = obj
+  data["_id"] = getHash()
+  data["_rev"] = 0
+  
+  require("fs").appendFile "db.json", JSON.stringify(obj) + "\n", (e)->
+
+
+# createData jjj:"kkkk"
+
+# R
+scanData = (cb)->
+  rs = require("fs").createReadStream "db.json", "utf-8"
+  stream = require('JSONStream').parse() 
+  stream.on 'data', (data)-> cb data
+  
+  rs.pipe(stream)
+
+# scanData (d)->
+#   console.log d
+
+readData = (id, cb)->
+  rs = require("fs").createReadStream "db.json", "utf-8"
+  stream = require('JSONStream').parse() 
+  stream.on 'data', (data)->
+    cb(data) if data._id == id
+  
+  rs.pipe(stream)
+  
+
+# readData "161bff92b47859e4bc2561577e42faeae58284b4565a786ef378804f0a5cd4d5", (d)->
+#   console.log d
+
+# U
+updateDate = (id)->
+  # revをインクリメントする
+
+# D
+deleteData = (id)->
+  # 削除
+###
+
+
+
+###
 Promise.race [
   new Promise (f)->
     console.log "1"
@@ -39,8 +147,12 @@ Promise.race [
 .then (v)->
   console.log "end"
   console.log v
+###
 
-  
+
+
+
+
 ###
 Promise.all [
   new Promise (f)-> f "1"
