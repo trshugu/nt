@@ -9,6 +9,39 @@ console.time "tmp"
 
 
 ###
+# 並行処理を直列に
+promise = require "bluebird"
+
+new promise (f)->
+  console.log "111"
+  setTimeout ->
+    console.log "111kita"
+    f "ichi"
+  , 2000
+.then (f)->
+  new promise (f)->
+    console.log "222"
+    setTimeout ->
+      console.log "222kita"
+      f "nii"
+    , 1000
+.then (f)->
+  new promise (f)->
+    console.log "333"
+    setTimeout ->
+      console.log "333kita"
+      f "sann"
+    , 1000
+.then (f)->
+  console.log "end", f
+.catch (e)->
+  console.log "error", e
+###
+
+
+
+
+###
 # 処理速度を測る
 while true
   console.time "measurement"
