@@ -8,6 +8,29 @@ console.time "tmp"
 
 
 
+sw = (st)->
+  setTimeout ->
+    dRap = new Date(new Date() - st)
+    console.log ("0" + dRap.getMinutes()).slice(-2) + ":" + ("0" + dRap.getSeconds()).slice(-2)
+    sw st
+  ,1000
+
+
+sw new Date()
+
+
+###
+sw =(i)->
+  setTimeout ->
+    console.log i
+    sw i + 1
+  ,1000
+
+
+sw parseInt process.argv[2]
+###
+
+
 ###
 # 並行処理を直列に
 promise = require "bluebird"
