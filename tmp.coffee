@@ -7,7 +7,7 @@ console.time "tmp"
 
 
 
-
+###
 sw = (st)->
   setTimeout ->
     dRap = new Date(new Date() - st)
@@ -17,6 +17,8 @@ sw = (st)->
 
 
 sw new Date()
+###
+
 
 
 ###
