@@ -1,0 +1,6 @@
+node_modules
+bower_components
+*.as3proj
+logs
+npm-debug.log
+
