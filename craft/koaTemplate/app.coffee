@@ -1,3 +1,44 @@
+koa = require('koa')
+route = require 'koa-route'
+serve = require 'koa-static'
+views = require 'co-views'
+app = koa()
+
+# jadeをテンプレートエンジンとして設定。
+render = views(__dirname + '/views', { map : {html : 'jade'}})
+
+# GET /views => render template engine
+app.use route.get('/views', (next)->
+  # bodyに対してindex.jadeの変更を実施。
+  this.body = yield render('index.jade', {name: "koa"})
+)
+
+# GET /hello => 'Hello!'
+app.use route.get('/hello', (next)=>
+  this.body = 'Hello!!'
+)
+
+# GET /hello/:name => 'Hello :name'
+app.use route.get('/hello/:name', (name) ->
+  this.body = 'Hello ' + name;
+)
+
+# static file serve
+app.use serve(__dirname + '/public')
+
+app.listen(3000); 
+
+###
+app.use *->
+  this.body = "noi"
+  console.log "non"
+
+# http.createServer(app.callback()).listen(3000)
+app.listen 3000
+###
+
+
+###
 debug = require("debug")("expresstemplate2")
 express = require "koa"
 path = require "path"
@@ -10,8 +51,8 @@ process.on 'uncaughtException', (e) ->
 app = express()
 
 # view engine setup
-app.set "views", path.join(__dirname, "views")
-app.set "view engine", "jade"
+app.use "views", -> path.join(__dirname, "views")
+app.use "view engine", "jade"
 
 favicon = require "serve-favicon"
 # uncomment after placing your favicon in /public
@@ -32,15 +73,13 @@ app.use require('iced-coffee-middleware')
 # use stylus
 app.use require('stylus').middleware(path.join(__dirname, 'public'))
 
-###
 # ここにhttps対応
-app.use (req, res, next) ->
-  schema = (req.headers['x-forwarded-proto'] || '').toLowerCase()
-  if schema == 'https' || req.secure
-    next()
-  else
-    res.redirect 'https://' + req.headers.host + req.url
-###
+# app.use (req, res, next) ->
+#   schema = (req.headers['x-forwarded-proto'] || '').toLowerCase()
+#   if schema == 'https' || req.secure
+#     next()
+#   else
+#     res.redirect 'https://' + req.headers.host + req.url
 
 # routes
 require("./controller/routes") app
@@ -80,5 +119,5 @@ server = http.createServer(app)
 # io = require('socket.io').listen(server)
 server.listen app.get('port'), ->
   debug "Express server listening on portee " + server.address().port
-
+###
 

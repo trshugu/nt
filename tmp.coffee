@@ -8,6 +8,37 @@ console.time "tmp"
 
 
 ###
+koa = require('koa')
+route = require 'koa-route'
+serve = require 'koa-static'
+views = require 'co-views'
+app = koa()
+
+# jadeをテンプレートエンジンとして設定。
+render = views(__dirname + '/views', { map : {html : 'jade'}})
+
+# GET /views => render template engine
+app.use route.get('/views', (next)->
+  # bodyに対してindex.jadeの変更を実施。
+  this.body = yield render('index.jade', {name: "koa"})
+)
+
+# GET /hello => 'Hello!'
+app.use route.get('/hello', (next)=>
+  this.body = 'Hello!!'
+)
+
+# GET /hello/:name => 'Hello :name'
+app.use route.get('/hello/:name', (name) ->
+  this.body = 'Hello ' + name;
+)
+
+# static file serve
+app.use serve(__dirname + '/public')
+###
+
+
+###
 sw = (st)->
   setTimeout ->
     dRap = new Date(new Date() - st)
