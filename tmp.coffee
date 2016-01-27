@@ -7,6 +7,81 @@ console.time "tmp"
 
 
 
+# 実質的なデータストアの運用
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+strage = "strage"
+
+checkDirectory = (dir, cb)->
+  require("fs").stat dir, (e,s)->
+    if e?
+      # console.log e
+      cb true
+    else
+      cb s.isDirectory() != true
+
+# put
+putObject = (filename, data)->
+  require("fs").writeFile filename, JSON.stringify(data), (e)->
+    if e?
+      console.log e
+      # NGならリトライ
+      putObject filename, data
+
+put = (o)->
+  # checkDirectory strage, (nothing)->
+    # require("fs").mkdirSync(strage) if nothing
+    
+  data = o
+  hash = getHash()
+  data["_id"] = hash
+  putObject strage + "/" + hash, data
+  # require("fs").writeFile strage + "/" + hash, JSON.stringify(data), (e)->
+  #   if e?
+  #     console.log e
+  #     # NGならリトライ
+  #     put o
+
+# put aaaa:"bbb"
+
+get = (id, cb)->
+  require("fs").readFile strage + "/" + id, (e,d)->
+    j = JSON.parse d
+    cb j
+
+# get "cd3dc0fe27db34186e6cc9dfb72cfd0f7715205a32390fd1a2cc3b5fc3e99cf6", (d)->
+#   console.log d
+
+getItem = (list, cb, getData = [])->
+  if list.length != 0
+    target = list.shift()
+    get target, (d)->
+      getData.push d
+      getItem list, cb, getData
+  else
+    cb getData
+
+scan = (cb)->
+  require("fs").readdir strage, (e,f)->
+    getItem f, (d)->
+      cb d
+
+# scan (d)->
+#   console.log d
+
+
+# too many openでダメ
+# [0...10000].forEach (i)->
+#   put zaiko: i
+
+for i in [0...9000]
+  put zai: i
+
+
+
 ###
 koa = require('koa')
 route = require 'koa-route'
