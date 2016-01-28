@@ -9,6 +9,17 @@ console.time "tmp"
 
 
 
+
+
+###
+tab = "asds\tdfa"
+console.log tab
+trim = tab.replace(/\t/g, "")
+console.log trim
+###
+
+
+
 ###
 # 実質的なデータストアの運用
 getHash = -> 
