@@ -7,6 +7,9 @@ console.time "tmp"
 
 
 
+
+
+###
 # 実質的なデータストアの運用
 getHash = -> 
   cry = require("crypto").createHash 'SHA256'
@@ -22,30 +25,6 @@ checkDirectory = (dir, cb)->
       cb true
     else
       cb s.isDirectory() != true
-
-# put
-putObject = (filename, data)->
-  require("fs").writeFile filename, JSON.stringify(data), (e)->
-    if e?
-      console.log e
-      # NGならリトライ
-      putObject filename, data
-
-put = (o)->
-  # checkDirectory strage, (nothing)->
-    # require("fs").mkdirSync(strage) if nothing
-    
-  data = o
-  hash = getHash()
-  data["_id"] = hash
-  putObject strage + "/" + hash, data
-  # require("fs").writeFile strage + "/" + hash, JSON.stringify(data), (e)->
-  #   if e?
-  #     console.log e
-  #     # NGならリトライ
-  #     put o
-
-# put aaaa:"bbb"
 
 get = (id, cb)->
   require("fs").readFile strage + "/" + id, (e,d)->
@@ -73,14 +52,122 @@ scan = (cb)->
 #   console.log d
 
 
+
+# putみなおし
+put = (o, cb)->
+  data = o
+  hash = getHash()
+  data["_id"] = hash
+  require("fs").writeFile strage + "/" + hash, JSON.stringify(data), (e)->
+    if e?
+      console.log e
+    
+    cb()
+
+
+i = 0
+lili = ->
+  # console.log "done"
+  if i < 10000
+    i = i + 1
+    put zai: i, ->
+      lili()
+  else
+    # console.log "end"
+
+# lili()
+
+###
+
+
+
+
+###
+# put
+putObject = (filename, data, cb)->
+  ws = require("fs").createWriteStream filename, "utf-8"
+  ws.write new Buffer(JSON.stringify(data))
+  cb()
+  # require("fs").writeFile filename, JSON.stringify(data), (e)->
+  #   if e?
+  #     console.log e
+  #     # NGならリトライ
+  #     putObject filename, data
+
+put = (o, cb)->
+  # checkDirectory strage, (nothing)->
+    # require("fs").mkdirSync(strage) if nothing
+    
+  data = o
+  hash = getHash()
+  data["_id"] = hash
+  putObject strage + "/" + hash, data, ->
+    cb()
+  
+  
+  # require("fs").writeFile strage + "/" + hash, JSON.stringify(data), (e)->
+  #   if e?
+  #     console.log e
+  #     # NGならリトライ
+  #     put o
+
+# put aaaa:"bbb"
+
+
+###
+
+
+
+
+
 # too many openでダメ
 # [0...10000].forEach (i)->
 #   put zaiko: i
 
-for i in [0...9000]
-  put zai: i
+# for i in [0...10000]
+#   put zai: i
 
 
+# i = 0
+# lili = ->
+#   if i < 10000
+#     i = i + 1
+#     setTimeout ->
+#       put zai: i, ->
+#         lili()
+#     , 0
+# lili()
+
+
+###
+arr = []
+for i in [0...1000000]
+  arr.push Math.random()
+###
+
+###
+start = "2015/07/29"
+stdt = new Date(start)
+console.log stdt
+console.log stdt.setDate(stdt.getDate()+1)
+###
+
+###
+epoch2date = (d)->
+  d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2)
+
+sDate = new Date("2015/07/29")
+eDate = new Date("2016/01/27")
+
+dateList = []
+while epoch2date(sDate) != epoch2date(eDate)
+  dateList.push epoch2date(sDate)
+  sDate.setDate(sDate.getDate()+1)
+
+console.log dateList
+###
 
 ###
 koa = require('koa')
@@ -207,7 +294,7 @@ scanData "db", (d)-> console.log d
 scanData = (cb)->
   data = []
   rs = require("fs").createReadStream "db.json", "utf-8"
-  stream = require('JSONStream').parse() 
+  stream = require('JSONStream').parse()
   
   stream.on 'data', (r)->
     console.log "int", r
