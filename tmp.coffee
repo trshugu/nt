@@ -1,5 +1,4 @@
 ###
-
 ###
 console.time "tmp"
 # console.timeEnd "tmp"
@@ -10,6 +9,364 @@ console.time "tmp"
 
 
 
+###
+# redisにDBを展開2
+# メモリ展開が遅い
+strage = "strage"
+
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+# 展開したデータをスキャン
+redis_get = (id, cb)->
+  redis = require "redis"
+  cli = redis.createClient()
+  
+  cli.get id, (e,d)->
+    if e?
+      console.log e
+    else
+      # console.log d
+      cli.end()
+      cb JSON.parse d
+
+# redis_get "000130db34c733db4e0130ab87b38c657cb72e6dcef74f3f5792739ab4897e6", (d)->
+#   console.log d
+
+redis_scan = (cb)->
+  redis = require "redis"
+  cli = redis.createClient()
+  
+  cli.keys "0000*", (e,d)->
+    if e?
+      console.log e
+    else
+      cli.end()
+      cb d
+
+# redis_scan (d)->
+#   console.log d
+
+# scanによるview作成
+writeView = (list, cb, getData = [])->
+  if list.length != 0
+    target = list.shift()
+    redis_get target, (d)->
+      getData.push d
+      writeView list, cb, getData
+  else
+    cb getData
+
+createView = ->
+  redis_scan (d)->
+    writeView d, (getList)->
+      require("fs").writeFile "view.json", JSON.stringify(getList), (e)->
+        if e?
+          console.log e
+
+# createView()
+
+# さらにviewのデータを取得
+getView = (cb)->
+  require("fs").readFile "view.json", (e,d)->
+    if e?
+      console.log e
+    else
+      cb JSON.parse d
+
+# getView (j)->
+#   console.log j.map((i)-> i._id)
+
+###
+
+
+
+
+###
+
+# ファイル全スキャン&メモリ展開
+get = (id, cb)->
+  require("fs").readFile strage + "/" + id, (e,d)->
+    j = JSON.parse d
+    cb j
+
+getItem = (list, cb, getData = [])->
+  if list.length != 0
+    target = list.shift()
+    get target, (d)->
+      getData.push d
+      getItem list, cb, getData
+  else
+    cb getData
+
+scan = (cb)->
+  require("fs").readdir strage, (e, f)->
+    getItem f, (d)->
+      cb d
+
+
+setter = (dataList, cb)->
+  if dataList.length !=0
+    target = dataList.shift()
+    cli.set target._id, JSON.stringify(target), (e,d)->
+      if e?
+        console.log e
+      else
+        # console.log d
+        setter dataList, cb
+  else
+    cli.end()
+    cb "done"
+
+redis = require "redis"
+cli = redis.createClient()
+
+scan (d)->
+  setter d, (done)->
+    console.log "setterend"
+    console.timeEnd "tmp"
+
+
+# strage大量作成
+put = (o, cb)->
+  data = o
+  hash = getHash()
+  data["_id"] = hash
+  require("fs").writeFile strage + "/" + hash, JSON.stringify(data), (e)->
+    if e?
+      console.log e
+    
+    cb()
+
+
+i = 0
+serial = ->
+  # console.log "done"
+  if i < 5000000
+    i = i + 1
+    put zaiko: i, ->
+      serial()
+  else
+    # console.log "end"
+    console.timeEnd "tmp"
+
+# serial()
+###
+
+
+
+
+
+
+
+
+###
+# redisにDBを展開
+strage = "strage"
+
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+# 展開したデータをスキャン
+redis_get = (id, cb)->
+  redis = require "redis"
+  cli = redis.createClient()
+  
+  cli.get id, (e,d)->
+    if e?
+      console.log e
+    else
+      # console.log d
+      cli.end()
+      cb JSON.parse d
+
+# redis_get "4b86ed6b1b22d183885a4a37ce8dffcf33335ea8584e0a3333dc9fb26ecd28a5", (d)->
+#   console.log d.zaiko
+
+redis_scan = (cb)->
+  redis = require "redis"
+  cli = redis.createClient()
+  
+  cli.keys "pre_25*", (e,d)->
+    if e?
+      console.log e
+    else
+      cli.end()
+      cb d
+
+# redis_scan (d)->
+#   console.log d.filter((i)-> i=="pre_259").map((i)->i.toUpperCase())
+
+
+
+# ファイル全スキャン&メモリ展開
+get = (id, cb)->
+  require("fs").readFile strage + "/" + id, (e,d)->
+    j = JSON.parse d
+    cb j
+
+getItem = (list, cb, getData = [])->
+  if list.length != 0
+    target = list.shift()
+    get target, (d)->
+      getData.push d
+      getItem list, cb, getData
+  else
+    cb getData
+
+scan = (cb)->
+  require("fs").readdir strage, (e, f)->
+    getItem f, (d)->
+      cb d
+
+
+setter = (dataList, cb)->
+  if dataList.length !=0
+    target = dataList.shift()
+    cli.set target._id, JSON.stringify(target), (e,d)->
+      if e?
+        console.log e
+      else
+        # console.log d
+        setter dataList, cb
+  else
+    cli.end()
+    cb "done"
+
+# redis = require "redis"
+# cli = redis.createClient()
+
+# scan (d)->
+#   setter d, (done)->
+#     console.log "setterend"
+#     console.timeEnd "tmp"
+
+
+# strage大量作成
+put = (o, cb)->
+  data = o
+  hash = getHash()
+  data["_id"] = hash
+  require("fs").writeFile strage + "/" + hash, JSON.stringify(data), (e)->
+    if e?
+      console.log e
+    
+    cb()
+
+
+i = 0
+serial = ->
+  # console.log "done"
+  if i < 10
+    i = i + 1
+    put zaiko: i, ->
+      serial()
+  else
+    # console.log "end"
+    console.timeEnd "tmp"
+
+# serial()
+###
+
+
+
+
+###
+# redisメモリ容量確認
+redis = require "redis"
+cli = redis.createClient()
+
+cli.on "ready", ->
+  # console.log cli.server_info
+  console.log cli.server_info.used_memory
+  console.log cli.server_info.used_memory_peak
+  cli.end()
+###
+
+
+
+###
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+redis = require "redis"
+cli = redis.createClient()
+
+setter = (i, cb)->
+  # console.log "kok"
+  cli.set i, getHash(), (e,d)->
+    if e?
+      console.log e
+    else
+      # console.log d
+    
+    cb()
+
+serial = (i, j)->
+  # console.log "s", i
+  if i < j
+    i = i + 1
+    console.log i if i % 10000 == 0
+    setter "pre_" + i, ->
+      serial i, j
+  else
+    # console.log "end"
+    console.timeEnd "tmp"
+    cli.end()
+
+# serial(0, 1000 * 20)
+
+[0...1000000].forEach (i)->
+  setter "pre2_" + getHash(), ->
+    if i % 100000 == 0
+      console.log i
+      console.timeEnd "tmp"
+###
+
+
+###
+[0...100].forEach (i)->
+  cli.set i, i + getHash(), (e,d)->
+    if e?
+      console.log e
+    else
+      console.log d
+###
+
+
+
+
+###
+# redis再考
+redis = require "redis"
+cli = redis.createClient()
+
+set = ->
+  cli.set "nanika", "nakami", (e,d)->
+    if e?
+      console.log e
+    else
+      console.log d
+      console.log "getiku"
+      get()
+
+get = ->
+  cli.get "nanika", (e,d)->
+    if e?
+      console.log e
+    else
+      console.log d
+      cli.end()
+set()
+
+# cli.end()
+###
 
 ###
 tab = "asds\tdfa"
