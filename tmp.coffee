@@ -8,6 +8,56 @@ console.time "tmp"
 
 
 
+###
+# 同期的forEach2
+list = [1,2,3,4,5,6,7,8,9,10]
+sent = ""
+
+Promise.all list.map (i)->
+  new Promise (f,r)->
+    setTimeout ->
+      sent += 'hello world: ' + i + '\n'
+      f()
+    ,1000
+.then (v)->
+  require('fs').writeFile 'hello.txt', sent, (err)->
+    throw err if(err)
+.catch (err)->
+  throw err if(err)
+###
+
+###
+# 同期的forEach
+list = [1,2,3,4,5,6,7,8,9,10]
+
+sent = ""
+require('async').each list, (i, cb)->
+    setTimeout ->
+      sent += 'hello world: ' + i + '\n'
+      cb()
+    , 5000
+
+, (err)->
+  throw err if(err)
+  require('fs').writeFile 'hello.txt', sent, (err)->
+    throw err if(err)
+###
+
+
+###
+# 同期的forEach NGなパターン
+a = [1,2,3,4,5,6,7,8,9,10]
+sent = ""
+
+a.forEach (i)->
+  setTimeout ->
+    sent += 'hello world: ' + i + '¥n'
+  , 5000
+
+require("fs").writeFile 'hello.txt', sent, (err)->
+  throw err if(err) 
+###
+
 
 
 ###
