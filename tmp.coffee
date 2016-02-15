@@ -8,6 +8,21 @@ console.time "tmp"
 
 
 
+
+###
+# 配列を特定の個数に合わせる
+arr = ["a","s","d","f","g","h","j"] # 7
+arr = ["a","s","d","f","g","h","j","k","l","z"] # 10
+arr = []
+con = ["q","w","e","r","t","y","u","i","o"]
+
+arr = arr.concat con.splice(0, 10 - arr.length)
+
+
+console.log arr
+console.log arr.length
+###
+
 ###
 # 同期的forEach2
 list = [1,2,3,4,5,6,7,8,9,10]
