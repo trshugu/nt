@@ -9,6 +9,40 @@ console.time "tmp"
 
 
 
+
+###
+# test facroty
+[1..20].forEach (i)->
+  s = String("0" + i).slice(-2)
+  
+  [1..8].forEach (j)->
+    b = String("0" + j).slice(-2)
+    
+    [1..5].forEach (k)->
+      p = String("0" + k).slice(-2)
+      
+      console.log s, b, p
+      
+###
+
+
+###
+# オブジェクト同士の結合
+ao = {}
+ao["id"] = S :"iuiui"
+
+bo = {}
+bo.noi = S: "asdf"
+bo.noimoi = S: "fefefa"
+bo.noimoidoi = S: "ei3ij"
+
+Object.keys(bo).forEach (k)->
+  ao[k] = bo[k]
+
+console.log ao
+###
+
+
 ###
 # 配列を特定の個数に合わせる
 arr = ["a","s","d","f","g","h","j"] # 7
