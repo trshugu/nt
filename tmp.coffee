@@ -8,6 +8,29 @@ console.time "tmp"
 
 
 
+###
+# promise map の中身がなかった場合の挙動
+# li = [1,2,3]
+# li = []
+li = ""
+Promise.all [
+  new Promise (g)->
+    Promise.all li.map (i)->
+      new Promise (f)->
+        f i + 10
+    .then (v)->
+      console.log "c"
+      g v
+]
+.then (v)->
+  console.log "a"
+  console.log v
+.catch (e)->
+  # listでなかった場合catchしないと止まる
+  console.log "b"
+  console.log e
+###
+
 
 
 ###
