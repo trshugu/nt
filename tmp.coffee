@@ -8,6 +8,34 @@ console.time "tmp"
 
 
 
+
+###
+# 配列 distinct
+a=[]
+a.push "aa"
+a.push "aa"
+a.push "aa"
+a.push "bb"
+a.push "cc"
+a.push "aa"
+a.push "bb"
+
+
+# 重複を削除
+console.log a.filter (x, i, self)-> self.indexOf(x) == i
+
+# 重複のみをリスト
+console.log a.filter (x, i, self)-> self.indexOf(x) != self.lastIndexOf(x)
+
+# 重複を検出したものを重複しないでリスト
+console.log a.filter (x, i, self)-> self.indexOf(x) == i and i != self.lastIndexOf(x)
+###
+
+
+
+
+
+
 ###
 # promise map の中身がなかった場合の挙動
 # li = [1,2,3]
