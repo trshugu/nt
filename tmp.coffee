@@ -9,6 +9,32 @@ console.time "tmp"
 
 
 
+
+
+###
+# 文字列のソート
+lstrs = []
+
+lstrs.push {suuji:1 , moji: "aabc"}
+lstrs.push {suuji:2 , moji: "babc"}
+lstrs.push {suuji:3 , moji: "cabc"}
+lstrs.push {suuji:4 , moji: "dabc"}
+lstrs.push {suuji:9 , moji: "tabc"}
+lstrs.push {suuji:1 , moji: "aabc"}
+lstrs.push {suuji:8 , moji: "sabc"}
+lstrs.push {suuji:7 , moji: "rabc"}
+lstrs.push {suuji:6 , moji: "qabc"}
+lstrs.push {suuji:5 , moji: "pabc"}
+
+# console.log lstrs
+# console.log lstrs.sort (a,b)-> b.suuji - a.suuji
+# 文字の昇順
+console.log lstrs.sort (a,b)-> a.moji > b.moji
+###
+
+
+
+
 ###
 # 配列 distinct
 a=[]
