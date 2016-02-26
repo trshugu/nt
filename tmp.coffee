@@ -12,6 +12,52 @@ console.time "tmp"
 
 
 ###
+lstrs = []
+
+
+lstrs.push {suuji:"9" , moji: "09"}
+lstrs.push {suuji:"1" , moji: "01"}
+lstrs.push {suuji:"9" , moji: "09"}
+lstrs.push {suuji:"5" , moji: "02"}
+lstrs.push {suuji:"9" , moji: "09"}
+lstrs.push {suuji:"1" , moji: "01"}
+lstrs.push {suuji:"9" , moji: "09"}
+lstrs.push {suuji:"5" , moji: "07"}
+lstrs.push {suuji:"9" , moji: "09"}
+lstrs.push {suuji:"1" , moji: "01"}
+lstrs.push {suuji:"9" , moji: "09"}
+lstrs.push {suuji:"5" , moji: "03"}
+lstrs.push {suuji:"9" , moji: "09"}
+lstrs.push {suuji:"1" , moji: "01"}
+lstrs.push {suuji:"9" , moji: "09"}
+lstrs.push {suuji:"5" , moji: "08"}
+lstrs.push {suuji:"9" , moji: "09"}
+lstrs.push {suuji:"1" , moji: "01"}
+lstrs.push {suuji:"9" , moji: "09"}
+
+# console.log lstrs
+# console.log lstrs.sort (a,b)-> b.suuji - a.suuji
+# 文字の昇順
+li= lstrs
+  .sort (a,b)->
+    if a.moji == b.moji
+      return 0
+    if a.moji < b.moji # 降順
+      return 1
+    else
+      return -1
+  .sort (a,b)->
+    if a.suuji == b.suuji
+      return 0
+    if a.suuji > b.suuji # 昇順
+      return 1
+    else
+      return -1
+
+console.log li
+###
+
+###
 # 文字列のソート
 lstrs = []
 
