@@ -8,6 +8,27 @@ console.time "tmp"
 
 
 
+###
+# スコープ
+a = "aaa"
+if true
+  b = "bbbb"
+
+if false
+  c = "cccc"
+
+
+
+console.log a
+console.log b
+console.log c
+
+if b?
+  console.log "bari"
+
+if c?
+  console.log "cari"
+###
 
 
 
