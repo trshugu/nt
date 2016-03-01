@@ -6,7 +6,41 @@ console.time "tmp"
 
 
 
+###
+# 配列3つが同じlengthであること
+a = [1,2,4]
+b = [3,4,2]
+c = [5,6,2]
 
+if (a.length == b.length == c.length) == false
+  console.log "同じでない"
+else
+  console.log "同じである"
+###
+
+
+
+###
+if 1==1==2
+  console.log "tt"
+else
+  console.log "f"
+###
+
+
+
+###
+# 差分抽出
+a = [1,2,3,4,5,6,7,8,9]
+b = [1,2,3,5,5,6,7,9,9]
+
+c = []
+for i in [0...a.length]
+  if a[i] != b[i]
+    c.push i
+
+console.log c
+###
 
 ###
 # スコープ
