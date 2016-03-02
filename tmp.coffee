@@ -363,7 +363,7 @@ getView = (cb)->
 
 
 ###
-
+strage = "strage"
 # ファイル全スキャン&メモリ展開
 get = (id, cb)->
   require("fs").readFile strage + "/" + id, (e,d)->
@@ -401,10 +401,10 @@ setter = (dataList, cb)->
 redis = require "redis"
 cli = redis.createClient()
 
-scan (d)->
-  setter d, (done)->
-    console.log "setterend"
-    console.timeEnd "tmp"
+# scan (d)->
+#   setter d, (done)->
+#     console.log "setterend"
+#     console.timeEnd "tmp"
 
 
 # strage大量作成
@@ -432,7 +432,6 @@ serial = ->
 
 # serial()
 ###
-
 
 
 
