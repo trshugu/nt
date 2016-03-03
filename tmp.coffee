@@ -6,6 +6,99 @@ console.time "tmp"
 
 
 
+
+
+###
+# 自分自身を再帰的呼び出す3 不可
+sss = (list, cb, data=[])->
+  if list.length != 0
+    target = list.shift()
+    data.push target + ".add"
+    
+    # console.log arguments.callee
+    
+    sss list, cb, data
+  else
+    # self = @
+    # Object.keys(self).forEach (k)->
+    #   console.log k
+    # Object.keys(this).forEach (k)->
+    #   console.log k
+    # console.log @.global
+    console.log this
+    # console.log module
+    # console.log module.exports
+    # console.log sss in process
+    cb data
+
+
+li = [
+  "aa"
+  "bbb"
+  "dcd"
+  "wer"
+  ]
+sss.call "gagaga", li, (d)->
+  console.log d
+###
+
+
+
+
+###
+# 自分自身を再帰的呼び出す2
+sss = (list, cb, data=[])->
+  if list.length != 0
+    target = list.shift()
+    data.push target + ".add"
+    
+    self = @
+    # Object.keys(self).forEach (k)->
+    #   console.log k
+    # console.log arguments.callee
+    
+    # ヘルパーで使うとうまくいかないケースあり
+    arguments.callee list, cb, data
+  else
+    cb data
+
+
+li = [
+  "aa"
+  "bbb"
+  "dcd"
+  "wer"
+  ]
+sss li, (d)->
+  console.log d
+###
+
+
+
+###
+# 自分自身を再帰的呼び出す
+sss = (self, list, cb, data=[])->
+  if list.length != 0
+    target = list.shift()
+    data.push target + ".add"
+    
+    # console.log arguments
+    self self, list, cb, data
+  else
+    cb data
+
+li = [
+  "aa"
+  "bbb"
+  "dcd"
+  "wer"
+  ]
+# 自分自身を渡すことによって一応は可能
+sss sss, li, (d)->
+  console.log d
+###
+
+
 ###
 # 配列3つが同じlengthであること
 a = [1,2,4]
