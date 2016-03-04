@@ -8,6 +8,75 @@ console.time "tmp"
 
 
 
+
+###
+# 末尾再帰 ならない
+rf = (n)->
+  ftc = (n, a)->
+    if n == 0
+      return a
+    return ftc(n-1, n*a)
+  
+  r = ftc n, 1
+  
+  return r
+
+console.log rf 100000
+###
+
+
+
+###
+f=(x)->s x,x
+s=(a,b)->a+b
+console.log f 1000000
+###
+
+
+
+###
+# 末尾呼び出し最適化
+sSum = (x)->
+  xs = sq x
+  rs = sm xs
+  return rs
+
+sq=(n)->n*n
+sm=(n)->n+n
+
+console.log sSum 0
+
+# fの結果はgの結果そのもの
+# f = -> g()
+###
+
+
+###
+# recursive function調査
+# 発生しない
+rf = (n)->
+  r = 1
+  [1..n].forEach (i)->
+    r = r * i
+  
+  return r
+
+console.log rf 10000000
+###
+
+
+###
+# スタックオーバーフロー
+rf = (n)->
+  if n == 0
+    return 1
+  
+  return n * rf(n - 1)
+
+console.log rf 10000
+###
+
+
 ###
 # 自分自身を再帰的呼び出す3 不可
 sss = (list, cb, data=[])->

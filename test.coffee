@@ -105,7 +105,7 @@ qt(q, sys.puts)
 with()
 
 
-#test("a basic test example", -> 
+#test("a basic test example", ->
 #  ok( true, "このテストは成功しました。" )
 #  value = "hello"
 #  equal( value, "hello", "helloとなることを期待しています。" )
