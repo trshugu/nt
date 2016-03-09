@@ -5,9 +5,30 @@ console.time "tmp"
 
 
 
+###
+# object2TSV
+# tsv = "asdf\tasdflkj\tsdfasdf\nsdfsdf\tasdfad\t"
+tsv = ""
+tsv += "a"
+tsv += "b"
+tsv += "c"
 
+d = []
+d.push
+  sadf: "あああ"
 
+d.push
+  sadf: "fefe"
 
+d.push
+  sadf: "fe3fe"
+
+d.forEach (i)->
+  tsv += i.sadf + "\t"
+  tsv += "\n"
+
+console.log tsv
+###
 
 ###
 # 末尾再帰 ならない
