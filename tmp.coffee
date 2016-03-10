@@ -5,6 +5,67 @@ console.time "tmp"
 
 
 
+
+###
+# 改行をなくす
+tsv = ""
+o = []
+[0...10].forEach (i)->
+  o.push
+    a: S: i.toString() + "asdf"
+    b: S: "f\nfed"
+    c: S: "fee\rfefe"
+    d: S: "改\r行\r\nなりfe\r\n"
+    e: N: "eefe"
+    f: S: "fe"
+
+o
+  # 改行を削除
+  .map (i)->
+    Object.keys(i)
+      .map((k)-> j={}; j[k] = (if i[k].S? then i[k].S = i[k].S.replace(/\r\n/g,"").replace(/\n/g,"").replace(/\r/g,""); i[k] else i[k]); j)
+      .reduce((a,b)-> Object.keys(b).forEach((l)-> a[l] = b[l]);a)
+  .forEach (i)->
+    # console.log i
+    tsv += i.a.S
+    tsv += "\t"
+    tsv += i.b.S
+    tsv += "\t"
+    tsv += i.c.S
+    tsv += "\t"
+    tsv += i.d.S
+    tsv += "\t"
+    tsv += i.e.N
+    tsv += "\t"
+    tsv += i.f.S
+    
+    tsv += "\n"
+
+console.log tsv
+###
+
+
+
+
+###
+# オブジェクト→配列→オブジェクト
+o =
+  a: "asdf"
+  b:"ffed"
+  c:"feefefe"
+  d:"改行\r\nなりfe\r\n"
+  e:"eefe"
+  f:"fe"
+
+console.log o
+
+a = Object.keys(o)
+  .map (k)-> i={}; i[k] = o[k]; i
+  .reduce (a,b)-> Object.keys(b).forEach((k)-> a[k] = b[k]); a
+
+console.log a
+###
+
 ###
 # object2TSV
 # tsv = "asdf\tasdflkj\tsdfasdf\nsdfsdf\tasdfad\t"
