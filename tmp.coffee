@@ -6,6 +6,21 @@ console.time "tmp"
 
 
 
+
+
+
+
+###
+# if式？
+a = if 1==2
+    "noi"
+  else
+    "elara"
+console.log a
+###
+
+
+
 ###
 # 改行をなくす
 tsv = ""
