@@ -6,8 +6,180 @@ console.time "tmp"
 
 
 
+###
+# rangeを一件ずつ処理できるのか3
+disposeRange = (list, cb, cnt=0)->
+  if list.length != 0
+    target = list.shift()
+    # console.log target
+    cnt = cnt + 1
+    console.log cnt
+    console.log cnt if cnt % 1000000 == 0
+    setTimeout ->
+      disposeRange list, cb, cnt
+    ,0
+  else
+    cb cnt
 
 
+list = [0...75200465]
+console.log list.length
+disposeRange list, (cnt)-> console.log "done:", cnt
+###
+
+
+
+
+
+###
+list = [0...75200465]
+console.log list.length
+
+stdt=new Date()
+Promise.all list.map (i)->
+  new Promise (f,r)->
+    # console.log "start", i
+    cnt = cnt + 1
+    console.log cnt if cnt % 1000000 == 0
+    console.log "end", i
+    f i.toString() + ":" + (new Date() - stdt).toString()
+.then (v)->
+  console.log v
+.catch (e)->
+  console.log e if e?
+###
+
+
+
+###
+# rangeを一件ずつ処理できるのか2
+list = [0...75200465] # 2016/03/16 18:14現在の閾値
+cnt = 0
+list.forEach (i)->
+  cnt = cnt + 1
+
+console.log cnt
+###
+
+###
+# rangeを一件ずつ処理できるのか
+disposeRange = (list, cb, cnt=0)->
+  if list.length != 0
+    target = list.shift()
+    # console.log target
+    cnt = cnt + 1
+    console.log cnt if cnt % 1000000 == 0
+    setTimeout ->
+      disposeRange list, cb, cnt
+    ,0
+  else
+    cb cnt
+
+
+list = [0...75200465]
+console.log list.length
+disposeRange list, (cnt)-> console.log "done:", cnt
+###
+
+
+
+###
+# rdsチェック2
+s = require "sequelize"
+
+c = new s "tmp", "root", "12121212",
+  host: "localhost"
+  dialect: "mariadb"
+
+
+tm = c.define "tmp_table"
+
+tm.sync()
+
+tm.findAll(where: "_id":"niij"
+  ).then (r)->
+    console.log "kita"
+    console.log r[0].dataValues
+  , (e)->
+    console.log e
+
+
+console.log "end"
+###
+
+
+
+
+###
+# rdsチェック
+s = require "sequelize"
+
+c = new s "tmp", "root", "12121212",
+  host: "localhost"
+  dialect: "mariadb"
+
+tm = c.define "tmp_table",
+  _id: s.STRING
+  date: s.INTEGER
+  nakami: s.STRING
+
+tm.sync()
+
+tm.findAll(where: "_id":"niij"
+  ).then (r)->
+    console.log "kita"
+    console.log r[0].dataValues
+  , (e)->
+    console.log e
+
+
+console.log "end"
+###
+
+
+
+
+###
+Sequelize = require('sequelize')
+sequelize = new Sequelize('tmp', 'root', '12121212')
+
+User = sequelize.define('User', 
+  username: Sequelize.STRING,
+  birthday: Sequelize.DATE
+)
+
+sequelize.sync().then( ->
+  User.create(
+    username: 'sdepold',
+    birthday: new Date(1986, 6, 28)
+  ).then( (sdepold)->
+    console.log(sdepold.values)
+  )
+)
+
+###
+
+
+
+
+###
+Client = require "mariasql"
+
+c = new Client(
+      host:"localhost"
+      user:"root"
+      password:"12121212"
+      db:"tmp"
+    )
+
+c.query "select * from tmp_table", (e,r)->
+  if e?
+    console.log e
+  else
+    console.log r
+  
+  c.end()
+###
 
 
 ###
