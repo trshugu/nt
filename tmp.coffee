@@ -11,6 +11,37 @@ console.time "tmp"
 
 
 ###
+# tsvの操作
+require("fs").readFile "tsv.tsv", (e,d)->
+  console.log "================"
+  console.log d.toString()
+  d.toString().split("\r\n").map((i)->i.split("\t")).map((i)->i[2]).filter((i)->i!=undefined).forEach (i)->
+    require("fs").appendFile "bon.txt", i+"\r\n", (e)->
+      console.log e if e?
+
+###
+
+
+###
+# 配列の中から該当のものを検出
+a=["asdf","fefe","gaitou","fefe","asf","fefe"]
+
+# console.log a
+
+b={}
+b.nanigasi = 
+  name:"nnnn"
+  name_en:"eee"
+b.doiud = 
+  name:"namaeee"
+  name_en:"eigooo"
+
+console.log b
+###
+
+
+
+###
 # if式？
 a = if 1==2
     "noi"
