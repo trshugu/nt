@@ -6,6 +6,182 @@ console.time "tmp"
 
 
 
+
+
+
+###
+a = require('koa')()
+
+fs = require 'co-fs'
+
+cofs = ->
+  paths = yield fs.readdir('.')
+  
+  files = yield paths.map (path) ->
+    return fs.readFile('co-view.js', 'utf8')
+  
+  this.type = 'co-view.js'
+  this.body = files.join('')
+
+a.use cofs
+
+a.listen 3000, -> console.log "in"
+###
+
+###
+a = require('koa')()
+
+mw = (n)->
+  console.log "aria"
+  yield n
+
+r = (n)->
+  console.log "routen"
+  yield n
+
+ender = (n)->
+  console.log "ender"
+  # console.log @
+  yield [@res.end("ender")]
+
+a.use mw
+a.use require("koa-route").get "/rrr" ,r
+a.use ender
+
+a.listen 3000, (a,b,c)->
+  console.log "in"
+###
+
+
+
+
+###
+a = require("connect")()
+
+mw = (q,s,n)->
+  console.log "aria"
+  # console.log q
+  # console.log s
+  # console.log n
+  n()
+
+r = (q,s,n)->
+  console.log "routen"
+  n()
+
+ender = (q,s,n)->
+  console.log "ender"
+  s.end "ender"
+
+a.use mw
+a.use "/rrr" ,r
+a.use ender
+
+a.listen 3000, (a,b,c)->
+  console.log "in"
+  console.log a
+  console.log b
+  console.log c
+###
+
+
+
+###
+Aaa = "asdfef"
+ABCD = "fefe"
+console.log Aaa
+console.log ABCD
+
+Aaa = "change"
+ABCD = "the rule"
+console.log Aaa
+console.log ABCD
+###
+
+
+###
+a = require('koa')()
+
+# a.use -> yield [@body="koa hell"]
+a.use require("koa-route").get "/views", (next)->
+  yield [@body = "bbb"]
+
+
+a.use (next)->
+  start = new Date
+  console.log("1 response time")
+  yield next
+  console.log("1 response time")
+  ms = new Date - start
+  this.set('X-Response-Time', ms + 'ms')
+
+a.use (next)->
+  start = new Date
+  console.log("2 logger")
+  yield next
+  console.log("2 logger") 
+  ms = new Date - start
+  console.log('%s %s - %s', this.method, this.url, ms)
+
+a.use (next)->
+  console.log("3 response") 
+  yield [this.body = 'Hell logger']
+  console.log("3 response")  
+
+
+
+a.listen 3000
+###
+
+
+###
+# koaに於けるエラーハンドリング2
+a.use (n)->
+  try
+    yield n
+  catch e
+    @status = 500
+    @body = e.message
+    # errorイベント
+    @app.emit "error", e, @
+
+a.use (n)->
+  if @url == "/_err"
+    throw new Error "errrrrorror"
+  
+  yield n
+
+a.on "error", (e)->
+  console.log e
+  console.log e.stack
+
+
+a.listen 3000
+###
+
+###
+# koaに於けるエラーハンドリング1
+a.use (n)->
+  try
+    yield n
+  catch e
+    console.log e
+    console.log e.stack
+    @status = 500
+    @body = e.message
+
+a.use (n)->
+  if @url == "/_err"
+    throw new Error "sended error"
+  
+  yield n
+
+a.listen 3000
+###
+
+
+
+
 ###
 # rangeを一件ずつ処理できるのか3
 disposeRange = (list, cb, cnt=0)->
