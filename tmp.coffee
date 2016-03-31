@@ -10,6 +10,530 @@ console.time "tmp"
 
 
 ###
+# array
+app = require("koa")()
+
+p = (v)->
+  new Promise (f)->
+    setTimeout ->
+      console.log "siteru", v
+      f "vin " + v
+    , 500
+
+vs =["efef","fef","feffee","dfd"]
+
+app.use (n)->
+  console.log "koma"
+  # 同期の場合はここ
+  ps = vs.map((n,i)-> "#{i}":p(n) )
+  console.log "toma"
+  # 非同期の場合はここ
+  res = yield ps
+  console.log "teru"
+  
+  @body = "result "
+  @body += "add "
+  console.log res
+  res.forEach (i)=>
+    console.log "kokohaatnoanoka"
+    @body += "anibu "
+    console.log i
+    @body += i.toString()
+  
+  # @body += res.map (i)-> i
+  #   .join()
+  
+  @body += "enndnd "
+  console.log "end"
+  
+
+app.listen 3000
+###
+
+
+
+###
+# thenable
+p = (v)->
+  new Promise (f, r)->
+    # r new Error "dee end"
+    f v + "wrapped"
+
+onerror = (err) ->
+  console.log "errr"
+  console.log err
+  console.log err.stack
+
+doin = (u) ->
+  return p(u).then (v)->
+      return v
+    .catch onerror
+
+thena = (u)->
+  return p u
+
+app = require("koa")()
+
+app.use (n)->
+  console.log "kiteru"
+  r = yield thena("thena")
+  @body = "is " + r
+
+app.listen 3000
+###
+
+
+
+###
+# 通常のコールバック
+ccbb = (num,cb)->
+  setTimeout ->
+    cb null, num * num
+  , 500
+
+# ccbb 3, (r)->console.log r
+
+# ラップしてthunkに
+ccbbt = (num)->
+  (cb)-> ccbb num, cb
+
+# ccbbt(3) (r)->console.log r
+
+# gen
+gengen = (num)->
+  console.log "g"
+  s = yield ccbbt num
+  console.log "e"
+  ss = yield ccbbt s
+  console.log "n"
+  yield ccbbt ss
+
+app = require("koa")()
+
+# thunkを使ったyield(deprecate)
+app.use (n)->
+  console.log "kiteru"
+  # s = yield ccbbt(4)
+  # genを出力するgen
+  s = yield gengen(4)
+  # yield [@body = "is "]
+  @body = "is " + s
+
+app.listen 3000
+###
+
+
+
+###
+p = (v)->
+  new Promise (f, r)->
+    r new Error "dee end"
+    # f v + "wrapped"
+
+onerror = (err) ->
+  console.log "errr"
+  console.log err
+  console.log err.stack
+
+p("don")
+  .then (v)->
+    console.log v
+  .catch onerror
+###
+
+
+
+###
+app = require("koa")()
+r = require('co-views')(".", map: html: 'jade')
+
+app.use (n)->
+  console.log "kiteru"
+  @body = yield r "index.jade"
+
+app.listen 3000
+###
+
+
+
+###
+yi = (n)->
+  console.log n
+  i = 1
+  console.log yield "bon"
+  i++
+  yield i
+  i++
+  yield "don"
+  i++
+  yield i
+  i++
+  yield 99
+  i++
+  console.log yield i
+  ++i
+
+console.log typeof yi()
+console.log yi()
+
+yy = yi(88)
+
+console.log typeof yy
+console.log yy
+
+console.log "a"
+console.log yy.next(20)
+console.log "b"
+console.log yy.next(30)
+console.log "c"
+console.log yy.next(40)
+console.log "d"
+console.log yy.next(50)
+console.log "e"
+console.log yy.next(60)
+console.log "f"
+console.log yy.next(70)
+console.log "g"
+console.log yy.next(70)
+console.log "h"
+console.log yy.next(70)
+###
+
+
+
+
+###
+# 再yield
+x = ->
+  yield 0
+  yield 1
+  yield 2
+
+gen = x() # generatorを生成
+console.log gen.next()
+console.log gen.next().value
+console.log gen.next()
+console.log gen.next()
+###
+
+
+
+###
+cbhell_org = (str, cb)->
+  console.log "a", str
+  setTimeout ->
+    console.log "b", str
+    cb "back" + str
+  , Math.floor(Math.random() * 5000)
+  
+  console.log "c", str
+
+cbhell = require("co").wrap cbhell_org
+
+require("co") ->
+  console.log "1"
+  yield cbhell "wan", (d)-> ei = d
+  console.log "2"
+  yield cbhell "tuu", (d)-> bi = d
+  console.log "3"
+  yield cbhell "suri", (d)-> si = d
+  console.log "4"
+  
+  console.log "kitra"
+  return ei + ":" + bi + ":" + si
+  console.log "binbin"
+.then (v)->
+  console.log "ebd", v
+###
+
+
+###
+require("co") ->
+  console.log "st"
+  arr = [1,2,3]
+  a = yield arr.map (i)->
+    console.log "yt"
+    new Promise (f)-> f i
+  
+  console.log "et"
+  yield a
+.then (v)->
+  console.log "ebd", v
+###
+
+
+
+###
+cbhell = (str)->
+  new Promise (f)->
+    console.log "a", str
+    setTimeout ->
+      console.log "b", str
+      f "back" + str
+    , Math.floor(Math.random() * 5000)
+    
+    console.log "c", str
+###
+
+
+###
+cbhell "ichi", (a)->
+  # console.log a
+  cbhell "ni", (b)->
+    cbhell "san", (c)->
+      console.log a,b,c
+###
+
+
+###
+require("co") ->
+  a =yield [
+    ei: cbhell("wan")
+    bi: cbhell "tuu"
+    si: cbhell "suri"
+  ]
+  
+  console.log "kitra"
+  # return ei + ":" + bi + ":" + si
+  return a
+.then (v)->
+  console.log "ebd", v
+###
+
+
+###
+require("co") ->
+  console.log "1"
+  ei = yield cbhell("wan")
+  console.log "2"
+  bi = yield cbhell "tuu"
+  console.log "3"
+  si = yield cbhell "suri"
+  console.log "4"
+  
+  console.log "kitra"
+  return ei + ":" + bi + ":" + si
+  console.log "binbin"
+.then (v)->
+  console.log "ebd", v
+###
+
+
+
+###
+p1 = new Promise (f)->
+  setTimeout ->
+    console.log "owattenda1"
+    f ("p1nari")
+  , 1000
+
+p2 = new Promise (f)->
+  setTimeout ->
+    console.log "owattenda2"
+    f ("p2nari")
+  , 10
+
+require("co")( ->
+  res = yield 
+    a: p1
+    b: Promise.resolve(1)
+    c: Promise.resolve(2)
+    d: Promise.resolve(3)
+    e: p2
+  
+  console.log(res)
+).catch(onerror)
+
+# require("co")( ->
+#   res = yield [
+#     p1
+#     Promise.resolve(1)
+#     Promise.resolve(2)
+#     Promise.resolve(3)
+#     p2
+#   ]
+#   console.log(res)
+# ).catch(onerror)
+
+
+onerror = (err) -> console.log err.stack
+###
+
+
+###
+# 再co
+co = require("co")
+
+console.log "s"
+
+co ->
+  console.log "a"
+  yield [1]
+  console.log "b"
+  # return [2]
+  yield [4]
+  console.log "c"
+  [3]
+.then (v)->
+  console.log "ebd", v
+
+
+console.log "e"
+###
+
+
+
+
+###
+app = require("koa")()
+
+app.use ->
+  console.log @request.url
+  console.log @response.body
+  console.log @body
+  console.log @res.body
+  console.log @response
+  # console.log @res
+  console.log @status
+  yield [@body = "asdf"]
+  console.log @response
+  console.log @request
+  # yield ->
+  # yield =>
+  # yield {}
+  # yield []
+  # yield new Promise (f)-> f()
+
+app.listen 3000
+###
+
+
+
+###
+# koaのcascading
+app = require("koa")()
+
+# x-response-time
+app.use (next)->
+  start = new Date
+  console.log "1 response time s"
+  yield next
+  console.log "1 response time e"
+  ms = new Date - start
+  this.set('X-Response-Time', ms + 'ms')
+
+# logger
+app.use (next)->
+  start = new Date
+  console.log "2 logger s"
+  yield next
+  console.log "2 logger e"
+  ms = new Date - start
+  console.log this.method, this.url, ms
+
+# response
+app.use ->
+  console.log "3 response s" 
+  yield [this.body = 'Hell World']
+  console.log "3 response e"
+
+app.listen 3000
+###
+
+
+###
+# expressのcascading
+app = require("express")()
+
+# 1. response time の記録モジュール
+app.use (req, res, next)->
+  start = new Date
+  
+  # resのheaderイベントを受け取り、startから現在時刻を引いた値を設定する。
+  res.on "header", ->
+    console.log "1ban"
+    duration = new Date - start
+    cosole.log duration
+    res.setHeader('X-Response-Time', duration + 'ms')
+  
+  
+  # res.on = (type, lintener)->
+  #   console.log "this type is", type
+  #   if type == "header"
+  #     return this
+  #   addListener.apply this, arguments
+  
+  console.log "1 response time s"
+  next()
+  console.log "1 response time e"
+  console.log "1:", new Date - start
+
+# 2. loggerモジュール
+app.use (req, res, next)->
+    start = new Date;
+    
+    res.on 'header', ->
+      console.log "2ban"
+      cosole.log duration
+      duration = new Date - start
+      console.log "2logger header event", req.method, req.url, duration
+    
+    # 次のモジュールに委譲 
+    console.log "2 logger s"
+    next()
+    console.log "2 logger e"
+    console.log "2:", new Date - start
+
+# 3. response
+app.use (req, res, next)->
+  res.on "header", ->
+    console.log "3ban"
+    duration = new Date - start
+    cosole.log duration
+  
+  console.log "3 response s"
+  res.status(200).send("Hell World")
+  console.log "3 response e"
+
+app.listen 3000
+###
+
+
+
+###
+epoch2date = (d)->
+  # console.log d
+  d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2) + " " \
+   + ("0" + d.getHours()).slice(-2) + ":" \
+   + ("0" + d.getMinutes()).slice(-2)  + ":" \
+   + ("0" + d.getSeconds()).slice(-2)
+
+ltime = []
+ltime.push 1457403601325
+ltime.push 1457410226404
+ltime.push 1457410810955
+ltime.push 1457840431074
+ltime.push 1456735499648
+ltime.push 1456319912090
+ltime.push 1457410782969
+ltime.push 1458614732951
+ltime.push 1458020040629
+ltime.push 1458021071130
+ltime.push 1457710844621
+ltime.push 1456734061563
+ltime.push 1456735193147
+ltime.push 1458020699776
+
+ltime.sort()
+
+ltime.forEach (i)->
+  console.log epoch2date(new Date i)
+###
+
+
+###
 a = require('koa')()
 
 fs = require 'co-fs'
@@ -208,7 +732,8 @@ disposeRange list, (cnt)-> console.log "done:", cnt
 
 
 ###
-list = [0...75200465]
+# list = [0...75200465]
+list = [0...2]
 console.log list.length
 
 stdt=new Date()
@@ -218,10 +743,12 @@ Promise.all list.map (i)->
     cnt = cnt + 1
     console.log cnt if cnt % 1000000 == 0
     console.log "end", i
+    throw new Error("asdf")
     f i.toString() + ":" + (new Date() - stdt).toString()
 .then (v)->
   console.log v
 .catch (e)->
+  console.log "erorroro"
   console.log e if e?
 ###
 
