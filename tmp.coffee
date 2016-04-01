@@ -8,6 +8,199 @@ console.time "tmp"
 
 
 
+# 下記をPromise化
+bidice = -> new Promise (f,r)->
+  if Math.floor(Math.random() * 2) == 0
+    f "nanigasi"
+  else
+    r "error"
+
+
+bidice()
+  .then (d)->
+    console.log "d", d
+    bidice()
+  .then (d)->
+    console.log "d", d
+    bidice()
+  .catch (e)->
+    console.log "erorr", e
+
+
+###
+# So genannte Callback -Hölle
+bidice = (cb)->
+  if Math.floor(Math.random() * 2) == 0
+    cb "error", ""
+  else
+    cb null, "nanigasi"
+
+
+bidice (e,d)->
+  if e?
+    console.log "erorr", e
+  else
+    console.log "d", d
+    bidice (e,d)->
+      if e?
+        console.log "erorr", e
+      else
+        console.log "d", d
+###
+
+
+
+
+###
+# 二分の一の分岐
+if Math.floor(Math.random() * 2) == 0
+  console.log "ttt"
+else
+  console.log "fff"
+###
+
+
+
+###
+# promiseのチェイン4 非同期 NG
+waka = (str)-> new Promise (f,r)->
+  setTimeout ->
+    console.log "waka", str
+    f "wakakaka"
+  ,1000
+
+ne = (str)-> new Promise (f,r)->
+  setTimeout ->
+    console.log "mono", str
+    f "voi"
+  , 100
+
+console.log "sdf"
+waka("daiiti")
+  .then (v)->
+    setTimeout ->
+      console.log "v", v
+      return ne "nekusuko"
+    , 1000
+  .then (v)->
+    setTimeout ->
+      console.log "222", v
+    , 100
+  .catch (e)->
+    console.log "e", e
+###
+
+
+###
+# promiseのチェイン3 非同期
+waka = (str)-> new Promise (f,r)->
+  setTimeout ->
+    console.log "waka", str
+    f "wakakaka"
+  ,1000
+
+ne = (str)-> new Promise (f,r)->
+  setTimeout ->
+    console.log "mono", str
+    f "voi"
+  , 100
+
+console.log "sdf"
+waka("daiiti")
+  .then (v)->
+    console.log "v", v
+    ne "nekusuko"
+  .then (v)->
+    console.log "222", v
+  .catch (e)->
+    console.log "e", e
+###
+
+
+
+###
+# promiseのチェイン2
+waka = (str)-> new Promise (f,r)->
+  console.log "waka", str
+  f "wakakaka"
+
+ne = (str)-> new Promise (f,r)->
+  console.log "mono", str
+  f "voi"
+
+console.log "sdf"
+waka("daiiti")
+  .then (v)->
+    console.log "v", v
+    ne "nekusuko"
+  .then (v)->
+    console.log "222", v
+  .catch (e)->
+    console.log "e", e
+###
+
+###
+# promiseのチェイン
+waka = (next)-> new Promise (f,r)->
+  console.log "waka"
+  f next("tugi")
+
+ne = (str)-> new Promise (f,r)->
+  console.log "mono", str
+  f "voi"
+
+console.log "sdf"
+waka(ne)
+  .then (v)->
+    console.log "v", v
+  .catch (e)->
+    console.log "e", e
+###
+
+
+
+
+###
+# promiseの連結
+waka = (aaa)-> new Promise (f,r)->
+  console.log "waka", aaa
+  f mono(aaa + "tugi")
+
+mono = (aaa)-> new Promise (f,r)->
+  console.log "mono", aaa
+  f "voi"
+
+
+waka("renmnnn").then (v)->
+  console.log "v", v
+###
+
+
+
+
+###
+# promise化するfuncton
+wakamono = (aaa)-> new Promise (f,r)->
+  console.log aaa
+  f "dondon"
+
+wakamono("asoij")
+  .then (v)->
+    console.log "v", v
+  .catch (e)->
+    console.log "e", e
+
+app = require("koa")()
+app.use wakamono
+# app.use ->
+#   console.log yield wakamono("bobo")
+#   console.log "done"
+
+app.listen 3000
+###
+
+
+
 
 ###
 # array
