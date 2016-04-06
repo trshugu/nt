@@ -8,6 +8,851 @@ console.time "tmp"
 
 
 
+###
+# promistream
+rs = require("fs").createReadStream("deka.txt")
+bl = require("byline").createStream(rs)
+
+t = new require("stream").Transform()
+
+t._transform = (c, e, cb)->
+  # @push c
+  cb(null, c)
+
+bl.pipe(t).pipe(process.stdout)
+###
+
+
+###
+t = new require("stream")
+t._transform = (chunk, encoding, callback)->
+  this.push chunk
+  callback()
+
+t._flush = (cb)->
+  cb()
+
+t.on = (cb)->
+  console.log cb
+
+t.once = (cb)->
+  console.log cb
+
+t.emit = (cb)->
+  console.log cb
+
+t.pipe = (cb)->
+  console.log cb
+
+t.write = (cb)->
+  console.log cb
+
+t.end = (cb)->
+  console.log cb
+###
+
+
+
+###
+# dataStrageからのpromisify3
+mocDy = (d = [], next=true)-> new Promise (f,r)->
+  setTimeout ->
+    d.push "@"
+    console.log "naibu", d
+    
+    if next
+      # recursive
+      # console.log "re"
+      seed = Math.floor(Math.random() * 1000)
+      
+      nt = if seed > 200 then true else !true
+      mocDy d, nt
+        .then (v)->f v
+    else
+      # end
+      # console.log "ed"
+      f d
+  , 1000
+
+mocDy().then (d)->
+  console.log "end", d
+###
+
+
+
+
+
+
+###
+# promise reduce ng
+arr = [1,3,5,3,2,4,3]
+
+arr.reduce (p,i)->
+  new Promise (f)->
+    console.log "asdf", i
+    f i
+  .then (v)->
+    console.log v
+    v
+.then (v)->
+  console.log v
+  v
+###
+
+
+
+
+
+###
+# dataStrageからのpromisify2
+mocDy = (d = [], next=true)-> new Promise (f,r)->
+  setTimeout ->
+    d.push "@"
+    console.log "naibu", d
+    
+    if next
+      # recursive
+      # console.log "re"
+      seed = Math.floor(Math.random() * 1000)
+      
+      nt = if seed > 200 then true else !true
+      mocDy d, nt
+        .then (v)->f v
+    else
+      # end
+      # console.log "ed"
+      f d
+  , 1000
+
+mocDy().then (d)->
+  console.log "end", d
+###
+
+
+
+
+
+###
+# dataStrageからのpromisify
+mocDy = (cb, d = [], next=true)-> 
+  setTimeout ->
+    d.push "@"
+    console.log "naibu", d
+    
+    if next
+      # recursive
+      seed = Math.floor(Math.random() * 1000)
+      
+      nt = if seed > 100 then true else !true
+      mocDy cb, d, nt
+    else
+      # end
+      cb d
+  , 100
+
+mocDy (d)->
+  console.log "end", d
+###
+
+
+###
+# AがあればA, なければB
+con = asdf ? "jijiji"
+console.log con
+###
+
+
+###
+# 再帰的なロジックのpromisify3
+rec = (list, d=[])-> new Promise (f,r)->
+  if list.length != 0
+    target = list.shift()
+    setTimeout ->
+      d.push target + "done" 
+      
+      rec list, d
+        .then (v)->
+          f v
+    , 100
+  else
+    f d
+
+rec ["a","b"]
+.then (v)->
+  console.log v
+
+rex = (list)-> new Promise (f,r)->
+  Promise.all list.map (i)->
+    new Promise (f,r)->
+      setTimeout ->
+        setTimeout ->
+          f i + "done"
+        , 100
+      , 1000
+  .then (v)->
+    # console.log v
+    f v
+
+rex ["a","b"]
+.then (v)->
+  console.log v
+###
+
+
+
+###
+# 実は並列parallel
+console.log "=start="
+
+re = (i)-> new Promise (f,r)->
+  cnt = Math.floor(Math.random() * 1000)
+  # console.log "st", i, cnt
+  setTimeout ->
+    # console.log "ed", i, cnt
+    f i.toString() + "done"
+  , cnt
+
+arr = [0...10]
+# Promise.all arr.map (i)->
+v = arr.map (i)->
+  re(i).then (d)->
+    console.timeEnd "tmp"
+    # console.log "a", i
+    Promise.resolve d
+    console.log d
+    return d
+# .then (v)->
+#   console.log v
+#   console.timeEnd "tmp"
+
+console.log v
+
+console.log "=end="
+###
+
+
+
+###
+# 再帰的なロジックのpromisify3 pre
+rec = (list, d=[])-> new Promise (f,r)->
+  if list.length != 0
+    target = list.shift()
+    setTimeout ->
+      d.push target + "done" 
+      
+      rec list, d
+        .then (v)->
+          f v
+    , 100
+  else
+    f d
+
+rec ["a","b"]
+.then (v)->
+  console.log v
+###
+
+
+###
+# 再帰的なロジックのpromisify2 非同期
+stabScan = (i, cb)->
+  console.log i
+  cb "s", i+1
+
+
+console.log "st"
+rec = (n, d=[])-> new Promise (f,r)->
+  stabScan n, (v,i)->
+    d.push v
+    
+    console.log i
+    console.log v
+    if i < 10
+      setTimeout ->
+        rec i, d
+          .then (q)->
+            console.log "q", q
+            f q
+      ,100
+    else
+      console.log "enddd"
+      f d
+
+rec(0).then (d)->
+  console.log "rec end"
+  console.log d
+
+console.log "ed"
+###
+
+###
+# 再帰的なロジックのpromisify
+console.log "st"
+rec = (list, d=[])-> new Promise (f,r)->
+  if list.length != 0
+    t = list.shift()
+    d.push t + 1
+    
+    rec list, d
+      .then (v)-> f v
+  else
+    f d
+
+rec([1,2,3]).then (d)->
+  console.log "rec end"
+  console.log d
+
+console.log "ed"
+###
+
+###
+rec = (list, cb, d=[])->
+  if list.length != 0
+    t = list.shift()
+    d.push t + 1
+    rec list, cb, d
+  else
+    cb d
+
+rec [1,2,3], (d)->
+  console.log d
+###
+
+
+
+###
+# rx.Observable.fromPromise
+bidiceAsync = -> new Promise (f,r)->
+  i = Math.floor(Math.random() * 5)
+  console.log i
+  setTimeout ->
+    if i > 0
+      f "nanigasi" + i
+    else
+      # rejectを返すとそのまま止まる
+      r "error"
+  , Math.floor(Math.random() * 1000)
+
+rx = require "rx"
+rx.Observable.fromPromise bidiceAsync()
+  .subscribe(
+    (x)->
+      console.log "xx",x
+    , (e)->
+      console.log "ee", e
+    , ->
+      console.log "c")
+###
+
+
+###
+console.log "start"
+co = require 'co'
+views = require 'co-views'
+
+render = views('.', map: html: 'jade')
+
+tobi =
+  name: 'tobi',
+  species: 'ferret'
+
+loki =
+  name: 'loki',
+  species: 'ferret'
+ 
+luna =
+  name: 'luna',
+  species: 'cat'
+ 
+co ->
+  console.log "coですよ"
+  
+  # a = render 'index', user: tobi
+  b = render 'index.jade', user: loki
+  # c = render 'index.ejs', user: luna
+  
+  console.log "yieldの前ですよ"
+  html = yield [ b]
+  console.log "yieldの後ですよ"
+  
+  html = html.join ''
+  console.log html
+
+co()
+console.log "end"
+###
+
+
+
+
+
+
+
+
+###
+# 差異のあるDB返却2 平均値を求める
+# a = [1,2,3,4,5,6]
+# a = [1...1001]
+# a = [1...700]
+# a = [1..6]
+# console.log a.reduce((a,b)->a+b) / a.length
+
+farDb = -> new Promise (f)->
+  i = Math.floor(Math.random() * 2000)
+  # console.log i
+  setTimeout ->
+    f i
+  , i
+
+
+racer = -> new Promise (f)-> 
+  arr = []
+  [0...32].forEach ->
+    arr.push farDb()
+  
+  Promise.race arr
+  .then (v)->
+    f v
+
+cyc = (n)-> new Promise (f)-> 
+  si = []
+  [0...n].forEach ->
+    si.push new Promise (f)->
+      racer().then (v)->
+        f v
+  
+  Promise.all si
+  .then (v)->
+    f v
+  
+
+cyc(2000).then (v)->
+  # console.log v
+  console.log v.reduce((a,b)->a+b) / v.length
+###
+
+
+
+
+
+###
+# ng
+a = []
+n = [0...10]
+avl = -> new Promise (f)->
+  n.forEach ->
+    Promise.race [
+      farDb()
+      farDb()
+      ]
+    .then (v)->
+      console.log v
+      # console.timeEnd "tmp"
+      a.push v
+  
+  f a
+
+
+console.log a
+###
+
+
+###
+# 差異のあるDB返却 Promise.race
+farDb = -> new Promise (f)->
+  i = Math.floor(Math.random() * 600)
+  console.log i
+  setTimeout ->
+    f "nanigasi" + i
+  , i
+
+
+# farDb().then (v)-> console.log v
+
+Promise.race [
+  farDb()
+  farDb()
+  ]
+.then (v)->
+  console.log v
+  console.timeEnd "tmp"
+###
+
+
+
+
+
+
+
+
+
+
+###
+# 平均がxだった場合のlength
+# n = 2x-1
+x = 10
+console.log 2 * x - 1
+###
+
+
+
+###
+# nまでの総数の平均を得る2
+# 1足して割る
+n = 1000
+console.log (n + 1) /2
+###
+
+###
+# nまでの総数の平均を得る
+# 偶数の場合
+even = (n)-> new Promise (f)->
+  f (n/2 * (1+n)) / n
+
+# even(6).then (d)-> console.log d
+
+# 奇数の場合
+odd = (n)-> new Promise (f)->
+  f ((Math.floor(n/2) * (1+n)) + Math.ceil(n/2)) / n
+
+# odd(6).then (d)-> console.log d
+# odd(7).then (d)-> console.log d
+
+# n = 1000
+n = 19
+
+if n % 2 == 0
+  even(n).then (d)-> console.log d
+else
+  odd(n).then (d)-> console.log d
+###
+
+
+###
+# bruebirdによるpromisify2
+eo = {}
+eo.sync = (cb)->
+  cb null, "syn"
+
+eo.async = (cb)->
+  setTimeout ->
+    cb null, "asyn"
+  , 1000
+
+bb = require "bluebird"
+bb.promisifyAll eo
+
+
+render = (d)->
+ console.log d
+
+i = Math.floor(Math.random() * 3)
+console.log i
+if i > 0
+  eo.syncAsync().then (r)->
+    render r
+else
+  eo.asyncAsync().then (r)->
+    render r
+###
+
+
+###
+# bruebirdによるpromisify
+bb = require "bluebird"
+fs = require "fs" 
+bb.promisifyAll fs
+
+# fs.readFileAsync("index.jade", "utf-8").then (v)-> console.log v
+require("co") ->
+  v = yield fs.readFileAsync("index.jade", "utf-8")
+
+  console.log v
+###
+
+
+###
+# 分岐させた結果のrenderと非同期同期処理の混合3
+# co:これが一番スマートだがまだ使えない
+sync = -> new Promise (f,r)->
+  f "syn"
+
+async = -> new Promise (f,r)->
+  setTimeout ->
+    f "asyn"
+  , 1000
+
+
+render = (d)->
+  console.log d
+
+
+i = Math.floor(Math.random() * 3)
+console.log i
+require("co") ->
+  if i > 0
+    render yield sync()
+  else
+    render yield async()
+###
+
+
+###
+# 分岐させた結果のrenderと非同期同期処理の混合2
+# promise化
+sync = -> new Promise (f,r)->
+  f "syn"
+
+async = -> new Promise (f,r)->
+  setTimeout ->
+    f "asyn"
+  , 1000
+
+
+render = (d)->
+ console.log d
+
+# console.log sync()
+# console.log async() ng
+
+
+i = Math.floor(Math.random() * 3)
+console.log i
+if i > 0
+  sync().then (r)->render r
+else
+  async().then (r)->render r
+###
+
+
+###
+# 分岐させた結果のrenderと非同期同期処理の混合1
+# 全部cbを定義:renderはまとまったがコールバック地獄である
+sync = (cb)->
+  cb "syn"
+
+async = (cb)->
+  setTimeout ->
+    cb "asyn"
+  , 1000
+
+
+render = (d)->
+ console.log d
+
+i = Math.floor(Math.random() * 3)
+console.log i
+if i > 0
+  sync (r)->
+    render r
+else
+  async (r)->
+    render r
+###
+
+
+###
+# 分岐させた結果のrenderと非同期同期処理の混合0
+# これでは処理は実現できるがrenderがバラバラに
+sync = ->
+  "syn"
+
+async = ->
+  setTimeout ->
+    render "asyn"
+  , 1000
+
+
+render = (d)->
+ console.log d
+
+# console.log sync()
+# console.log async() ng
+
+
+i = Math.floor(Math.random() * 3)
+console.log i
+if i > 0
+  r = sync()
+  render r
+else
+  async()
+###
+
+
+
+
+
+
+###
+# console.log(process.versions.v8)
+
+vm = require "vm"
+
+localVar = 'initial value'
+
+vmResult = vm.runInThisContext 'localVar = "vm";'
+console.log 'vmResult: ', vmResult
+console.log 'localVar: ', localVar
+
+evalResult = eval 'localVar = "eval";'
+console.log 'evalResult: ', evalResult
+console.log 'localVar: ', localVar
+###
+
+
+###
+# coによるpromise直列処理2 直列はthenチェインでもいい
+bidiceAsync = -> new Promise (f,r)->
+  i = Math.floor(Math.random() * 5)
+  console.log i
+  setTimeout ->
+    if i > 0
+      f "nanigasi" + i
+    else
+      # rejectを返すとそのまま止まる
+      r "error"
+  , Math.floor(Math.random() * 1000)
+
+
+require("co") ->
+  res1 = yield bidiceAsync()
+  res2 = yield bidiceAsync()
+  res3 = yield bidiceAsync()
+  res4 = yield bidiceAsync()
+  
+  console.log "result1:", res1
+  console.log "result2:", res2
+  console.log "result3:", res3
+  console.log "result4:", res4
+.catch (e)->
+  # co下でcatch
+  console.log "eeee", e
+###
+
+
+###
+# coによるpromise直列処理
+bidiceAsync = -> new Promise (f,r)->
+  i = Math.floor(Math.random() * 3)
+  console.log i
+  setTimeout ->
+    if i > 0
+      f "nanigasi"
+    else
+      # rejectを返すとそのまま止まる
+      r "error"
+  , Math.floor(Math.random() * 1000)
+
+
+require("co") ->
+  res1 = yield bidiceAsync()
+  
+  console.log "result1:", res1
+  
+  if res1
+    console.log "res1"
+  
+  if res1?
+    console.log "存在する"
+  
+  
+  if res1 == ""
+    console.log "からである"
+  
+  if res1 != ""
+    console.log "からでない"
+  
+  
+  if res1 == null
+    console.log "nullである"
+  
+  if res1 != null
+    console.log "nullでない"
+  
+  if res1 == undefined
+    console.log "未定義である"
+  
+  if res1 != undefined
+    console.log "未定義でない"
+  
+
+###
+
+
+
+
+
+###
+# 下記をPromise化2 async
+bidiceAsync = -> new Promise (f,r)->
+  i = Math.floor(Math.random() * 3)
+  console.log i
+  setTimeout ->
+    if i > 0
+      f "nanigasi"
+    else
+      r "error"
+  , Math.floor(Math.random() * 1000)
+
+
+bidiceAsync()
+  .then (d)->
+    console.log "d", d
+    bidiceAsync()
+  .then (d)->
+    console.log "d", d
+    bidiceAsync()
+  .catch (e)->
+    console.log "erorr", e
+
+Promise.all [
+  bidiceAsync()
+    .then (d)->
+      console.log "1d", d
+      d + "1"
+    .catch (e)->
+      console.log "1erorr", e
+      e + "1"
+  bidiceAsync()
+    .then (d)->
+      console.log "2d", d
+      d + "2"
+    .catch (e)->
+      console.log "2erorr", e
+      e + "2"
+  bidiceAsync()
+    .then (d)->
+      console.log "3d", d
+      d + "3"
+    .catch (e)->
+      console.log "3erorr", e
+      e + "3"
+  bidiceAsync()
+    .then (d)->
+      console.log "4d", d
+      d + "4"
+    .catch (e)->
+      console.log "4erorr", e
+      e + "4"
+  bidiceAsync()
+    .then (d)->
+      console.log "5d", d
+      d + "5"
+    .catch (e)->
+      console.log "5erorr", e
+      e + "5"
+]
+.then (d)->
+  console.log "all!", d
+.catch (e)->
+  console.log "allllerorr", e
+###
+
+
+
+
+###
 # 下記をPromise化
 bidice = -> new Promise (f,r)->
   if Math.floor(Math.random() * 2) == 0
@@ -25,6 +870,9 @@ bidice()
     bidice()
   .catch (e)->
     console.log "erorr", e
+###
+
+
 
 
 ###
