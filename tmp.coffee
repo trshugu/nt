@@ -9,6 +9,41 @@ console.time "tmp"
 
 
 
+###
+# 再koa
+app = require('koa')()
+
+g = (n)->
+  i = 0
+  while i < 3
+    console.log "kiteru"
+    i += 1
+    yield n
+
+app.use (next)->
+  start = new Date
+  yield next
+  ms = new Date - start
+  console.log '%s %s - %s', @method, @url, ms
+
+app.use g
+
+# app.use ->
+#   @body = 'Hello World'
+#   yield []
+
+render = -> new Promise (f)->
+  f 'Hello World'
+
+app.use ->
+  @body = yield render()
+  # yield render
+
+
+app.listen 3000
+###
+
+
 
 ###
 # stream再度2
