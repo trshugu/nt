@@ -8,6 +8,460 @@ console.time "tmp"
 
 
 
+
+
+###
+# stream再度2
+g = do->
+  i = 0
+  while i < 10
+    i += 1
+    yield i
+
+rs = require('stream').Readable()
+rs._read = ->
+  y = g.next()
+  @push y.value.toString() if !y.done
+
+rs.pipe(process.stdout)
+###
+
+
+###
+# stream再度
+g = ->
+  i = 0
+  while i < 10
+    i += 1
+    yield i
+
+Readable = require('stream').Readable
+rs = Readable()
+gg = g()
+
+rs._read = ->
+  setTimeout =>
+    y = gg.next()
+    # console.log y
+    if !y.done
+      @push y.value.toString()
+  , 1000
+
+rs.pipe(process.stdout)
+###
+
+
+
+###
+# genとco
+sync = -> new Promise (f,r)->
+  f "syn"
+
+console.log "1"
+require("co")->
+  console.log "2"
+  i = 0
+  while i < 3
+    console.log "3", i
+    yield [i]
+    console.log "4"
+    i += 1
+  
+  console.log "5"
+###
+
+
+
+###
+console.log "s"
+g = ->
+  console.log "1"
+  i = 0
+  while i < 3
+    console.log "2"
+    i += 1
+    yield i
+  
+  ""
+
+
+console.log "4"
+Readable = require('stream').Readable;
+rs = Readable()
+gg = g()
+
+console.log "5"
+rs._read = ->
+  console.log "6"
+  setTimeout =>
+    console.log "7"
+    c = gg.next().value
+    console.log "ccc", c
+    @push c.toString()
+  , 100
+
+console.log "8"
+rs.pipe(process.stdout)
+console.log "e"
+###
+
+
+###
+# for of gen NG
+g = ->
+  console.log "1"
+  i = 0
+  while i < 3
+    console.log "2"
+    yield i
+    console.log "3"
+    i += 1
+
+# console.log g().next()
+console.log "a"
+for a in g()
+  console.log a.next()
+console.log "b"
+###
+
+
+###
+console.log "s"
+f = require("co").wrap (v)->
+  console.log "1"
+  yield Promise.resolve v
+
+console.log "3"
+f(true)
+.then (v)->
+  console.log "4"
+  console.log v
+
+console.log "e"
+###
+
+
+
+
+###
+# coはpromiseを返す
+console.log "s"
+require("co") ->
+  console.log "1"
+  re = yield Promise.resolve true
+  console.log "2"
+  re
+  console.log "3"
+.then (v)->
+  console.log "v", v
+.catch (e)->
+  console.log "e", e
+
+console.log "e"
+###
+
+
+
+###
+sleep = (ms)-> (cb)-> setTimeout(cb, ms)
+
+console.log "a"
+sleep(10000) -> console.log "sdf"
+console.log "b"
+###
+
+
+###
+require("co") (fn)->
+  console.log fn
+
+console.log "1"
+co = (fn)-> 
+  console.log fn
+  console.log "2"
+  
+  done = (val)->
+    console.log "3"
+    gen.next val
+  
+  console.log "4"
+  gen = fn done
+  
+  console.log "5"
+  gen.next()
+  console.log "6"
+
+console.log "7"
+
+co (done)->
+  console.log "4-s"
+  console.log "4-1"
+  val = yield setTimeout ->
+    console.log "4-2"
+    done("qq")
+  , 500
+  
+  console.log "4-3"
+  console.log 'val:', val
+  
+  console.log "4-e"
+###
+
+
+
+###
+s = -> new Promise (f)-> f "p"
+w = -> new Promise (f)->
+  yield 1
+  f 2
+
+x = -> yield new Promise (f)->
+  # yield 1
+  f 2
+y = -> yield 1
+z = -> 1
+
+require("co") ->
+  console.log "a"
+  # yy = y()
+  # console.log yield yy.next()
+  # console.log yield yy.next()
+  # console.log yield [z()]
+  # console.log yield x().next()
+  console.log "b"
+###
+
+
+
+
+###
+s = -> new Promise (f)-> f "p"
+require("co") -> console.log yield s()
+###
+
+
+###
+console.log "start"
+
+s = ->
+  console.log "1"
+  new Promise (f)->
+    console.log "2"
+    f "p"
+
+console.log "3"
+require("co") ->
+  console.log "4"
+  console.log yield s()
+  console.log yield s()
+  console.log "5"
+
+console.log "end"
+###
+
+###
+# 142a6 35
+console.log "1"
+
+s = ->
+  console.log "2"
+  new Promise (f)->
+    console.log "a"
+    setTimeout ->
+      console.log "3"
+      f "p"
+    ,100
+
+console.log "4"
+
+s().then (v)->
+  console.log "5"
+  console.log v
+
+console.log "6"
+###
+
+
+###
+# 14236 5
+console.log "1"
+
+s = ->
+  console.log "2"
+  new Promise (f)->
+    console.log "3"
+    f "p"
+
+console.log "4"
+
+s().then (v)->
+  console.log "5"
+  console.log v
+
+console.log "6"
+###
+
+
+###
+console.log "1"
+
+require("co") ->
+  console.log "a"
+  setTimeout (-> ""), 100
+  console.log "b"
+  
+console.log "2"
+###
+
+
+
+###
+f = -> yield 1
+
+console.log typeof f
+console.log typeof f()
+console.log typeof f().next()
+###
+
+###
+# gen new しなくてもいける
+console.log "1"
+g = ->
+  console.log "2"
+  i = 0
+  while i < 3
+    console.log "3", i
+    yield i
+    console.log "4"
+    i += 1
+  
+  console.log "5"
+
+console.log "6"
+a = g()
+console.log "7"
+console.log "nexco", a.next()
+console.log "nexco", a.next()
+console.log "nexco", a.next()
+console.log "nexco", a.next()
+console.log "nexco", a.next()
+console.log "8"
+###
+
+
+###
+var http = require('http');
+var express = require("express");
+var RED = require("node-red");
+
+// Create an Express app
+var app = express();
+
+// Add a simple route for static content served from 'public'
+app.use("/",express.static("public"));
+
+// Create a server
+var server = http.createServer(app);
+
+// Create the settings object - see default settings.js file for other options
+var settings = {
+    httpAdminRoot:"/red",
+    httpNodeRoot: "/api",
+    userDir:"/home/nol/.nodered/",
+    functionGlobalContext: { }    // enables global context
+};
+
+// Initialise the runtime with a server and settings
+RED.init(server,settings);
+
+// Serve the editor UI from /red
+app.use(settings.httpAdminRoot,RED.httpAdmin);
+
+// Serve the http nodes UI from /api
+app.use(settings.httpNodeRoot,RED.httpNode);
+
+server.listen(8000);
+
+// Start the runtime
+RED.start();
+###
+
+
+
+
+
+###
+src = "asdf"
+
+aa = if src? src then else "noi"
+
+console.log aa
+console.log src?
+console.log src
+console.log src? src
+###
+
+
+
+###
+# cocat ng
+cat = require "co-cat"
+twice = (str)->
+  console.log "str", str
+  i = 0
+  return (end)->
+    console.log "q", i, str, end
+    return "nanika" if end
+    console.log "w", i, str, end
+    return str if ++i < 3
+    console.log "e", i, str, end
+
+require("co") ->
+  console.log "1"
+  read = cat(twice('foo'), twice('bar'), twice('baz'))
+  console.log "2"
+  data = undefined
+  
+  console.log "a"
+  while data = yield read()
+    console.log "b"
+    console.log data
+###
+
+
+###
+rc = require("co-redis")(require('redis').createClient())
+require("co") ->
+  console.log yield rc.set "tetete", 3983
+  console.log yield rc.get "tetete"
+  console.log yield rc.end()
+###
+
+###
+# 謎
+gh = require "hash-stream"
+gh "README.md", "sha256", (e,h)->
+  if e?
+    console.log e
+  else 
+    console.log h.toString("hex")
+###
+
+
+
+
+
+###
+require("fs").readFile "66076821.mp4", (e,b)->
+  if e?
+    console.log e
+  else
+    console.log b
+    console.log require("file-type") b
+###
+
+
+
 ###
 # promistream
 rs = require("fs").createReadStream("deka.txt")
