@@ -1,0 +1,67 @@
+console.time "tmp"
+document.addEventListener 'DOMContentLoaded', ->
+  console.log "done"
+  # $("#tmp").css "font-size", "20pt"
+  
+  
+  
+  get = (url)-> new Promise (f,r)->
+    req = new XMLHttpRequest()
+    req.open 'GET', url
+    
+    req.onload = ->
+      if req.status == 200
+        f req.response
+      else
+        r Error(req.statusText)
+    
+    req.onerror = -> r(Error("Network Error"))
+    req.send()
+  
+  console.log "eee"
+  get("http://localhost:3000")
+    .then (r)->
+        console.log "ok", r
+      ,(e)->
+        console.log "ng", e
+  
+  
+  ###
+  # bacon.js2
+  up = $("#up").asEventStream("click").map(1)
+  down = $("#down").asEventStream("click").map(-1)
+  counter = up.merge(down).scan(0, (x, y) -> x + y)
+  counter.assign $("#counter"), "text"
+  ###
+  
+  
+  ###
+  # FRP1
+  arr = [1,2,3,4,5,6,7,8,9]
+  Bacon.fromArray(arr).map((n)-> n * 2).log()
+  
+  arr.push 99
+  arr.push 100
+  Bacon.fromArray(arr).map((n)-> n * 2).log()
+  ###
+  
+  
+  
+  ###
+  console.log 1
+  setInterval ->
+    $.ajax
+      url: "http://localhost:3000"
+    .done (d,t)->
+      console.log 2
+      console.log "t",t
+      console.log "d",d
+      $("#tmp").append("<div>aaa</div><br>")
+    .fail (r)->
+      console.log 3
+      console.log r
+  , 1000
+  
+  console.log 4
+  ###
+
