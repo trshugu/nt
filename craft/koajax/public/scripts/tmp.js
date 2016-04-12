@@ -2,12 +2,48 @@
   console.time("tmp");
 
   document.addEventListener('DOMContentLoaded', function() {
-    console.log("done");
-    return $.post("http://localhost:3000/poster?ppp=eee", {
-      parame: "para"
-    }, function(a) {
-      return console.log("a", a);
-    });
+    return console.log("done");
+
+    /*
+     * viewModelでの制御(sortなどができる)
+    getSt = (data=[])->
+      $.get "http://localhost:3000/rnd/first"
+        .done (v)->
+          data.push v
+           * クライアント側の時間制御
+          if v.next
+            setTimeout ->
+              getSt data
+            , 1000
+          else
+            data
+              .sort (a,b)->
+                b.seed - a.seed
+              .forEach (i)->
+                $("#tmp").append("<div>" + i.data + ":" + i.seed + "</div><br>")
+    
+    getSt()
+     */
+
+    /*
+    getSt = ->
+      $.get "http://localhost:3000/rnd/first"
+        .done (v)->
+          $("#tmp").append("<div>" + v.data + ":" + v.seed + "</div><br>")
+          
+           * クライアント側の時間制御
+          if v.next
+            setTimeout ->
+              getSt()
+            , 1000
+    
+    getSt()
+     */
+
+    /*
+    $.post "http://localhost:3000/poster?ppp=eee", parame:"para", (a)->
+      console.log "a", a
+     */
 
     /*
     $.get("http://localhost:3000/nf?ppp=eee", param:"ppp")
