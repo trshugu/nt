@@ -8,6 +8,17 @@ console.time "tmp"
 
 
 
+###
+# promise chain -> coを使わないと難しいかも
+p = ->
+  console.log "a"
+  # f "ppp"
+
+Promise.resolve(1)
+  .then p
+  .then p
+  .then p
+###
 
 ###
 # 再koa
