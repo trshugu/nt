@@ -4,7 +4,75 @@ document.addEventListener 'DOMContentLoaded', ->
   # $("#tmp").css "font-size", "20pt"
   
   
+  $.post "http://localhost:3000/poster?ppp=eee", parame:"para", (a)->
+    console.log "a", a
   
+  
+  ###
+  $.get("http://localhost:3000/nf?ppp=eee", param:"ppp")
+    .done (v)->
+      console.log v.data
+    .fail (e)->
+      console.log "e", e
+  ###
+  
+  
+  
+  ###
+  $.when(
+    $.getJSON(url: "http://localhost:3000/data"),
+    $.get(url: "http://localhost:3000/data")
+  ).then (a,b)->
+    console.log a[1]
+    console.log b
+  ###
+  
+  
+  
+  ###
+  p = -> new Promise (f)->
+    f "hell"
+  
+  p().then (v)->
+    console.log v
+  ###
+  
+  
+  ###
+  .done (d,t, c)->
+    console.log "t",t
+    console.log "c",c
+    console.log "d",d
+    $("#tmp").append("<div>" + d.data + "</div><br>")
+  ###
+  
+  
+  
+  ###
+  $.get url: "http://localhost:3000/data"
+  .done (d,t, c)->
+    console.log "t",t
+    console.log "c",c
+    console.log "d",d
+    $("#tmp").append("<div>" + d.data + "</div><br>")
+  ###
+  
+  ###
+  console.log 1
+  r = new XMLHttpRequest()
+  r.open "GET", "http://localhost:3000/styles/tmp.css", true
+  r.onreadystatechange = ->
+    console.log 2
+    return if r.readyState != 4 or r.status != 200
+    console.log r.responseText
+    console.log 3
+  
+  r.send "a=1&b=2&c=3"
+  console.log 4
+  ###
+  
+  
+  ###
   get = (url)-> new Promise (f,r)->
     req = new XMLHttpRequest()
     req.open 'GET', url
@@ -24,6 +92,7 @@ document.addEventListener 'DOMContentLoaded', ->
         console.log "ok", r
       ,(e)->
         console.log "ng", e
+  ###
   
   
   ###
@@ -65,3 +134,30 @@ document.addEventListener 'DOMContentLoaded', ->
   console.log 4
   ###
 
+
+###
+# ajax promisify
+@ajax = (url, param="")-> new Promise (f,r)->
+  # f()
+  re = new XMLHttpRequest()
+  re.open "GET", "http://localhost:3000/styles/tmp.css", true
+  re.onreadystatechange = ->
+    if re.readyState != 4 or re.status != 200
+      # r()
+      console.log "standby"
+      console.log re.readyState
+      console.log re.status
+      return
+    else
+      # f()
+      console.log re.responseText
+      f(re.responseText)
+  
+  re.send param
+
+console.log "astart"
+@ajax("http://localhost:3000/styles/tmp.css").then (v)->
+  console.log "then"
+  console.log v
+
+###

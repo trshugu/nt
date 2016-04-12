@@ -2,32 +2,90 @@
   console.time("tmp");
 
   document.addEventListener('DOMContentLoaded', function() {
-    var get;
     console.log("done");
-    get = function(url) {
-      return new Promise(function(f, r) {
-        var req;
-        req = new XMLHttpRequest();
-        req.open('GET', url);
-        req.onload = function() {
-          if (req.status === 200) {
-            return f(req.response);
-          } else {
-            return r(Error(req.statusText));
-          }
-        };
-        req.onerror = function() {
-          return r(Error("Network Error"));
-        };
-        return req.send();
-      });
-    };
-    console.log("eee");
-    return get("http://localhost:3000").then(function(r) {
-      return console.log("ok", r);
-    }, function(e) {
-      return console.log("ng", e);
+    return $.post("http://localhost:3000/poster?ppp=eee", {
+      parame: "para"
+    }, function(a) {
+      return console.log("a", a);
     });
+
+    /*
+    $.get("http://localhost:3000/nf?ppp=eee", param:"ppp")
+      .done (v)->
+        console.log v.data
+      .fail (e)->
+        console.log "e", e
+     */
+
+    /*
+    $.when(
+      $.getJSON(url: "http://localhost:3000/data"),
+      $.get(url: "http://localhost:3000/data")
+    ).then (a,b)->
+      console.log a[1]
+      console.log b
+     */
+
+    /*
+    p = -> new Promise (f)->
+      f "hell"
+    
+    p().then (v)->
+      console.log v
+     */
+
+    /*
+    .done (d,t, c)->
+      console.log "t",t
+      console.log "c",c
+      console.log "d",d
+      $("#tmp").append("<div>" + d.data + "</div><br>")
+     */
+
+    /*
+    $.get url: "http://localhost:3000/data"
+    .done (d,t, c)->
+      console.log "t",t
+      console.log "c",c
+      console.log "d",d
+      $("#tmp").append("<div>" + d.data + "</div><br>")
+     */
+
+    /*
+    console.log 1
+    r = new XMLHttpRequest()
+    r.open "GET", "http://localhost:3000/styles/tmp.css", true
+    r.onreadystatechange = ->
+      console.log 2
+      return if r.readyState != 4 or r.status != 200
+      console.log r.responseText
+      console.log 3
+    
+    r.send "a=1&b=2&c=3"
+    console.log 4
+     */
+
+    /*
+    get = (url)-> new Promise (f,r)->
+      req = new XMLHttpRequest()
+      req.open 'GET', url
+      
+      req.onload = ->
+        if req.status == 200
+          f req.response
+        else
+          r Error(req.statusText)
+      
+      req.onerror = -> r(Error("Network Error"))
+      req.send()
+    
+    console.log "eee"
+    get("http://localhost:3000")
+      .then (r)->
+          console.log "ok", r
+        ,(e)->
+          console.log "ng", e
+     */
 
     /*
      * bacon.js2
@@ -65,5 +123,32 @@
     console.log 4
      */
   });
+
+
+  /*
+   * ajax promisify
+  @ajax = (url, param="")-> new Promise (f,r)->
+     * f()
+    re = new XMLHttpRequest()
+    re.open "GET", "http://localhost:3000/styles/tmp.css", true
+    re.onreadystatechange = ->
+      if re.readyState != 4 or re.status != 200
+         * r()
+        console.log "standby"
+        console.log re.readyState
+        console.log re.status
+        return
+      else
+         * f()
+        console.log re.responseText
+        f(re.responseText)
+    
+    re.send param
+  
+  console.log "astart"
+  @ajax("http://localhost:3000/styles/tmp.css").then (v)->
+    console.log "then"
+    console.log v
+   */
 
 }).call(this);
