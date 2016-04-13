@@ -4,6 +4,108 @@ console.time "tmp"
 # console.timeEnd "tmp"
 
 
+###
+# req,resを渡さない3
+# 並列で値の直列 よくないアイデア
+req = {}
+req.end = ->
+  console.log "finish"
+
+mod = (req)->
+  d=""
+  e=""
+  f=""
+  Promise.resolve(1)
+    .then ->
+      fun1()
+    .then (a)->
+      console.log "1", a
+      d = a
+      fun2()
+    .then (b)->
+      console.log "2", b
+      e = b
+      render()
+    .then (c)->
+      console.log "3", c
+      f = c
+      console.log "aaa", d,e,f
+      req.end()
+    .catch (e)-> console.log "e",e
+  .then (v)->
+    console.log "soto", v
+  .catch (e)-> console.log "e",e
+
+fun1 = (r)-> new Promise (f)->
+  f "kicoichi"
+
+fun2 = (r)-> new Promise (f)->
+  f "senni"
+
+render= (r)-> new Promise (f)->
+  f "dpp"
+
+
+# origin
+mod req
+###
+
+
+###
+# req,resを渡さない2
+req = {}
+req.end = ->
+  console.log "finish"
+
+mod = (req)->
+  Promise.resolve(1)
+    .then ->
+      fun1()
+    .then (hu,ku)->
+      console.log hu[1]
+      console.log hu[2]
+      fun2()
+      ""
+    .then ->
+      render()
+    .then ->
+      req.end()
+
+fun1 = (r)-> new Promise (f)->
+  f 1:"su", 2:"u"
+
+fun2 = (r)-> new Promise (f)->
+  f()
+
+render= (r)-> new Promise (f)->
+  f()
+
+
+# origin
+mod req
+###
+
+
+###
+# req,resを渡さない
+req = {}
+req.end = ->
+  console.log "finish"
+
+mod = (req)->
+  fun1 req
+
+fun1 = (r)->
+  fun2 r
+
+fun2 = (r)->
+  render r
+
+render= (r)->
+  r.end()
+
+mod req
+###
 
 
 
