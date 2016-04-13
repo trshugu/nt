@@ -1,0 +1,90 @@
+#tmp {
+  color: #f00;
+}
+.med {
+  background: #f00;
+}
+@media (min-width: 37.5em) {
+  .med {
+    background: #0f0;
+  }
+}
+.rwd {
+  background: #800;
+}
+@media screen and (min-width: 31.25em) {
+  .rwd {
+    background: #080;
+  }
+}
+.medpx {
+  background: #f0f;
+}
+@media (min-width: 600px) {
+  .medpx {
+    background: #0ff;
+  }
+}
+.rwdpx {
+  background: #808;
+}
+@media screen and (min-width: 500px) {
+  .rwdpx {
+    background: #088;
+  }
+}
+:target {
+  color: #f00;
+  font-weight: bold;
+}
+:target::after {
+  content: "���R�R�ɔ����ł�����";
+  padding-left: 5px;
+  color: #666;
+  font-weight: normal;
+}
+.acc {
+  width: 50px;
+  background-color: #880;
+  height: 16px;
+  transition: 0.5s;
+}
+.emo {
+  content: "oiuiouoiuoiu";
+}
+.acc:hover {
+  background-color: #088;
+  height: 100px;
+}
+a.modal {
+  background-color: #088;
+  height: 20px;
+  transition: 0.5s;
+  display: block;
+  width: 500px;
+}
+.emo:target .emo {
+  background-color: #000;
+  height: 100px;
+}
+.box {
+  width: 40px;
+  box-shadow: 5px 10px 5px 5px rgba(0,0,50,0.3);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.li a[href="#"] {
+  background-color: #eed;
+}
+.li a[href="#"]:hover {
+  background-color: #0f0;
+}
+.li a[href^="http"] {
+  background-color: #112;
+}
+.li a[href^="https"] {
+  background-color: #898;
+}
+.li:nth-child(2n+0) {
+  font-weight: bold;
+}
