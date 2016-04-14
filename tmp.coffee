@@ -4,6 +4,108 @@ console.time "tmp"
 # console.timeEnd "tmp"
 
 
+
+
+
+
+
+###
+# Promise.all のエラーハンドリング2
+p1 = new Promise (f)-> f 1
+p2 = new Promise (f)->
+  # throw new Error
+  f 2
+
+Promise.all [
+  p1
+  p2
+]
+  .then (v)-> console.log "v", v
+  .catch (e)-> console.log "e", e.stack
+###
+
+
+###
+# Promise.all のエラーハンドリング ng
+Promise.all [
+  new Promise (f,r)->
+    r 4
+    1.pop()
+    f 1
+      .then (v)->
+        console.log "v1",v
+        v
+      .catch (e)->
+        cosole.log "e1",e
+        e
+  new Promise (f)->
+    throw new Error
+    f 2
+      .then (v)->
+        console.log "v2",v
+        v
+      .catch (e)->
+        cosole.log "e2",e
+        e
+]
+.then (v)-> console.log "v",v
+.catch (e)-> cosole.log "e",e
+###
+
+###
+# spreadはない
+Promise.all [
+  new Promise (f)-> f 1
+  new Promise (f)-> f 2
+]
+.spread (a,v)-> console.log "v",v
+.catch (e)-> cosole.log "e",e
+###
+
+
+
+###
+# 再帰的なロジックのpromisify4 reduce
+rex = (list)-> new Promise (f,r)->
+  f list.reduce (p,i)->
+    p.then (v)-> new Promise (fu)->
+      setTimeout ->
+        console.log "v", v
+        fu i + "done"
+      , 1000
+  , Promise.resolve()
+  .then (v)->
+    console.log "all", v
+    f v
+  .catch (e)-> console.log "uti", e
+
+rex ["a","b"]
+.then (v)->
+  console.log "soto", v
+.catch (e)-> console.log "soto", e
+###
+
+
+
+###
+# reduce is?
+[1,2,3].reduce (a,b)->
+  console.log "=start="
+  console.log "a", a
+  console.log "b", b
+  99
+, 88
+###
+
+###
+[1,2,3].reduceRight (a,b)->
+  console.log "=start="
+  console.log "a", a
+  console.log "b", b
+  ""
+###
+
+
 ###
 # req,resを渡さない3
 # 並列で値の直列 よくないアイデア
