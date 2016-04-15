@@ -8,6 +8,18 @@ console.time "tmp"
 
 
 
+###
+# if式
+b = 1
+
+a =
+  if b == 1
+    "ttt"
+  else
+    "fff"
+
+console.log a
+###
 
 ###
 # Promise.all のエラーハンドリング2
