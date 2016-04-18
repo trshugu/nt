@@ -8,6 +8,24 @@ console.time "tmp"
 
 
 
+# Promise.allの挙動チェック
+p1 = new Promise (f)-> f 1
+p2 = new Promise (f)-> f 2
+p3 = new Promise (f)-> f 3
+
+
+Promise.all [
+  p1
+    .then (v)->
+      p3
+  p2
+]
+.then (v)->
+  console.log v
+
+
+
+
 ###
 # if式
 b = 1

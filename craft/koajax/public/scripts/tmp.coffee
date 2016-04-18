@@ -3,6 +3,14 @@ document.addEventListener 'DOMContentLoaded', ->
   console.log "done"
   # $("#tmp").css "font-size", "20pt"
   
+  @add = ->
+    console.log "addd"
+    localStorage.setItem new Date().toString(), "krakkusu"
+    # localStorage.clear()
+  
+  window.addEventListener 'storage', (e)->
+    console.log "stragehakka"
+    console.log e
   
   ###
   # viewModelでの制御(sortなどができる)

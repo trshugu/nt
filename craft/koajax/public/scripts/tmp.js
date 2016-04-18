@@ -2,7 +2,15 @@
   console.time("tmp");
 
   document.addEventListener('DOMContentLoaded', function() {
-    return console.log("done");
+    console.log("done");
+    this.add = function() {
+      console.log("addd");
+      return localStorage.setItem(new Date().toString(), "krakkusu");
+    };
+    return window.addEventListener('storage', function(e) {
+      console.log("stragehakka");
+      return console.log(e);
+    });
 
     /*
      * viewModelでの制御(sortなどができる)
