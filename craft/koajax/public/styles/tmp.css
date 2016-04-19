@@ -1,6 +1,57 @@
 #tmp {
   color: #f00;
 }
+.im {
+  width: 50px;
+  height: 50px;
+  display: block;
+  transition: 0.5s;
+  opacity: 0;
+}
+.im:hover {
+  opacity: 1;
+  background: url("/sp.png");
+}
+/*
+sum(nums...)
+  n = 0
+  n += num for num in nums
+
+@import "_part"
+.part
+  // background: #567
+  // background: "#%sff" % sum(1,2,3,4,5)
+  background: rgba(#245, .1)
+
+.con
+  background: #888
+  width 80%
+
+  .in
+    background: #808
+    width (@width * 0.3)
+*/
+/*
+mod1()
+  // color: #0f0
+  font-style: bold
+
+mod2()
+  color: #00f
+
+
+cc()
+  background: arguments
+  mod1()
+
+as = #aaa
+
+.a
+  cc(as)
+
+#i
+  cc(#ccc)
+*/
 .med {
   background: #f00;
 }
@@ -38,7 +89,7 @@
   font-weight: bold;
 }
 :target::after {
-  content: "���R�R�ɔ����ł�����";
+  content: "←ココに飛んできたよ";
   padding-left: 5px;
   color: #666;
   font-weight: normal;
