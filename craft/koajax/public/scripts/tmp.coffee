@@ -7,6 +7,9 @@ document.addEventListener 'DOMContentLoaded', ->
     console.log "addd"
     localStorage.setItem new Date().toString(), "krakkusu"
     # localStorage.clear()
+    
+    for k,v of localStorage
+      console.log k, ":", v
   
   window.addEventListener 'storage', (e)->
     console.log "stragehakka"

@@ -4,8 +4,15 @@
   document.addEventListener('DOMContentLoaded', function() {
     console.log("done");
     this.add = function() {
+      var k, results, v;
       console.log("addd");
-      return localStorage.setItem(new Date().toString(), "krakkusu");
+      localStorage.setItem(new Date().toString(), "krakkusu");
+      results = [];
+      for (k in localStorage) {
+        v = localStorage[k];
+        results.push(console.log(k, ":", v));
+      }
+      return results;
     };
     return window.addEventListener('storage', function(e) {
       console.log("stragehakka");
