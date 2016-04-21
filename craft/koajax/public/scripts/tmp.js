@@ -2,22 +2,68 @@
   console.time("tmp");
 
   document.addEventListener('DOMContentLoaded', function() {
+    var createComp, fetchData;
     console.log("done");
-    this.add = function() {
-      var k, results, v;
-      console.log("addd");
-      localStorage.setItem(new Date().toString(), "krakkusu");
-      results = [];
-      for (k in localStorage) {
-        v = localStorage[k];
-        results.push(console.log(k, ":", v));
-      }
-      return results;
+    document.querySelector("#tmp").style.color = "#f00";
+    fetchData = function(url) {
+      return new Promise(function(f) {
+        return fetch(url).then(function(d) {
+          return d.text();
+        }).then(function(d) {
+          return f(JSON.parse(d).data);
+        });
+      });
     };
-    return window.addEventListener('storage', function(e) {
-      console.log("stragehakka");
-      return console.log(e);
+    createComp = function(content) {
+      return new Promise(function(f) {
+        var div;
+        div = document.createElement('div');
+        div.textContent = content;
+        div.classList.add("kla");
+        return f(div);
+      });
+    };
+    return Promise.resolve(1).then(function() {
+      return fetchData("http://localhost:3000/data");
+    }).then(function(d) {
+      return createComp(d);
+    }).then(function(v) {
+      return document.querySelector("#con").appendChild(v);
     });
+
+    /*
+      .then (a)->
+        console.log a
+        div = document.createElement 'div'
+        div.textContent = 'hoge'
+        
+        element = document.querySelector("#ado")
+         * element.appendChild div
+        element.insertBefore div, element.firstChild
+         * element.parentNode.insertBefore div, element
+         * element.parentNode.insertBefore div, element.nextSibling
+     */
+
+    /*
+    fetch "http://localhost:3000/data"
+      .then (d)-> d.text()
+      .then (d)-> document.querySelector("#tmp2").innerHTML = JSON.parse(d).data
+      .then (a)-> console.log a
+     */
+
+    /*
+    @add = ->
+      console.log "addd"
+      localStorage.setItem new Date().toString(), "krakkusu"
+       * localStorage.clear()
+      
+      for k,v of localStorage
+        console.log k, ":", v
+    
+    window.addEventListener 'storage', (e)->
+      console.log "stragehakka"
+      console.log e
+     */
 
     /*
      * viewModelでの制御(sortなどができる)

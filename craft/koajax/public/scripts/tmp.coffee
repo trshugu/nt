@@ -1,8 +1,58 @@
 console.time "tmp"
 document.addEventListener 'DOMContentLoaded', ->
   console.log "done"
+  # $("#tmp").css "color", "#f00"
+  document.querySelector("#tmp").style.color = "#f00"
+  
+  
+  
+  fetchData = (url)-> new Promise (f)->
+    fetch url
+      .then (d)-> d.text()
+      .then (d)-> f JSON.parse(d).data
+  
+  createComp = (content)-> new Promise (f)->
+    div = document.createElement 'div'
+    div.textContent = content
+    div.classList.add "kla"
+    f div
+  
+  Promise.resolve(1)
+    .then ->
+      fetchData "http://localhost:3000/data"
+    .then (d)->
+      createComp d
+    .then (v)->
+      document.querySelector("#con").appendChild v
+  
+  
+  
+  ###
+    .then (a)->
+      console.log a
+      div = document.createElement 'div'
+      div.textContent = 'hoge'
+      
+      element = document.querySelector("#ado")
+      # element.appendChild div
+      element.insertBefore div, element.firstChild
+      # element.parentNode.insertBefore div, element
+      # element.parentNode.insertBefore div, element.nextSibling
+  ###
+  
+  
   # $("#tmp").css "font-size", "20pt"
   
+  ###
+  fetch "http://localhost:3000/data"
+    .then (d)-> d.text()
+    .then (d)-> document.querySelector("#tmp2").innerHTML = JSON.parse(d).data
+    .then (a)-> console.log a
+  ###
+  
+  
+  
+  ###
   @add = ->
     console.log "addd"
     localStorage.setItem new Date().toString(), "krakkusu"
@@ -14,6 +64,9 @@ document.addEventListener 'DOMContentLoaded', ->
   window.addEventListener 'storage', (e)->
     console.log "stragehakka"
     console.log e
+  ###
+  
+  
   
   ###
   # viewModelでの制御(sortなどができる)
