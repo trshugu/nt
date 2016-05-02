@@ -6,8 +6,53 @@ console.time "tmp"
 
 
 
+###
+# generator中のエラーの場合
+randomer = ->
+  seed = Math.floor(Math.random() * 1000)
+  if seed > 500 then true else !true
+
+# console.log randomer()
+pro = -> new Promise (f)->
+  console.log "pro"
+  if randomer()
+    f "pdone"
+  else
+    throw new Error()
+
+# throw new Error()
+
+fun = -> new Promise (f, r)->
+  console.log "fun"
+  if randomer()
+    f "fdone"
+  else
+    throw new Error()
+    r "fail"
+    throw new Error()
 
 
+pro()
+  .then (v)-> console.log "pv",v
+  .catch (e)-> console.log "pe",e
+  
+fun()
+  .then (v)-> console.log "fv",v
+  .catch (e)-> console.log "fe",e
+
+
+require("co") ->
+  pro()
+  fun()
+.then (v)-> console.log "v", v
+.catch (e)-> console.log "e",e
+###
+
+
+
+
+
+###
 # Promise.allの挙動チェック
 p1 = new Promise (f)-> f 1
 p2 = new Promise (f)-> f 2
@@ -22,7 +67,7 @@ Promise.all [
 ]
 .then (v)->
   console.log v
-
+###
 
 
 
