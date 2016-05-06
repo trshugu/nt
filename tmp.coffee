@@ -6,6 +6,25 @@ console.time "tmp"
 
 
 
+
+###
+# 条件によって処理しない
+randomer = ->
+  seed = Math.floor(Math.random() * 1000)
+  if seed > 500 then true else !true
+
+fun = -> new Promise (f,r)->
+  console.log "fun done"
+  f()
+
+Promise.resolve(1)
+  .then ->
+    console.log "1"
+    fun() if randomer()
+  .then ->
+    console.log "end"
+###
+
 ###
 # generator中のエラーの場合
 randomer = ->
