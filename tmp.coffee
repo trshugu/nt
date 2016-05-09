@@ -6,6 +6,14 @@ console.time "tmp"
 
 
 
+###
+d = require("dirty")("d.db")
+# d.set "gugu", "jijioj" + Math.floor(Math.random() * 1000).toString()
+# console.log d.get "gugu"
+# d.rm "gugu"
+d.set "gugu", [1,2,3,4]
+###
+
 
 ###
 # 条件によって処理しない
