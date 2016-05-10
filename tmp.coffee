@@ -6,6 +6,20 @@ console.time "tmp"
 
 
 
+
+###
+pub = "true"
+
+if (pub? && pub == "true") == false
+  console.log "りだいれくと"
+else
+  console.log "ee"
+
+bbb = null
+console.log typeof bbb
+###
+
+
 ###
 d = require("dirty")("d.db")
 # d.set "gugu", "jijioj" + Math.floor(Math.random() * 1000).toString()
