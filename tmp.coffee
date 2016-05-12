@@ -5,7 +5,23 @@ console.time "tmp"
 
 
 
+# asc descの反転
+li = [6,1,3,4,3,2,2,3,4,4,3]
 
+narave = (desc=false)-> 
+  k = if desc then -1 else 1
+  return (a,b)->
+    if a > b
+      return 1 * k
+    if a < b
+      return -1 * k
+    return 0
+
+console.log li.sort narave()
+console.log li.sort narave(true)
+
+# というかreverseすればいいだけのこと
+console.log li.sort(narave()).reverse()
 
 ###
 # switchもとがない場合->エラーになる
