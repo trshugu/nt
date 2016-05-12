@@ -5,6 +5,18 @@ console.time "tmp"
 
 
 
+
+
+###
+# switchもとがない場合->エラーになる
+switch nani
+ when 1
+   console.log "kkoko"
+ else
+   console.log "else"
+###
+
+
 ###
 # promisifyに於けるコールバックの挙動
 randomer = -> if Math.floor(Math.random() * 1000) > 500 then true else !true
