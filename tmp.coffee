@@ -5,6 +5,44 @@ console.time "tmp"
 
 
 
+###
+# promisifyに於けるコールバックの挙動
+randomer = -> if Math.floor(Math.random() * 1000) > 500 then true else !true
+
+ranfan = (cb)->
+  cb null, "normal" if randomer()
+  cb new Error("eratta")
+
+fun = -> new Promise (f,r)-> ranfan (e,d)->
+  r e if e?
+  f d
+
+fun().then (v)->
+  console.log "seijodu1", v
+.catch (e)-> console.log "eraa1", e
+
+# こんなのでもいける
+fun2 = -> new Promise (f,r)-> ranfan (e,d)-> if e? then r e else f d
+
+fun2().then (v)->
+  console.log "seijodu2", v
+.catch (e)-> console.log "eraa2", e
+###
+
+
+
+###
+ranfan (e,d)->
+  if e?
+    console.log "era-desu", e
+  else
+    console.log "seijoudesu", d
+###
+
+
+
+
+
 
 
 ###
