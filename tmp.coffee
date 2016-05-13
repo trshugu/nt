@@ -5,6 +5,7 @@ console.time "tmp"
 
 
 
+
 ###
 # asc descの反転
 li = [6,1,3,4,3,2,2,3,4,4,3]
