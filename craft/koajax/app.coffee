@@ -1,4 +1,7 @@
 app = module.exports = require('koa')()
+sc = require 'koa-static-cache'
+
+app.use sc( require("path").join(__dirname + '/public'), maxAge: 1*24*60*60 )
 
 # Logger
 app.use require('koa-logger')()
@@ -16,7 +19,7 @@ app.use require('koa-stylus')(require("path").join(__dirname, 'public'))
 app.use require('koa-coffee-script')(require("path").join(__dirname, 'public'))
 
 # Serve static files
-app.use require('koa-static')(require('path').join(__dirname, 'public'))
+app.use require('koa-static')(require('path').join(__dirname, 'public'), maxAge: 1*24*60*60)
 
 if !module.parent
   app.listen 3000

@@ -6,6 +6,31 @@ console.time "tmp"
 
 
 
+
+
+# beacon
+getHash = -> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update require("node-uuid").v4(), "utf8"
+  cry.digest 'hex'
+
+require("bleacon").startAdvertising(getHash(), 0, 0, -59)
+
+
+###
+# 文字数の判定
+a="abcde"
+b="あいうえい"
+c="あいeef"
+
+console.log a.length
+console.log b.length
+console.log c.length
+
+# 特殊文字でも一文字
+# console.log d.length
+###
+
 ###
 # asc descの反転
 li = [6,1,3,4,3,2,2,3,4,4,3]
