@@ -5,9 +5,17 @@ console.time "tmp"
 
 
 
+###
+obj = {asdf:"asdlfkj"}
+obj.jimae = process.versions
+console.log obj
+console.log JSON.stringify(obj)
+console.log encodeURIComponent(JSON.stringify(obj))
+###
 
 
 
+###
 # beacon
 getHash = -> 
   cry = require("crypto").createHash 'SHA256'
@@ -15,6 +23,7 @@ getHash = ->
   cry.digest 'hex'
 
 require("bleacon").startAdvertising(getHash(), 0, 0, -59)
+###
 
 
 ###
