@@ -5,6 +5,58 @@ console.time "tmp"
 
 
 
+
+
+
+###
+get = -> new Promise (f, r)->
+  console.log "re1"
+  require("request") 'http://localhost:3000', (e, res)->
+    if e?
+      r res
+    else
+      f res
+
+arr = []
+[0...1000].forEach ->
+  arr.push get().then (v)-> console.log v.statusCode
+
+Promise.all arr
+.then (v)->
+  console.log v.length
+  console.timeEnd "tmp"
+.catch (e)-> console.log e
+###
+
+
+
+###
+gun = (i)->
+  if i < 1000
+    console.log "i",i
+    get()
+      .then (v)->
+        console.log v.statusCode
+        gun i + 1
+      .catch (e)-> console.log e
+  else
+    console.log "endne"
+    console.timeEnd "tmp"
+
+# gun 0
+###
+
+###
+[0...1000].forEach ->
+  get()
+    .then (v)->
+      console.log v.statusCode
+      # gun i + 1
+      console.timeEnd "tmp"
+    .catch (e)-> console.log e
+###
+
+
 ###
 obj = {asdf:"asdlfkj"}
 obj.jimae = process.versions
