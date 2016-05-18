@@ -8,6 +8,15 @@ console.time "tmp"
 
 
 
+
+###
+# passport
+p = require "passport"
+console.log p.authenticate()(statusCode:1)
+###
+
+
+
 ###
 get = -> new Promise (f, r)->
   console.log "re1"
