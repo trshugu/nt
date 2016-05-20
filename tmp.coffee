@@ -8,6 +8,17 @@ console.time "tmp"
 
 
 
+###
+# こう書くべきであった
+# nulob
+# a= "asdf"
+# a= null
+# a={b:2}
+# a={}
+# console.log a.b
+# console.log a?.b
+###
+
 
 ###
 # passport

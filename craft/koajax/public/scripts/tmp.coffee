@@ -19,11 +19,16 @@ document.addEventListener 'DOMContentLoaded', ->
   
   Promise.resolve(1)
     .then ->
-      fetchData "http://localhost:3000/data"
+      di = document.createElement("div")
+      di.textContent = "loadddd"
+      document.querySelector("#fet").appendChild di
+    .then ->
+      fetchData "http://localhost:3000/spadata"
     .then (d)->
       createComp d
     .then (v)->
-      document.querySelector("#con").appendChild v
+      document.querySelector("#fet").removeChild document.querySelector("#fet").childNodes.item(0)
+      document.querySelector("#fet").appendChild v
   
   
   

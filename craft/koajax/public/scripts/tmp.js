@@ -24,11 +24,17 @@
       });
     };
     return Promise.resolve(1).then(function() {
-      return fetchData("http://localhost:3000/data");
+      var di;
+      di = document.createElement("div");
+      di.textContent = "loadddd";
+      return document.querySelector("#fet").appendChild(di);
+    }).then(function() {
+      return fetchData("http://localhost:3000/spadata");
     }).then(function(d) {
       return createComp(d);
     }).then(function(v) {
-      return document.querySelector("#con").appendChild(v);
+      document.querySelector("#fet").removeChild(document.querySelector("#fet").childNodes.item(0));
+      return document.querySelector("#fet").appendChild(v);
     });
 
     /*
