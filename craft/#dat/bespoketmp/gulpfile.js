@@ -28,10 +28,9 @@ gulp.task('js', ['clean:js'], function() {
 });
 
 gulp.task('html', ['clean:html'], function() {
-  return gulp.src('src/index.jade')
+  return gulp.src('src/*.jade')
     .pipe(isDist ? through() : plumber())
     .pipe(jade({ pretty: true }))
-    .pipe(rename('index.html'))
     .pipe(gulp.dest('dist'))
     .pipe(connect.reload());
 });
