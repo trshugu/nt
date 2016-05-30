@@ -1,0 +1,25 @@
+{
+  "name": "koagen",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "coffee --nodejs --harmony app.coffee",
+    "test": "mocha --harmony"
+  },
+  "dependencies": {
+    "co-body": "^0.0.1",
+    "co-views": "^0.2.0",
+    "coffee-script": "^1.10.0",
+    "jade": "^1.11.0",
+    "koa": "^0.6.0",
+    "koa-compress": "^1.0.6",
+    "koa-logger": "^1.2.0",
+    "koa-route": "^1.1.4",
+    "koa-static": "^1.4.5",
+    "stylus": "^0.54.2"
+  },
+  "devDependencies": {
+    "supertest": "^0.12.1",
+    "mocha": "^1.18.2"
+  }
+}

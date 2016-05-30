@@ -1,0 +1,32 @@
+{
+  "name": "expresstemplate2",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "coffee app.coffee"
+  },
+  "devDependencies": {
+    "coffee-script": "*",
+    "gulp": "*",
+    "gulp-coffee": "*",
+    "gulp-jade": "*",
+    "gulp-livereload": "*",
+    "gulp-plumber": "*",
+    "gulp-stylus": "*",
+    "tiny-lr": "*"
+  },
+  "dependencies": {
+    "body-parser": "*",
+    "coffee-script": "*",
+    "connect-slashes": "^1.3.1",
+    "cookie-parser": "*",
+    "debug": "*",
+    "express": "*",
+    "iced-coffee-middleware": "*",
+    "jade": "*",
+    "morgan": "*",
+    "serve-favicon": "*",
+    "socket.io": "*",
+    "stylus": "*"
+  }
+}
