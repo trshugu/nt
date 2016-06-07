@@ -8,6 +8,194 @@ console.time "tmp"
 
 
 
+
+###
+bun = require "./Bungu"
+
+b = bun.Bungu
+b.use()
+console.log b.live
+
+p = bun.pen
+p.use()
+console.log p.live
+
+g = bun.gum
+g.use()
+console.log g.live
+###
+
+
+
+
+
+###
+# リスコフの置換原則とTDD
+class Bungu
+  @live: false
+  
+  @use: ->
+    console.log "naniyara"
+
+class pen extends Bungu
+  @use: ->
+    console.log "this is"
+
+class gum extends Bungu
+  @live: true
+  
+  @use: ->
+    console.log "gomgom"
+###
+
+###
+b = new Bungu
+b.use()
+console.log b.live
+
+p = new pen
+p.use()
+console.log p.live
+
+g = new gum
+g.use()
+console.log g.live
+###
+
+
+
+
+###
+# 最小サーバーkoa
+require('koa')().use(->@body = yield ["hell" + @url]).listen 3000
+###
+
+
+
+###
+# 存在確認しなくていいのではないか
+tadatukuru = (n)-> new Promise (f, r)->
+  require("fs").mkdir n, (e)->
+    console.log e.code if e?
+    f "owata"
+
+require('koa')().use(->@body = yield tadatukuru("dtada")).listen 3000
+###
+
+###
+tadatukuru = (n)-> new Promise (f, r)->
+  console.timeEnd "tmp"
+  require("fs").mkdir n, (e)->
+    console.log e.code if e?
+    console.timeEnd "tmp"
+  console.log "owri"
+  f "owata"
+
+app = require('koa')()
+app.use ->
+  console.log "1"
+  yield []
+  console.log "2"
+  @body = tadatukuru("dtada")
+
+
+app.listen 3000
+###
+
+
+
+###
+# promisifyの先にあるもの
+tadatukuru = (n)-> new Promise (f, r)->
+  console.timeEnd "tmp"
+  require("fs").mkdir n, (e)->
+    console.log e.code if e?
+    console.timeEnd "tmp"
+    f "owata"
+
+console.log "start"
+require("co") ->
+  console.log "1"
+  re = yield tadatukuru "tadaco"
+  console.log "2"
+  console.log re
+  console.log "3"
+.then (v)->
+  console.log "v", v
+.catch (e)->
+  console.log "e", e
+
+console.log "end"
+###
+
+
+
+###
+# promisify
+console.timeEnd "tmp"
+# rは使わず
+tadatukuru = (n)-> new Promise (f, r)->
+  console.timeEnd "tmp"
+  require("fs").mkdir n, (e)->
+    console.log e.code if e?
+    console.timeEnd "tmp"
+    f()
+console.timeEnd "tmp"
+tadatukuru("tada").then ->
+  console.log "ちゃんと終わった"
+  console.timeEnd "tmp"
+console.timeEnd "tmp"
+###
+
+
+###
+# cb
+console.timeEnd "tmp"
+tadatukuru = (n, cb)-> require("fs").mkdir n, -> cb()
+console.timeEnd "tmp"
+tadatukuru "tada", ->
+  console.log "ちゃんと終わった"
+  console.timeEnd "tmp"
+console.timeEnd "tmp"
+###
+
+
+###
+# 投げっぱなしパターン
+console.timeEnd "tmp"
+tadatukuru = (n)-> require("fs").mkdir n, ->
+console.timeEnd "tmp"
+tadatukuru "tada"
+console.timeEnd "tmp"
+###
+
+
+
+###
+console.timeEnd "tmp"
+require("fs").mkdir "siren", (a,b,c,d)->
+  console.log "1",a,":",b,":",c,":",d
+  require("fs").mkdir "siren", (a,b,c,d)->
+    console.log "2",a,":",b,":",c,":",d
+console.timeEnd "tmp"
+require("fs").mkdir "siren", (a,b,c,d)->
+  console.log "3",a,":",b,":",c,":",d
+  require("fs").mkdir "siren", (a,b,c,d)->
+    console.log "4",a,":",b,":",c,":",d
+console.timeEnd "tmp"
+###
+
+###
+# syncではエラーに
+console.timeEnd "tmp"
+require("fs").mkdirSync("siren")
+console.timeEnd "tmp"
+require("fs").mkdirSync("siren")
+console.timeEnd "tmp"
+###
+
+
+
 ###
 # こう書くべきであった
 # nulob

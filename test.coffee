@@ -6,6 +6,33 @@
 
 
 
+
+###
+# リスコフの置換原則に於けるTDD
+chai = require "chai"
+tmp = require "./Bungu"
+
+describe "スーパークラス1", ->
+  it "Bungu", (done)->
+    k = tmp.Bungu
+    chai.assert.isFunction k.use
+    chai.assert.isBoolean k.live
+    done()
+  
+  it "pen", (done)->
+    k = tmp.pen
+    chai.assert.isFunction k.use
+    chai.assert.isBoolean k.live
+    done()
+  
+  it "gum", (done)->
+    k = tmp.gum
+    chai.assert.isFunction k.use
+    chai.assert.isBoolean k.live
+    done()
+###
+
+###
 # 入れ子XMLの取得と判別
 chai = require "chai"
 cheerio = require "cheerio"
@@ -40,7 +67,7 @@ describe "01:", ->
     chai.assert.notOk $("root").find("nasi").is("nasi")
     chai.assert.ok  $("root").find("ids").is("ids")
     chai.assert.notOk  $("root").find("nasi").is("nasi")
-
+###
 
 
 
