@@ -9,6 +9,147 @@ console.time "tmp"
 
 
 
+
+
+###
+# cheerio-httpcliがよくわかってないので再習
+ch = require "cheerio-httpcli"
+ch.fetch 'http://www.google.com/search',
+  q: 'node.js'
+.then (v) ->
+  console.log v.response.headers
+  # console.log v.response
+  console.log v.$('title').text()
+  v.$('a').each (idx) ->
+    # console.log $(this).attr('href')
+.catch (e)-> console.log e
+###
+
+
+###
+ch.fetch 'http://www.google.com/search',
+  q: 'node.js'
+  , (err, $, res) ->
+    console.log res.headers
+    console.log $('title').text()
+    $('a').each (idx) ->
+      # console.log $(this).attr('href')
+###
+
+
+
+
+###
+# promiseの直列処理に於けるreduce2
+list = [1,2,4,5,3]
+list.reduce (p, i)->
+  console.log "p", p
+  console.log "i", i
+  
+  p.then (v)-> new Promise (f)->
+    console.log "kokohairani", i
+    setTimeout ->
+      f "end"
+    , 1000
+, Promise.resolve()
+.then (v)-> console.log "v", v
+.catch (e)-> console.log "e", e
+###
+
+
+###
+# promiseの直列処理に於けるreduce
+list = [1,2,4,5,3]
+
+list.reduce (m,p)->
+  m.then (v)->new Promise (f,r)-> console.log "p"
+  , Promise.resolve(1)
+###
+
+
+
+###
+# child_process
+w = require('child_process').fork "a.coffee"
+
+w.on "message", (msg)->
+  console.log "msg", msg
+  console.timeEnd "tmp"
+  
+
+console.timeEnd "tmp"
+# execはOSでの実行。forkはnodeの実行
+###
+
+
+
+
+###
+# リスト処理内でいくつかエラーがあった場合の挙動
+# リスト処理
+randomer = -> if Math.floor(Math.random() * 1000) > 500 then true else !true
+list = ["aa","bb","cc"]
+
+Promise.all list.map (i)->
+  new Promise (f,r)->
+    setTimeout ->
+      console.log "kos"
+      if randomer()
+        console.log "raise"
+        throw new Error "asdf"
+      
+      if randomer()
+        console.log "tt:", i
+        f i + "done"
+      else
+        console.log "rr:", i
+        r i + "reje"
+    , Math.floor(Math.random() * 1000)
+  .then (v)->
+    console.log "kov", v
+    v
+  .catch (e)->
+    console.log "koe", e
+    e
+.then (v)->
+  # 個別の方の最後がリストとなる
+  console.log "v:",v
+.catch (e)->
+  # rejectがきた瞬間にこちらに入る
+  # 個別に返却した場合普通にエラーハンドリング
+  console.log "e:",e
+###
+
+
+###
+Promise.all arr
+.then (v)->
+  console.log v.length
+  console.timeEnd "tmp"
+.catch (e)-> console.log e
+
+tadatukuru = (n)-> new Promise (f, r)->
+  require("fs").mkdir n, (e)->
+    console.log e.code if e?
+    f "owata"
+###
+
+
+
+###
+# OSコマンドの実行
+exec = require('child_process').exec
+exec "ls -l",
+  encoding: "utf8"
+  env: process.env
+  ,(e,o,s)->
+    if e?
+      console.log e
+    else
+      console.log o
+      console.log s
+###
+
 ###
 bun = require "./Bungu"
 
