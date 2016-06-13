@@ -9,6 +9,39 @@ console.time "tmp"
 
 
 
+###
+tp = 1
+pp =  999999
+gp = 1000000
+
+console.log (tp + pp) / gp
+if (tp + pp) / gp >= 1
+  console.log "OK"
+else
+  console.log "NG"
+###
+
+
+###
+# 無言プロミス
+fin = (o)-> new Promise (f, r)->
+  console.log "naka"
+  f ""
+
+fin "noi"
+###
+
+###
+# finally ない。NG
+fin = (o)-> new Promise (f, r)->
+  console.log "naka"
+  f ""
+
+fin "noi"
+  .finally (v)->
+    console.log "asdf", v
+###
+
 
 
 ###
