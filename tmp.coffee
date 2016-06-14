@@ -9,6 +9,27 @@ console.time "tmp"
 
 
 
+
+###
+# -Fオプション
+parse = require('koa-body')
+require('koa')()
+  .use(
+    require('koa-body')(formidable: uploadDir: __dirname)
+  
+  )
+  .use(->
+    console.log @request
+    console.log @request.body
+    a= parse(@)
+    console.log a()
+    @body = yield ["hell" + @url]
+  ).listen 3000
+###
+
+
+
+
 ###
 tp = 1
 pp =  999999
