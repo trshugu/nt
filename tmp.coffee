@@ -8,7 +8,43 @@ console.time "tmp"
 
 
 
+###
+# 全角スペースもいける
+a="as df"
+console.log　 a.match　 /\　/
+###
 
+
+###
+# parseして一行ごとのobjにしてくれる
+nd = require "ndjson"
+require("fs").createReadStream("t.json")
+  .pipe(nd.parse())
+  .on "data", (o)->
+    console.log "================================"
+    console.log o
+    console.log "--------------------------------"
+    
+    # if o.date?.N?
+    #   console.log o.date.N
+###
+
+###
+# ndjsonに関する
+nd = require "ndjson"
+console.log nd.parse "asdf":12
+###
+
+
+
+###
+n = "ye"
+
+if (n == "no" || n == "nono") == false
+  console.log "t"
+else
+  console.log "f"
+###
 
 ###
 # -Fオプション
