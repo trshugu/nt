@@ -7,6 +7,535 @@ console.time "tmp"
 
 
 
+# dbsizeもためす
+
+# redisを使ってチェック2
+crypto = require("crypto")
+uuid = require("node-uuid")
+getHash = ->
+  cry = crypto.createHash 'SHA256'
+  cry.update uuid.v4(), "utf8"
+  cry.digest 'hex'
+l = require "lodash"
+
+cluster = require "cluster"
+if cluster.isMaster
+  [0...3].forEach ->
+    cluster.fork()
+
+else
+  rc = require("co-redis")(require('redis').createClient())
+  require("co") ->
+    console.time "arr"
+    i = 0
+    # while i < 14800000
+    while i < 20000000
+      h = getHash().substr 0, 12
+      
+      console.log i if i % 100000 == 0
+      console.timeEnd "arr" if i % 100000 == 0
+      
+      if yield rc.get h
+        console.log i, "find"
+        console.log yield rc.info "keyspace"
+        break
+      
+      yield rc.set h, i
+      i += 1
+    
+    console.timeEnd "arr"
+    # yield rc.flushall()
+    yield rc.quit()
+    process.exit()
+
+
+
+###
+# redisを使ってチェック
+rc = require("co-redis")(require('redis').createClient())
+require("co") ->
+  console.time "arr"
+  i = 0
+  # while i < 14800000
+  while i < 20000000
+    h = getHash().substr 0, 12
+    
+    console.log i if i % 100000 == 0
+    console.timeEnd "arr" if i % 100000 == 0
+    
+    if yield rc.get h
+      console.log i, "find"
+      console.log yield rc.info "keyspace"
+      break
+    
+    yield rc.set h, i
+    i += 1
+  
+  console.timeEnd "arr"
+  # yield rc.flushall()
+  yield rc.quit()
+###
+
+
+
+###
+rc = require("co-redis")(require('redis').createClient())
+require("co") ->
+  console.log yield rc.set "tetete", 3983
+  console.log yield rc.get "tetete"
+  # console.log yield rc.flush()
+  # console.log yield rc.end()
+  console.log yield rc.quit()
+###
+
+
+###
+# クラスターでgethashを集める黒魔法
+# 増やせば増やすほど重く
+crypto = require("crypto")
+uuid = require("node-uuid")
+getHash = ->
+  cry = crypto.createHash 'SHA256'
+  cry.update uuid.v4(), "utf8"
+  cry.digest 'hex'
+l = require "lodash"
+
+cluster = require "cluster"
+if cluster.isMaster
+  console.time "arr"
+  arr = []
+  warehouse = (item)->
+    arr.push item
+    console.log arr.length if arr.length % 10000 == 0
+    # console.timeEnd "tmp" if arr.length % 1000 == 0
+    if arr.length >= 100000
+      console.log "end!!!!!!!"
+      console.timeEnd "arr"
+      process.exit()
+  
+  # 1:15秒 
+  [0...3].forEach ->
+    w = cluster.fork()
+    w.on "message", (msg)->
+      # console.log msg
+      warehouse msg
+    
+    w.on "exit", ->
+      console.log "exited", arr.length
+    
+    setTimeout ->
+      w.send "death"
+    , 120000
+  
+else
+  process.on "message", (msg)->
+    if msg == "death"
+      console.log "memento"
+      process.exit()
+  
+  i = 1
+  while i <= 14800000
+    # console.log process.pid
+    process.send getHash()
+    i += 1
+###
+
+
+###
+# 結局UUIDは何文字まで信頼性が高いのか 2
+# 9文字ではどうか→485451 'find'
+crypto = require("crypto")
+uuid = require("node-uuid")
+getHash = ->
+  cry = crypto.createHash 'SHA256'
+  cry.update uuid.v4(), "utf8"
+  cry.digest 'hex'
+
+l = require "lodash"
+arr = []
+j = 0
+while j < 2000
+  i = 0
+  while i < 14800000
+    console.log j, i if i % 100000 == 0
+    console.timeEnd "tmp" if i % 100000 == 0
+    
+    h = getHash().substr 0, 9
+    
+    if l.indexOf(arr, h) >= 0
+      console.log j, i, "find"
+      break
+    
+    arr.push h
+    i += 1
+  j += 1
+###
+
+
+
+
+
+###
+# 作って検索 vs 全部作ってあとから検索
+# 全部作って検索したほうが速いっぽい？
+# 目的が違うので比較できない
+crypto = require("crypto")
+uuid = require("node-uuid")
+getHash = ->
+  cry = crypto.createHash 'SHA256'
+  cry.update uuid.v4(), "utf8"
+  cry.digest 'hex'
+
+l = require "lodash"
+
+i = 800000
+m = 10
+
+console.time "soku"
+soku = []
+s = 0
+while s < i
+  h = getHash().substr 0, m
+  
+  if l.indexOf(soku, h) >= 0
+    console.log s, "sokufind"
+    break
+  
+  soku.push h
+  s += 1
+
+console.timeEnd "soku"
+
+console.time "atoo"
+atoo = []
+
+a = 0
+while a < i
+  h = getHash().substr 0, m
+  atoo.push h
+  
+  a += 1
+
+console.timeEnd "atoo"
+
+n = 0
+while n < atoo.length
+  if l.indexOf(atoo, atoo[n]) >= 0
+    console.log "atoofind"
+    break
+  
+  n += 1
+
+console.timeEnd "atoo"
+###
+
+
+
+###
+# もうwhileでやるしかない
+kensakutime = (arr)->
+  console.time "for"
+  for i in arr
+    if i == "nothing"
+      break
+  console.timeEnd "for"
+
+  console.time "in"
+  if arr.indexOf("nothing") >= 0
+    console.log "find"
+  console.timeEnd "in"
+
+  console.time "in2"
+  arr.indexOf("nothing")
+  console.timeEnd "in2"
+
+  console.time "fi"
+  arr.find((i)->i=="nothing")?
+  console.timeEnd "fi"
+
+
+  l = require "lodash"
+  console.time "loin"
+  l.indexOf(arr, "nothing")
+  console.timeEnd "loin"
+
+  console.time "lofi"
+  l.find(arr,(i)->i=="nothing")?
+  console.timeEnd "lofi"
+
+  console.timeEnd "tmp"
+
+console.time "arr"
+arr = []
+j = 0
+while j < 2 # 二回目は耐えられないもよう
+  i = 0
+  while i < 14800000
+    console.log j, i if i % 100000 == 0
+    console.timeEnd "arr" if i % 100000 == 0
+    arr.push getHash()
+    i += 1
+  
+  kensakutime arr
+###
+
+
+
+###
+console.time "arr"
+arr = []
+
+i = 0
+# 14800000
+while i < 14800000
+  console.log i if i % 100000 == 0
+  console.timeEnd "arr" if i % 100000 == 0
+  arr.push getHash()
+  i += 1
+
+console.timeEnd "arr"
+
+kensakutime arr
+###
+
+###
+# catchできるかどうか→できない
+i = 0
+try
+  # while i < 75197499
+  while i < 76000000
+    console.log i if i % 1 == 0 && i > 75197400
+    arr.push i
+    i += 1
+catch e
+  console.log "catch!", arr.length
+  kensakutime arr
+
+###
+
+# [0...75000000].forEach (i)->
+#   arr.push i
+
+###
+# 数字の境界は 75197498 と思ったら変動した
+i = 0
+while i < 75197499
+  console.log i if i % 1 == 0 && i > 75197400
+  arr.push i
+  i += 1
+###
+
+
+###
+# 結局UUIDは何文字まで信頼性が高いのか
+# 8文字では2万行く前に重複する
+
+# モジュールは先に読んだほうが速かった
+crypto = require("crypto")
+uuid = require("node-uuid")
+getHash = ->
+  cry = crypto.createHash 'SHA256'
+  cry.update uuid.v4(), "utf8"
+  cry.digest 'hex'
+
+# 75200000万個生成を2000回して重複の有無のチェック
+l = require "lodash"
+arr = []
+# for i in [0...75200000]
+for j in [0...2000]
+  # console.log j if j % 2 == 0
+  for i in [0...75200000]
+    console.log j, i if i % 10000000 == 0
+    h = getHash().substr 0, 9
+    if l.indexOf(arr, h) >= 0
+      console.log j, i, "find"
+      break
+    
+    arr.push h
+
+
+# console.timeEnd "tmp"
+###
+
+
+###
+# いくつまでリストできるか。何秒かかるか。2 ng
+# まとめる処理で死んでしまう
+console.time "tmp"
+
+crypto = require("crypto")
+uuid = require("node-uuid")
+getHash = ->
+  cry = crypto.createHash 'SHA256'
+  cry.update uuid.v4(), "utf8"
+  cry.digest 'hex'
+
+console.time "arr"
+
+Promise.resolve()
+  .then ->
+    # Promise.all [0.75200000].map (i)->
+    Promise.all [0...1000000].map (i)->
+      new Promise (f,r)->
+        console.log i if i % 100000 == 0
+        console.timeEnd "arr" if i % 100000 == 0
+        f getHash()
+  .then (arr)->
+    # console.log arr
+    console.timeEnd "arr"
+    
+    console.log "kensaku str"
+    console.time "for"
+    for i in arr
+      if i == "nothing"
+        break
+    console.timeEnd "for"
+    
+    console.time "in"
+    if arr.indexOf("nothing") >= 0
+      console.log "find"
+    console.timeEnd "in"
+    
+    console.time "in2"
+    arr.indexOf("nothing")
+    console.timeEnd "in2"
+    
+    console.time "fi"
+    arr.find((i)->i=="nothing")?
+    console.timeEnd "fi"
+    
+    
+    l = require "lodash"
+    console.time "loin"
+    l.indexOf(arr, "nothing")
+    console.timeEnd "loin"
+    
+    console.time "lofi"
+    l.find(arr,(i)->i=="nothing")?
+    console.timeEnd "lofi"
+    
+    console.timeEnd "tmp"
+
+console.timeEnd "tmp"
+###
+
+
+
+
+
+###
+# いくつまでリストできるか。何秒かかるか。
+# lodashのindexOfの勝ち
+console.time "tmp"
+# 100000000はダメだった
+crypto = require("crypto")
+uuid = require("node-uuid")
+getHash = ->
+  cry = crypto.createHash 'SHA256'
+  cry.update uuid.v4(), "utf8"
+  cry.digest 'hex'
+
+console.time "arr"
+arr = []
+
+# [0...75200000].forEach ->
+#   arr.push getHash()
+
+for i in [0...10000000]
+  console.log i if i % 100000 == 0
+  console.timeEnd "arr"  if i % 100000 == 0
+  arr.push getHash()
+
+console.log arr.length
+console.timeEnd "arr"
+
+
+console.time "for"
+for i in arr
+  if i == "nothing"
+    break
+console.timeEnd "for"
+
+console.time "in"
+if arr.indexOf("nothing") >= 0
+  console.log "find"
+console.timeEnd "in"
+
+console.time "in2"
+arr.indexOf("nothing")
+console.timeEnd "in2"
+
+console.time "fi"
+arr.find((i)->i=="nothing")?
+console.timeEnd "fi"
+
+
+l = require "lodash"
+console.time "loin"
+l.indexOf(arr, "nothing")
+console.timeEnd "loin"
+
+console.time "lofi"
+l.find(arr,(i)->i=="nothing")?
+console.timeEnd "lofi"
+
+console.timeEnd "tmp"
+###
+
+
+###
+# 重複チェック for
+a=[]
+a.push "cc"
+a.push "bb"
+a.push "aa"
+console.log "start"
+for i in a
+  if i == "bb"
+    console.log "brea"
+    break
+  else
+    console.log "cont"
+
+console.log "end"
+###
+
+
+
+###
+# 重複チェック lodash
+l = require "lodash"
+a=[]
+a.push "aa"
+console.log l.indexOf(a, "aa")
+console.log l.indexOf(a, "bb")
+
+console.log l.find(a,(i)->i=="aa")?
+console.log l.find(a,(i)->i=="bb")?
+###
+
+
+
+###
+# 重複チェック find
+a=[]
+a.push "aa"
+
+console.log a.find((i)->i=="aa")?
+console.log a.find((i)->i=="bb")?
+###
+
+###
+# 重複チェック indexOf
+a=[]
+[0...3].forEach ->
+  if a.indexOf("aa") >= 0
+    console.log "t"
+  else
+    console.log "e"
+  a.push "aa"
+###
+
 
 ###
 # 全角スペースもいける
