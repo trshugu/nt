@@ -7,9 +7,36 @@ console.time "tmp"
 
 
 
-# dbsizeもためす
 
+
+###
+# sql文字列返す奴
+findNantoke2 = (moid)->
+  return """
+    noi 
+      soi
+      soid
+      moid = #{moid}
+  """
+
+findNantoke = (moid)->
+  s = ""
+  s += "noi "
+  s += "  soi"
+  s += "  soid"
+  s += "  moid = " + moid
+  return s
+
+# console.log findNantoke "momomo"
+console.log findNantoke2 "momomo"
+###
+
+
+
+
+###
 # redisを使ってチェック2
+# ローカルではもう限界
 crypto = require("crypto")
 uuid = require("node-uuid")
 getHash = ->
@@ -20,9 +47,31 @@ l = require "lodash"
 
 cluster = require "cluster"
 if cluster.isMaster
-  [0...3].forEach ->
-    cluster.fork()
-
+  [0...2].forEach ->
+    w = cluster.fork()
+    
+    w.on "message", (msg)->
+      process.exit()
+    
+    w.on "exit", (a)->
+      console.log "exitest", a
+  
+  # dbsizeもためす
+  i = 0
+  rc = require("co-redis")(require('redis').createClient())
+  fs = require("fs")
+  co = require("co")
+  setInterval ->
+    co ->
+      cnt = yield rc.dbsize()
+      i += 1
+      console.log i, cnt
+      fs.appendFile "redidb.csv", i + "," + cnt + "\r\n", (e)->
+        console.log e if e?
+  , 1000
+  
+  
+  
 else
   rc = require("co-redis")(require('redis').createClient())
   require("co") ->
@@ -30,7 +79,7 @@ else
     i = 0
     # while i < 14800000
     while i < 20000000
-      h = getHash().substr 0, 12
+      h = getHash().substr 0, 13
       
       console.log i if i % 100000 == 0
       console.timeEnd "arr" if i % 100000 == 0
@@ -38,6 +87,7 @@ else
       if yield rc.get h
         console.log i, "find"
         console.log yield rc.info "keyspace"
+        process.send "found"
         break
       
       yield rc.set h, i
@@ -47,6 +97,21 @@ else
     # yield rc.flushall()
     yield rc.quit()
     process.exit()
+###
+
+
+
+
+###
+# カリー化
+csum = (a)-> return (b) -> a + b
+
+# おおもと
+sum = (a,b)-> a + b
+
+console.log sum 2,3
+console.log csum(2)(3)
+###
 
 
 
