@@ -8,7 +8,7 @@ app.use require('koa-logger')()
 
 # route
 route = require('koa-route')
-render = require('co-views')(require("path").join(__dirname + '/views'), default: "jade")
+render = require('co-views')(require("path").join(__dirname + '/views'), default: "pug")
 require("./controllers/routes") app, route, render
 
 # Compress
