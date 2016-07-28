@@ -10,6 +10,21 @@ console.time "tmp"
 
 
 
+###
+# speakslackbot
+speakSlackBot = (msg)-> new Promise (f,r)->
+  req = require("https").request
+    host: "slack.com"
+    path: "/"
+    method: "POST"
+    , (res)->
+      res.on "data", (c)-> f c.toString()
+  
+  req.on "error", (e)-> r e
+  req.write msg
+  req.end()
+###
+
 
 ###
 # oxy
