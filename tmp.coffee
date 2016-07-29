@@ -8,7 +8,27 @@ console.time "tmp"
 
 
 
+###
+# sleepasync
+sleep = (ms)-> new Promise (f)-> setTimeout (-> f()), ms
 
+console.log "start"
+console.timeEnd "tmp"
+sleep(2000).then ->
+  console.log "end"
+  console.timeEnd "tmp"
+###
+
+###
+# sleep
+sleep = (ms)-> (done)-> setTimeout(done, ms)
+
+console.log "start"
+console.timeEnd "tmp"
+sleep(2000)  ->
+  console.log "end"
+  console.timeEnd "tmp"
+###
 
 ###
 # speakslackbot
