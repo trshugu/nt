@@ -8,6 +8,53 @@ console.time "tmp"
 
 
 
+
+
+###
+from = "201a0808103200"
+
+console.log "length", from.length
+fromYear = from[0..3]
+fromMonth = from[4..5]
+fromDay = from[6..7]
+fromHour = from[8..9]
+fromMinite = from[10..11]
+fromSecond = from[12..13]
+
+console.log fromYear
+# console.log isNaN(fromYear)
+console.log fromMonth
+console.log fromDay
+console.log fromHour
+console.log fromMinite
+console.log fromSecond
+###
+
+
+
+###
+options =
+  year: "2-digit"
+  month: "2-digit"
+  day: "2-digit"
+  hour: "2-digit"
+  minute: "2-digit"
+  second: "2-digit"
+  # timeZoneName: "short"
+
+
+msPerDay = 24 * 60 * 60 * 1000
+july172014 = new Date(msPerDay * (44 * 365 + 11 + 197))
+
+console.log "msPerDay",msPerDay
+console.log "july172014",july172014
+
+americanDateTime = new Intl.DateTimeFormat("en-US", options).format
+console.log "americanDateTime",americanDateTime()
+
+console.log americanDateTime(july172014)
+###
+
 ###
 # sleepasync
 sleep = (ms)-> new Promise (f)-> setTimeout (-> f()), ms
