@@ -10,6 +10,107 @@ console.time "tmp"
 
 
 
+
+
+
+
+###
+a = []
+# [0...1000000].forEach (i)->
+for i in [0...1000000]
+  # a.push i
+  a[i] = i
+
+console.timeEnd "tmp"
+###
+
+###
+console.time "fe"
+stm = require("through2")( (c,e,n)->
+    # console.log c
+    this.push c
+    n()
+  )
+
+
+ws = require('fs').createWriteStream "aaa.txt", "utf-8"
+
+ws.on "close", (d)->
+  console.log "endddd"
+  console.timeEnd "fe"
+
+stm.pipe(ws)
+
+
+j=""
+# [0...1000000].forEach (i)->
+for i in [0...10000000]
+  stm.write new Buffer i.toString()
+
+stm.end()
+console.timeEnd "fe"
+# console.log j
+###
+
+
+###
+console.time "fe"
+j=""
+# [0...1000000].forEach (i)->
+for i in [0...10000000]
+  j += i
+console.timeEnd "fe"
+# console.log j
+
+require('fs').writeFile 'death.txt', j, (err)->
+  throw err if(err)
+  console.timeEnd "fe"
+###
+
+###
+console.time "fe"
+j=0
+# [0...1000000].forEach (i)->
+for i in [0...100000000]
+  j += i
+console.timeEnd "fe"
+###
+
+
+###
+# coはPromiseの配列を渡すだけで並列に回る
+sleeper = (ms)->
+  new Promise (f)->
+    setTimeout (->
+      console.log ms, "::end::"
+      f()
+    ), ms
+
+co = require "co"
+
+co ->
+  console.log "1"
+  console.timeEnd "tmp"
+  yield sleeper(1000)
+  console.log "2"
+  console.timeEnd "tmp"
+  yield sleeper(1000)
+  console.log "3"
+  console.timeEnd "tmp"
+  yield [sleeper(1000),sleeper(1000),sleeper(1000)]
+  console.log "4"
+  console.timeEnd "tmp"
+  yield [sleeper(2000),sleeper(3000),sleeper(4000)]
+  console.log "5"
+  console.timeEnd "tmp"
+  yield sleeper(1000)
+  console.log "6"
+  console.timeEnd "tmp"
+###
+
+
+
+
 ###
 # naught
 process.on "msg", (m)->
