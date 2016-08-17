@@ -11,6 +11,16 @@ console.time "tmp"
 
 
 ###
+# naught
+process.on "msg", (m)->
+  console.log "kitayo", m
+
+process.emit "msg", "okuri"
+
+###
+
+
+###
 from = "201a0808103200"
 
 console.log "length", from.length
