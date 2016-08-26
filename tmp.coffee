@@ -6,12 +6,258 @@ console.time "tmp"
 
 
 
+###
+bunyan = require('bunyan')
+Elasticsearch = require('bunyan-elasticsearch')
+esStream = new Elasticsearch
+  indexPattern: '[logstash-]YYYY.MM.DD'
+  type: 'logs'
+  host: 'localhost:9200'
+
+esStream.on 'error', (err)-> console.log('Elasticsearch Stream Error:', err.stack)
+
+logger = bunyan.createLogger
+  name: "hellbunyan"
+  streams: [
+    {stream: process.stdout},
+    {stream: esStream}
+  ],
+  serializers: bunyan.stdSerializers
+
+
+logger.info "dea\nth"
+logger.error "hell"
+logger.fatal "hell"
+logger.info new Error("stta").stack
+logger.info new Error("stta").stack.replace(/\r|\n/g,"")
+
+# logger.info "ininininnnii"
+# logger.error "era-desu"
+###
+
+
+
+###
+# bunyan
+b = require "bunyan"
+l = b.createLogger name: "tmp"
+
+l.info "dea\nth"
+l.error "hell"
+l.fatal "hell"
+l.info new Error("stta").stack
+l.info new Error("stta").stack.replace(/\r|\n/g,"")
+
+# console.log "lolo"
+# console.error "errr"
+###
 
 
 
 
+###
+speakSlackBot = (msg)-> new Promise (f,r)->
+  require("request").post
+    uri: "slack.com"
+    body: msg
+    , (e,r,b)->
+      console.log b
+      f b
+
+speakSlackBot "localから"
+.then (v)-> console.log b
+###
 
 
+###
+require("request").post
+  uri: 'amazonaws.com/'
+  json:
+    title : "tukuru"
+    body  : "nari"
+    url   : "tongariiiii"
+, (e,r,b)->
+  console.log b
+###
+
+
+###
+# requestの場合
+require("request").post
+  uri: 'http://localhost:9200/test/entry'
+  json:
+    title : "taitoru"
+    body  : "nakami"
+    url   : "https://noinio.oijoij"
+, (e,r,b)->
+  console.log b
+###
+
+
+
+
+###
+require("request")
+  uri: 'http://localhost:9200/test/entry/_search'
+  json:
+    query:
+      text:
+        body: "naka"
+, (e,r,b)->
+  console.log b.error.failed_shards
+###
+
+
+
+###
+client = new require('elasticsearch').Client
+  host: 'localhost:9200'
+  log: 'trace'
+###
+
+###
+client.index
+  index: 'myindex'
+  type: 'newtype'
+  id: 3
+  body:
+    title: 'foo'
+.then (v)-> console.log "v",v
+###
+
+
+
+###
+# ng
+client.get 'myindex', 'newtype',
+  id: 3
+.then (v)-> console.log "v",v._source.title
+.catch (e)-> console.log "e",e
+###
+
+###
+client.get
+  index: 'myindex'
+  type: 'newtype'
+  id: 3
+.then (v)-> console.log "v",v._source.title
+###
+
+###
+client.cat.master()
+client.cat.nodes()
+client.cat.nodeattrs()
+###
+
+
+###
+client.cat.nodes
+  v: true
+.then (v)-> console.log "v",v
+.catch (e)-> console.log "e",e
+###
+
+###
+client.get
+  local: false
+  index: 'testindex'
+  type: 'newtype'
+  id: '1',
+.then (v)-> console.log "v",v
+.catch (e)-> console.log "e",e
+###
+
+
+
+
+###
+client.exists
+  index: 'testindex',
+  type: 'newtype',
+  id: '2',
+.then (v)-> console.log "v",v
+.catch (e)-> console.log "e",e
+###
+
+
+###
+client.create
+  index: 'testindex',
+  type: 'newtype',
+  id: '1',
+  body:
+    title: 'Test 1'
+    tags: ['y', 'z']
+    published: true
+    published_at: '2013-01-01'
+    counter: 1
+.then (v)-> console.log v
+.catch (e)-> console.log e
+###
+
+
+
+###
+client.bulk
+  body: [
+    index:
+      _index: 'myindex'
+      _type: 'mytype'
+      _id: 1
+    title: 'foo'
+    update:
+      _index: 'myindex'
+      _type: 'mytype'
+      _id: 2
+    doc:
+      title: 'foo'
+    delete:
+      _index: 'myindex'
+      _type: 'mytype'
+      _id: 3
+  ]
+.then (v)-> console.log v
+.catch (e)-> console.log e
+###
+
+
+###
+client.search
+  index: 'twitter'
+  type: 'tweets',
+  body:
+    query:
+      match:
+        body: 'elasticsearch'
+.then (resp) ->
+  hits = resp.hits.hits
+.catch (e)->
+  console.log e
+###
+
+###
+client.search
+  q: 'pants'
+.then  (body) ->
+  hits = body.hits.hits
+.catch (e)->
+  console.log e.message
+###
+
+
+###
+client.ping
+  # ping usually has a 3000ms timeout
+  requestTimeout: Infinity
+
+  # undocumented params are appended to the query string
+  hello: "elasticsearch!"
+  , (e) ->
+    if e
+      console.log 'elasticsearch cluster is down!', e
+    else
+    console.log 'All is well'
+###
 
 
 ###
