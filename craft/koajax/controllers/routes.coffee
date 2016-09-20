@@ -10,3 +10,6 @@ module.exports = (app, route, render)->
   app.use route.get '/spa', require('./spa')(render)
   app.use route.get '/spadata', require('./spadata')(render)
   
+  app.use route.get '/sub', require('./sub')(render)
+  app.use route.post '/sub', require('./sub')(render)
+  
