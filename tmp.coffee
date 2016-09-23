@@ -12,6 +12,9 @@ console.time "tmp"
 # 変更される値を保持。比較して変更を抽出
 # 保持した値に日付を持ち前回更新日としてタグ付けする
 # 同じものを抽出するもuri毎にによってロジックをcase分けできるようにする
+
+# 格納するデータは urihash, 更新日付, tagのロケート
+
 http = require "http"
 cheerio = require "cheerio"
 d = require("dirty")("d.log")
