@@ -6,6 +6,131 @@ console.time "tmp"
 
 
 
+
+# idなしなどのn番目の特定タグのテキストを取得
+# urlをハッシュ化してキーとする
+# 変更される値を保持。比較して変更を抽出
+# 保持した値に日付を持ち前回更新日としてタグ付けする
+# 同じものを抽出するもuri毎にによってロジックをcase分けできるようにする
+http = require "http"
+cheerio = require "cheerio"
+d = require("dirty")("d.log")
+
+getHash = (src)-> 
+  cry = require("crypto").createHash 'SHA256'
+  cry.update src, "utf8"
+  cry.digest 'hex'
+
+epoch2date = (d)->
+  # console.log d
+  d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2) + " " \
+   + ("0" + d.getHours()).slice(-2) + ":" \
+   + ("0" + d.getMinutes()).slice(-2)  + ":" \
+   + ("0" + d.getSeconds()).slice(-2)
+
+
+url = "http://localhost:3000"
+url_hash = getHash url
+
+http.get(url).on 'response',(res)->
+  res.setEncoding("utf8")
+  console.log res.statusCode
+  
+  buff = ""
+  res.on 'data', (d)->
+    buff += d
+  
+  res.on "end",->
+    scr = cheerio.load buff
+    
+    ###
+    console.log scr.html()
+    console.log scr("body").eq(0).text()
+    console.log scr("body").get()
+    console.log scr("body").get()[0].children[1].children[0].data
+    ###
+    
+    target = scr("body").get()[0].children[1].children[0].data
+    
+    if d.get(url_hash).value == target
+      console.log "同じだった"
+      
+    else
+      console.log "ちがった"
+      d.set url_hash,
+        value: target
+        update: new Date().getTime()
+    
+    
+    # console.log $("result").eq(0).text()
+    # console.log $("result").get().length
+    # console.log $("message").is("message")
+    # console.log $("tracks").find("result").text()
+    # console.log $("tracks").find("result").eq(0).text()
+    # console.log $("tracks").find("result").eq(1).text()
+    
+    ###
+    $("tracks").find("result").each (i,el)->
+      console.log $(this).text()
+      if $(this).text() is "success"
+        console.log $(this).parent().find("code").is("code")
+        console.log $(this).parent().find("message").is("message")
+        console.log $(this).parent().find("id").is("id")
+        console.log $(this).parent().find("undelivery").is("undelivery")
+        console.log $(this).parent().find("type").is("type")
+        console.log $(this).parent().find("title").is("title")
+        console.log $(this).parent().find("display_artist_name").is("display_artist_name")
+        console.log $(this).parent().find("recochoku_artist_name").is("recochoku_artist_name")
+        console.log $(this).parent().find("recochoku_artist_id").is("recochoku_artist_id")
+        console.log $(this).parent().find("exceptional_artist").is("exceptional_artist")
+        console.log $(this).parent().find("music_name").is("music_name")
+        console.log $(this).parent().find("mg_music_id").is("mg_music_id")
+        console.log $(this).parent().find("company_cd").is("company_cd")
+        console.log $(this).parent().find("company_name_short").is("company_name_short")
+        console.log $(this).parent().find("trial_public").is("trial_public")
+        console.log $(this).parent().find("md_artist_ids").is("md_artist_ids")
+        console.log $(this).parent().find("md_artist_id").is("md_artist_id")
+      else if $(this).text() is  "failure"
+        console.log $(this).parent().find("code").is("code")
+        console.log $(this).parent().find("message").is("message")
+        console.log $(this).parent().find("id").is("id")
+        console.log $(this).parent().find("undelivery").is("undelivery")
+        console.log $(this).parent().find("type").is("type")
+        console.log $(this).parent().find("title").is("title")
+        console.log $(this).parent().find("display_artist_name").is("display_artist_name")
+        console.log $(this).parent().find("recochoku_artist_name").is("recochoku_artist_name")
+        console.log $(this).parent().find("recochoku_artist_id").is("recochoku_artist_id")
+        console.log $(this).parent().find("exceptional_artist").is("exceptional_artist")
+        console.log $(this).parent().find("music_name").is("music_name")
+        console.log $(this).parent().find("mg_music_id").is("mg_music_id")
+        console.log $(this).parent().find("company_cd").is("company_cd")
+        console.log $(this).parent().find("company_name_short").is("company_name_short")
+        console.log $(this).parent().find("trial_public").is("trial_public")
+        console.log $(this).parent().find("md_artist_ids").is("md_artist_ids")
+        console.log $(this).parent().find("md_artist_id").is("md_artist_id")
+      else
+        throw "reigai"
+    ###
+
+
+    # viewにわたすもの
+    val = d.get(url_hash)
+    console.log "前回更新日", epoch2date(new Date(parseInt(val.update)))
+
+
+
+
+
+###
+# 通常のコンソール出力はパイプに渡すと表示されない
+console.log "logudesuyo"
+console.error "era-desuyos"
+###
+
+
+
 ###
 bunyan = require('bunyan')
 Elasticsearch = require('bunyan-elasticsearch')
