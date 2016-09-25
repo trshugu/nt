@@ -34,6 +34,33 @@ epoch2date = (d)->
    + ("0" + d.getSeconds()).slice(-2)
 
 
+url_hash = getHash url
+
+http.get(url).on 'response',(res)->
+  # res.setEncoding("utf8")
+  console.log res.statusCode
+  
+  buff = ""
+  res.on 'data', (d)->
+    buff += d
+  
+  res.on "end",->
+    scr = cheerio.load buff
+    
+    # console.log scr.html()
+    console.log scr("title").eq(0).text()
+    # console.log scr("th").eq(0).text()
+    require("fs").writeFileSync "dump_sjis.txt", scr("title").eq(0).text(), {encoding: "sjis"}
+    
+    # console.log scr("body").get()
+    # console.log scr("body").get()[0].children[1].children[0].data
+    
+    # target = scr("body").get()[0].children[1].children[0].data
+    
+
+
+
+###
 url = "http://localhost:3000"
 url_hash = getHash url
 
@@ -48,12 +75,10 @@ http.get(url).on 'response',(res)->
   res.on "end",->
     scr = cheerio.load buff
     
-    ###
     console.log scr.html()
     console.log scr("body").eq(0).text()
     console.log scr("body").get()
     console.log scr("body").get()[0].children[1].children[0].data
-    ###
     
     target = scr("body").get()[0].children[1].children[0].data
     
@@ -74,7 +99,6 @@ http.get(url).on 'response',(res)->
     # console.log $("tracks").find("result").eq(0).text()
     # console.log $("tracks").find("result").eq(1).text()
     
-    ###
     $("tracks").find("result").each (i,el)->
       console.log $(this).text()
       if $(this).text() is "success"
@@ -115,13 +139,13 @@ http.get(url).on 'response',(res)->
         console.log $(this).parent().find("md_artist_id").is("md_artist_id")
       else
         throw "reigai"
-    ###
 
 
     # viewにわたすもの
     val = d.get(url_hash)
     console.log "前回更新日", epoch2date(new Date(parseInt(val.update)))
 
+###
 
 
 
