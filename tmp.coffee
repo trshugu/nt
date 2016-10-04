@@ -6,7 +6,7 @@ console.time "tmp"
 
 
 
-
+###
 # idなしなどのn番目の特定タグのテキストを取得
 # urlをハッシュ化してキーとする
 # 変更される値を保持。比較して変更を抽出
@@ -57,7 +57,22 @@ http.get(url).on 'response',(res)->
     
     # target = scr("body").get()[0].children[1].children[0].data
     
+###
 
+
+
+
+###
+# string reverse
+rev01 = (s)->
+  rv = []
+  for i in[0..s.length]
+    rv[i] = s[s.length - i - 1]
+
+  return rv.join("")
+
+console.log rev01 "pj.oc.oohay@non-snemgnaras"
+###
 
 
 ###
