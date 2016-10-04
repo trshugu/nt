@@ -71,7 +71,7 @@ rev01 = (s)->
 
   return rv.join("")
 
-console.log rev01 "pj.oc.oohay@non-snemgnaras"
+console.log rev01 ""
 ###
 
 
