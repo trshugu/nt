@@ -59,6 +59,10 @@ http.get(url).on 'response',(res)->
     
 ###
 
+###
+# string reverse2
+console.log "abcd".split("").reverse().join("")
+###
 
 
 
