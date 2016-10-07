@@ -7,6 +7,153 @@ console.time "tmp"
 
 
 
+###
+# ファイル名文字列ぬきだす
+#  0123456789012345678901234567890
+# "/23/12323/1 2 323/file.jpaa"
+p = "/23/12323/1 2 323/file.jpaa"
+
+# 最後のスラッシュと最後のドットの位置を割り出しスライス
+console.log p.slice p.lastIndexOf("/")+1,p.lastIndexOf(".")
+###
+
+
+
+###
+# 2016 12 31 23 59 59 日付はこのようにわたってくる
+param = "20161232235959"
+
+# 文字列をSQL用に変換
+convertSqlDatetime = (queryDate)->
+  year = queryDate[0..3]
+  month = queryDate[4..5]
+  day = queryDate[6..7]
+  hour = queryDate[8..9]
+  minite = queryDate[10..11]
+  second = queryDate[12..13]
+  "#{year}-#{month}-#{day} #{hour}:#{minite}:#{second}"
+
+
+# エポック秒をAPI形式に変換
+epoch2apidate = (d)->
+  # console.log d
+  d.getFullYear() \
+   + ("0" + (d.getMonth() + 1)).slice(-2) \
+   + ("0" + d.getDate()).slice(-2) \
+   + ("0" + d.getHours()).slice(-2) \
+   + ("0" + d.getMinutes()).slice(-2) \
+   + ("0" + d.getSeconds()).slice(-2)
+
+# パース可能になる
+sql = convertSqlDatetime param
+console.log "sql:", sql
+console.log "date parse sql:", Date.parse sql
+
+# もとにもどす
+api1 = epoch2apidate new Date(Date.parse(sql))
+console.log "apipd:", api1
+
+api2 = epoch2apidate new Date(sql)
+console.log "api:", api2
+###
+
+
+###
+# 関数言語的なIF式
+a = 2
+ihu =
+  if a == 1
+    "truee"
+  else
+    "falseee"
+
+console.log ihu
+###
+
+
+###
+# 配列をsplitして空文字があるか判定する
+strArr = "asdfsa,a,asdffa,adf,asd,,fsda,asd,asdffe"
+arr = strArr.split ","
+
+console.log arr
+
+
+# 一部空？→true
+console.log arr.some (i)-> i == ""
+
+# 全部空？→false
+console.log arr.every (i)-> i == ""
+
+# 一部空でない？→true
+console.log arr.some (i)-> i != ""
+
+# 全部空でない？→false
+console.log arr.every (i)-> i != ""
+
+# 正常系
+strArr2 = "asdfsa,a,asdffa,adf,asd,fsda,asd,asdffe"
+arr2 = strArr2.split ","
+console.log arr2
+
+# 一部空？→false→○空があるかどうかチェック(採用)
+console.log arr2.some (i)-> i == ""
+
+# 全部空？→false→×これだとダメ。値があったらfalse
+console.log arr2.every (i)-> i == ""
+
+# 一部空でない？→true→×値が入っていたらtrueに
+console.log arr2.some (i)-> i != ""
+
+# 全部空でない？→true→○空がないかどうかチェック
+console.log arr2.every (i)-> i != ""
+###
+
+
+
+
+###
+createHash = (src) ->
+  md5 =  require("crypto").createHash 'SHA256'
+  md5.update src, 'utf8'
+  # md5.digest('hex').substr(5,5).toUpperCase()
+  md5.digest('hex').toUpperCase()
+
+
+h = createHash "aaa"
+
+console.log new Buffer(h, "hex")
+console.log h
+console.log "length", h.length
+console.log h.substr(5,5)
+console.log h[6]
+console.log h[8]
+console.log h[0]
+console.log h[63]
+
+hash = ""
+
+b = new Buffer(h, "hex")
+b.forEach (i)->
+  hash += i.toString(16)
+console.log hash
+###
+
+
+###
+i = 64
+j = 0
+for i in [63..0].filter((j)->j%2==0)
+  # console.log i
+  console.log h[i]
+  if h[i] == "0"
+    console.log i,"ばんめゼロです"
+    h = h
+###
+
+
+###
+
 # idなしなどのn番目の特定タグのテキストを取得
 # urlをハッシュ化してキーとする
 # 変更される値を保持。比較して変更を抽出
@@ -58,7 +205,7 @@ http.get(url).on 'response',(res)->
     # target = scr("body").get()[0].children[1].children[0].data
     
 
-
+###
 
 ###
 url = "http://localhost:3000"
