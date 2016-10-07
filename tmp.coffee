@@ -6,6 +6,50 @@ console.time "tmp"
 
 
 
+
+###
+# cron
+cj = require("cron").CronJob
+
+new cj
+  cronTime: "* * * * *"
+  onTick: ->
+    console.log "tiiiick", new Date()
+  start: true
+  timeZone: "Asia/Tokyo"
+
+new cj
+  cronTime: "* * * * *"
+  onTick: ->
+    console.log "tznasi", new Date()
+  start: true
+
+new cj
+  cronTime: "* * * * *"
+  onTick: ->
+    console.log "suta--tonasi"
+
+# new require("cron").CronJob({cronTime: "* * * * *", start: true, onTick: (-> console.log("riki"))})
+
+# new cron({cronTime: "* * * * *", start: true, onTick: (-> console.log("jitu"))})
+###
+
+
+###
+# botkit
+botkit = require("botkit").slackbot()
+bot = botkit.spawn(token:"ng").startRTM (e,b,p)->
+  if e?
+    console.log "eee",e
+
+
+botkit.hears ["testreq"], ["direct_message","direct_mention","mention"], (bot,message) ->
+  bot.reply(message, 'testres')
+###
+
+
+
+
 ###
 # ファイル名文字列ぬきだす
 #  0123456789012345678901234567890
