@@ -7,6 +7,44 @@ console.time "tmp"
 
 
 
+pg = require "pg"
+
+createClient = -> new Promise (f,r)->
+  cli = new pg.Client "postgres://localhost/postgres"
+  
+  cli.connect (e)->
+    if e?
+      console.log "createClient", e
+      r e
+    else
+      f cli
+
+query = (sql)-> new Promise (f,r)->
+  createClient()
+  .then (cli)->
+    cli.query sql, (e,res)->
+      if e?
+        console.log "query", e
+        r e
+      else
+        cli.end (e)->
+          if e?
+            console.log "query:end", e
+        
+        f res.rows
+  .catch (e)->
+    r e
+
+query """
+  SELECT NOW() AS "theTime"
+"""
+.then (v)->
+  console.log v[0].theTime
+.catch (e)->
+  console.error 'error running query'
+
+
+
 ###
 # cron
 cj = require("cron").CronJob
