@@ -7,6 +7,8 @@ console.time "tmp"
 
 
 
+
+###
 pg = require "pg"
 
 createClient = -> new Promise (f,r)->
@@ -42,7 +44,7 @@ query """
   console.log v[0].theTime
 .catch (e)->
   console.error 'error running query'
-
+###
 
 
 ###
