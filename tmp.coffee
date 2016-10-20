@@ -6,6 +6,48 @@ console.time "tmp"
 
 
 
+###
+# i = 100000000000000000
+# i = 8639977849199000
+# i = 8639977849099000
+# i = 8639997849199000
+i = 8639999999699000
+while true
+  console.log "dat", i, Date.parse(new Date(i))
+  # console.log typeof Date.parse(i)
+  if isNaN(Date.parse(new Date(i)))
+    break
+  
+  i++
+
+console.log i
+###
+
+
+
+
+
+
+###
+# node-canvas
+Canvas = require "canvas"
+i = Canvas.Image
+c = new Canvas(200,200)
+ctx = c.getContext('2d')
+
+ctx.font = '30px Impact'
+ctx.rotate(.1)
+ctx.fillText("Awesome!", 50, 100)
+
+te = ctx.measureText('Awesome!')
+ctx.strokeStyle = 'rgba(0,0,0,0.5)'
+ctx.beginPath()
+ctx.lineTo(50, 102)
+ctx.lineTo(50 + te.width, 102)
+ctx.stroke()
+
+console.log c.toDataURL()
+###
 
 
 ###
