@@ -7,6 +7,125 @@ console.time "tmp"
 
 
 ###
+ws = require "webshot"
+ws "google.com", "g.png", (e)->
+  if e?
+    console.log "e",e
+###
+
+
+
+###
+xml2js = require "xml2js"
+
+xml = """
+"""
+
+ps = xml2js.parseString
+ps xml, (e,d)->
+  console.log d.entry.content[0].$.src
+  console.log d.entry.content[0].$.thumbnail
+###
+
+
+
+
+###
+text = """
+ichitanokuta  
+nisannmyaku
+sansannogai
+shi
+go
+"""
+console.log text.split("\n")[0].trim()
+console.log text.split("\n")[1..2]
+console.log text.split("\n")[1...2]
+# console.log text.split("\n")[1..].join("\n")
+###
+
+
+
+###
+# atompub
+rtend = ""
+username = ""
+password = ""
+
+wsse = require 'wsse'
+xml2js = require 'xml2js'
+
+token = new wsse.UsernameToken "username":username, "password": password
+header =
+  'Authorization': 'WSSE profile="UsernameToken"'
+  'X-WSSE': token.getWSSEHeader(nonceBase64: true)
+  "Content-Type": "image/jpeg"
+
+
+
+require("request").post
+  uri: rtend + "/image"
+  body: new Buffer("00")
+  headers: header
+  , (e,r,b)->
+    if e?
+      console.log "e:",e
+    else
+      console.log "b:",b
+###
+
+
+
+
+
+
+
+
+###
+'X-WSSE': 'UsernameToken ' \
+  + 'Username="' + token.getUsername() + '", ' \
+  + 'PasswordDigest="' + token.getPasswordDigest() + '", ' \
+  + 'Nonce="' + token.getNonceBase64() + '", ' \  
+  + 'Created="' + token.getCreated() + '"'
+###
+
+
+
+
+
+
+
+###
+
+
+# console.log header
+# console.log token.getWSSEHeader(nonceBase64: true)
+
+param = {}
+param.title = "test"
+param.content = "ctest"
+param.updated = new Date()
+
+builder = new xml2js.Builder(rootName : "entry")
+xml = builder.buildObject param
+console.log xml
+
+require("request").post
+  uri: rtend + "/article"
+  body: xml
+  headers: header
+  , (e,r,b)->
+    if e?
+      console.log "e:",e
+    else
+      console.log "b:",b
+###
+
+
+
+
+
+###
 # i = 100000000000000000
 # i = 8639977849199000
 # i = 8639977849099000
@@ -48,6 +167,8 @@ ctx.stroke()
 
 console.log c.toDataURL()
 ###
+
+
 
 
 ###
