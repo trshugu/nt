@@ -6,11 +6,112 @@ console.time "tmp"
 
 
 
+
 ###
 ws = require "webshot"
-ws "google.com", "g.png", (e)->
-  if e?
-    console.log "e",e
+
+hardcopy = (url, name, option)-> new Promise (f,r)->
+  # ws url, name + ".png", siteType:'html', (e)->
+  ws url, name + ".png", option, (e)->
+    if e?
+      console.log "e",e
+      e r
+    else 
+     f "done"
+
+hardcopy "http://localhost:3000/spa", "spa", 
+  screenSize: { width: 320, height: 480}
+  shotSize: { width: 320, height: 'all'}
+  defaultWhiteBackground: true
+  renderDelay: 7000
+  onLoadFinished: -> console.log "finnn"
+.then (v)-> console.log "v:",v
+.catch (e)-> console.log "e:",e
+###
+
+
+###
+# なぜか画像サイズが小さい
+rs = ws "http://localhost:3000/spa"
+file = require("fs").createWriteStream 'spaspa.png', encoding: 'binary'
+rs.on 'data', (data)-> file.write(data.toString('binary'), 'binary')
+###
+
+###
+hardcopy "http://localhost:3000/spa", "spa"
+.then (v)-> console.log "v:",v
+.catch (e)-> console.log "e:",e
+###
+
+###
+hardcopy "google.com", "test"
+.then (v)-> console.log "v:",v
+.catch (e)-> console.log "e:",e
+###
+
+###
+html = "<html><body>Hell World</body></html>"
+hardcopy html, "html"
+.then (v)-> console.log "v:",v
+.catch (e)-> console.log "e:"
+###
+
+
+###
+fs = require "fs"
+
+kakikomi = (msg)-> new Promise (f, r)->
+  fs.appendFile "xidy.csv", msg, (e)->
+    if e?
+      console.log e
+      r e
+    else
+      f()
+
+require("co") ->
+  yield kakikomi "件数" + "," + "バイト" + "," + "CU" + "\r\n"
+  yield kakikomi "untarakanntara" + "\r\n"
+  yield kakikomi "untarakanntara" + "\r\n"
+  yield kakikomi "untarakanntara" + "\r\n"
+  yield kakikomi "untarakanntara" + "\r\n"
+###
+
+
+###
+# async NG
+Main = async ->
+  console.log("a");
+  await new Promise (resolve)=> setTimeout(resolve,2000)
+  console.log("b");
+  await new Promise (resolve)=> setTimeout(resolve,1000)
+  console.log("c");
+
+Main()
+###
+
+
+###
+# async(koa内部でも使えそう)
+Main = (g)->
+  p = g.next()
+  return if(p.done)
+  p.value.then =>
+    Main(g)
+
+Gen = ->
+  console.log "a"
+  
+  yield new Promise (resolve)=>
+    setTimeout(resolve,2000)
+  
+  console.log "b"
+  
+  yield new Promise (resolve)=>
+    setTimeout(resolve,1000)
+     
+  console.log "c"
+
+Main Gen()
 ###
 
 
