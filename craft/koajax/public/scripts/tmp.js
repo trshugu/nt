@@ -2,12 +2,14 @@
   console.time("tmp");
 
   document.addEventListener('DOMContentLoaded', function() {
-    var createComp, fetchData;
+    var createComp, di, fetchData;
     console.log("done");
-    document.querySelector("#tmp").style.color = "#f00";
+    window.setTimeout(function() {
+      return document.querySelector("#tmp").style.color = "#ff0";
+    }, 2000);
     fetchData = function(url) {
       return new Promise(function(f) {
-        return fetch(url).then(function(d) {
+        return window.fetch(url).then(function(d) {
           return d.text();
         }).then(function(d) {
           return f(JSON.parse(d).data);
@@ -23,18 +25,14 @@
         return f(div);
       });
     };
-    return Promise.resolve(1).then(function() {
-      var di;
-      di = document.createElement("div");
-      di.textContent = "loadddd";
-      return document.querySelector("#fet").appendChild(di);
-    }).then(function() {
-      return fetchData("http://localhost:3000/spadata");
-    }).then(function(d) {
-      return createComp(d);
-    }).then(function(v) {
-      document.querySelector("#fet").removeChild(document.querySelector("#fet").childNodes.item(0));
-      return document.querySelector("#fet").appendChild(v);
+    di = document.createElement("div");
+    di.textContent = "loadddd";
+    document.querySelector("#fet").appendChild(di);
+    return fetchData("http://localhost:3000/spadata").then(function(d) {
+      return createComp(d).then(function(v) {
+        document.querySelector("#fet").removeChild(document.querySelector("#fet").childNodes.item(0));
+        return document.querySelector("#fet").appendChild(v);
+      });
     });
 
     /*

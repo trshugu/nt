@@ -2,12 +2,13 @@ console.time "tmp"
 document.addEventListener 'DOMContentLoaded', ->
   console.log "done"
   # $("#tmp").css "color", "#f00"
-  document.querySelector("#tmp").style.color = "#f00"
-  
+  window.setTimeout ->
+    document.querySelector("#tmp").style.color = "#ff0"
+  , 2000
   
   
   fetchData = (url)-> new Promise (f)->
-    fetch url
+    window.fetch url
       .then (d)-> d.text()
       .then (d)-> f JSON.parse(d).data
   
@@ -17,15 +18,12 @@ document.addEventListener 'DOMContentLoaded', ->
     div.classList.add "kla"
     f div
   
-  Promise.resolve(1)
-    .then ->
-      di = document.createElement("div")
-      di.textContent = "loadddd"
-      document.querySelector("#fet").appendChild di
-    .then ->
-      fetchData "http://localhost:3000/spadata"
-    .then (d)->
-      createComp d
+  di = document.createElement("div")
+  di.textContent = "loadddd"
+  document.querySelector("#fet").appendChild di
+  fetchData "http://localhost:3000/spadata"
+  .then (d)->
+    createComp d
     .then (v)->
       document.querySelector("#fet").removeChild document.querySelector("#fet").childNodes.item(0)
       document.querySelector("#fet").appendChild v

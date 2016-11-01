@@ -7,6 +7,191 @@ console.time "tmp"
 
 
 
+
+
+
+###
+# spooky2
+Spooky = require('spooky')
+
+spooky = new Spooky
+  child:
+    transport: 'http'
+    command: "./node_modules/casperjs/bin/casperjs"
+  , (e)->
+    if e?
+      console.log "e:",e
+    else
+      console.log "dooo"    
+      spooky.start 'https://qiita.com/', ->
+        console.log "done"
+      
+      console.log "doooo2"
+      spooky.then ->
+        console.log "done"
+        # @emit 'p', @getTitle()
+      
+      console.log "d00003"
+      spooky.run()
+
+spooky.on 'p', (msg)-> console.log msg
+spooky.on 'error', (msg)-> console.log msg
+###
+
+###
+# casper
+Spooky = require('spooky')
+
+spooky = new Spooky
+  child:
+    command: "./node_modules/casperjs/bin/casperjs"
+    transport: 'http'
+  casper:
+    logLevel: 'error'
+    verbose: true
+    waitTimeout : 3000
+  , (e)->
+    if e?
+      console.log "e:", e
+    
+    spooky.userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36 ')
+    spooky.start "http://www.yahoo.co.jp", ->
+      this.evaluate (searchTxt)->
+        document.querySelector('#srchtxt').value = searchTxt
+        document.querySelector("#srchbtn").click()
+      , "cspark"
+    
+    spooky.on 'complete', (a,b)->
+      console.log a,b
+    
+    spooky.on 'error', (a,b)->
+      console.log "error:", a,b
+    
+    
+    spooky.then ->
+      text = this.evaluate ->
+        return __utils__.getElementByXPath('//*[@id="WS2m"]/div[1]/div[1]/h3/a').innerHTML
+      
+      this.emit('complete',text)
+    
+    spooky.run()
+###
+
+
+
+
+###
+ws = require "webshot"
+
+# console.log require("phantomjs").path
+ws 'http://localhost:3000/spa', 'lh.png',
+  windowSize: {width : 200 , height: 100}
+  # phantomPath: require("phantomjs").path
+  # phantomPath: "C:\gh\nt\node_modules\phantomjs\lib\phantom\bin\phantomjs.exe"
+  # phantomPath: "C:\Program Files\phantomjs-2.1.1-windows\bin\phantomjs.exe"
+  defaultWhiteBackground: true
+  # renderDelay: 10000
+  , (e)->
+    if e?
+      console.log "e:", e
+    else
+      console.log "done"
+###
+
+
+
+###
+# phatntom 3
+phantom= require 'phantom'
+
+ph = null
+page = null
+phantom.create()
+  .then (i)->
+    ph = i
+    ph.outputEncoding = 'utf8' 
+    i.createPage()
+  .then (p)-> 
+    page = p
+    page.viewportSize = {width : 200 , height: 100}
+    page.clipRect = {
+      left: 456,
+      top: 123,
+      width : 201,
+      height: 101}
+    page.open 'http://localhost:3000/spa'
+    # page.open 'http://github.com/'
+  .then (s)->
+    console.log s
+    setTimeout ->
+      page.render("gc01.png")
+      ph.exit()
+    , 5000
+  .catch (e)->
+    console.log "e:", e
+    ph.exit()
+###
+
+
+
+
+###
+# phatntom 2
+phantom= require 'phantom'
+
+ph = null
+page = null
+phantom.create()
+  .then (i)->
+    ph = i
+    i.createPage()
+  .then (p)-> 
+    page = p
+    page.viewportSize = width : 200 , height: 100
+    page.open 'http://github.com/'
+  .then (s)->
+    console.log s
+    page.render("gp3.png", width : 200 , height: 100)
+    ph.exit()
+  .catch (e)->
+    console.log "e:", e
+    ph.exit()
+###
+
+
+###
+# phatntom 1
+phantom= require 'phantom'
+
+ph = null
+page = null
+phantom.create()
+  .then (i)->
+    ph = i
+    i.createPage()
+  .then (p)-> 
+    page = p
+    p.open 'http://github.com/'
+  .then (s)->
+    if s == "success"
+      console.log "done"
+      page.render("gp.png")
+    else
+      throw new Error("error")
+    ph.exit()
+  .catch (e)->
+    console.log "e:", e
+    ph.exit()
+###
+
+###
+require('webpage') 'http://github.com/', (a,b)->
+  console.log a,b
+  # page.render('github.png')
+  # phantomjs.exit();
+###
+
+
 ###
 ws = require "webshot"
 
@@ -15,7 +200,7 @@ hardcopy = (url, name, option)-> new Promise (f,r)->
   ws url, name + ".png", option, (e)->
     if e?
       console.log "e",e
-      e r
+      r e
     else 
      f "done"
 
