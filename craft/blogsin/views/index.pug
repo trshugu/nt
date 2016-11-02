@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    meta(name="robots" content="noindex")
+    meta(name="robots" content="nofollow")
+    meta(name="robots" content="noarchive")
+    
+    link(rel="stylesheet" href="styles/tmp.css")
+    
+    style(type="text/css")
+    script(type="text/coffeescript")
+    
+  body
+    form(action='/' method='POST' enctype="multipart/form-data")
+      .form
+        textarea(name="desc" rows="2" cols="40")
+      .file
+        input(type="file" name="im")
+      .button
+        input(type="submit" value="sub")

@@ -1,2 +1,2 @@
 @echo off
-"C:\Program Files\redis\redis-server.exe" "C:\Program Files\redis\redis.windows.conf"
+"C:\Program Files\Redis\redis-server.exe" "C:\Program Files\Redis\redis.windows.conf"

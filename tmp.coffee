@@ -12,6 +12,530 @@ i = c.Image
 
 
 
+
+###
+# node-yaml
+yaml = require 'node-yaml'
+
+yaml.read './tmp.yml',
+  encoding: 'utf8'
+  schema: yaml.schema.defaultSafe,
+  (err, data) ->
+    if err
+      throw err
+    console.log data
+
+
+yaml.readPromise './tmp.yml'
+.then (data)->
+  console.log data
+  # yaml.write './ny2.yaml', data, 'utf8', (err) -> throw err if err
+  yaml.writePromise './ny3.yaml', data
+  .then ->
+    console.log "done"
+  .catch (e)->
+    console.log "e1:",e
+.catch (e)->
+  console.log "e2:",e
+
+
+data =
+  "root":
+    "foo": "foo"
+    "bar": "bar"
+
+yaml.write './ny.yaml', data, 'utf8', (err) -> throw err if err
+
+console.log "kiteru"
+data = """
+  foo: foo
+  bar: bar
+"""
+
+console.log yaml.parse(data).foo
+
+datam =
+  root:
+    foo: "foo"
+    bar: "bar"
+
+console.log yaml.dump datam
+###
+
+
+
+###
+# yamljs
+Yaml = require("yamljs")
+
+console.log Yaml.parseFile("./tmp.yml")
+console.log Yaml.parse require("fs").readFileSync("./tmp.yml").toString()
+
+require("fs").readFile "./tmp.yml", (e,d)->
+  # console.log d.toString()
+  y = Yaml.parse d.toString()
+  console.log y
+  console.log Yaml.stringify(y, 4)
+  require("fs").writeFileSync "./test.yml", Yaml.stringify(y, 4)
+
+Yaml.load "./tmp.yml", (res)->
+  console.log res
+
+###
+
+
+
+
+
+
+
+###
+# spooky2
+Spooky = require('spooky')
+
+spooky = new Spooky
+  child:
+    transport: 'http'
+    command: "./node_modules/casperjs/bin/casperjs"
+  , (e)->
+    if e?
+      console.log "e:",e
+    else
+      console.log "dooo"    
+      spooky.start 'https://qiita.com/', ->
+        console.log "done"
+      
+      console.log "doooo2"
+      spooky.then ->
+        console.log "done"
+        # @emit 'p', @getTitle()
+      
+      console.log "d00003"
+      spooky.run()
+
+spooky.on 'p', (msg)-> console.log msg
+spooky.on 'error', (msg)-> console.log msg
+###
+
+###
+# casper
+Spooky = require('spooky')
+
+spooky = new Spooky
+  child:
+    command: "./node_modules/casperjs/bin/casperjs"
+    transport: 'http'
+  casper:
+    logLevel: 'error'
+    verbose: true
+    waitTimeout : 3000
+  , (e)->
+    if e?
+      console.log "e:", e
+    
+    spooky.userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36 ')
+    spooky.start "http://www.yahoo.co.jp", ->
+      this.evaluate (searchTxt)->
+        document.querySelector('#srchtxt').value = searchTxt
+        document.querySelector("#srchbtn").click()
+      , "cspark"
+    
+    spooky.on 'complete', (a,b)->
+      console.log a,b
+    
+    spooky.on 'error', (a,b)->
+      console.log "error:", a,b
+    
+    
+    spooky.then ->
+      text = this.evaluate ->
+        return __utils__.getElementByXPath('//*[@id="WS2m"]/div[1]/div[1]/h3/a').innerHTML
+      
+      this.emit('complete',text)
+    
+    spooky.run()
+###
+
+
+
+
+###
+ws = require "webshot"
+
+# console.log require("phantomjs").path
+ws 'http://localhost:3000/spa', 'lh.png',
+  windowSize: {width : 200 , height: 100}
+  # phantomPath: require("phantomjs").path
+  # phantomPath: "C:\gh\nt\node_modules\phantomjs\lib\phantom\bin\phantomjs.exe"
+  # phantomPath: "C:\Program Files\phantomjs-2.1.1-windows\bin\phantomjs.exe"
+  defaultWhiteBackground: true
+  # renderDelay: 10000
+  , (e)->
+    if e?
+      console.log "e:", e
+    else
+      console.log "done"
+###
+
+
+
+###
+# phatntom 3
+phantom= require 'phantom'
+
+ph = null
+page = null
+phantom.create()
+  .then (i)->
+    ph = i
+    ph.outputEncoding = 'utf8' 
+    i.createPage()
+  .then (p)-> 
+    page = p
+    page.viewportSize = {width : 200 , height: 100}
+    page.clipRect = {
+      left: 456,
+      top: 123,
+      width : 201,
+      height: 101}
+    page.open 'http://localhost:3000/spa'
+    # page.open 'http://github.com/'
+  .then (s)->
+    console.log s
+    setTimeout ->
+      page.render("gc01.png")
+      ph.exit()
+    , 5000
+  .catch (e)->
+    console.log "e:", e
+    ph.exit()
+###
+
+
+
+
+###
+# phatntom 2
+phantom= require 'phantom'
+
+ph = null
+page = null
+phantom.create()
+  .then (i)->
+    ph = i
+    i.createPage()
+  .then (p)-> 
+    page = p
+    page.viewportSize = width : 200 , height: 100
+    page.open 'http://github.com/'
+  .then (s)->
+    console.log s
+    page.render("gp3.png", width : 200 , height: 100)
+    ph.exit()
+  .catch (e)->
+    console.log "e:", e
+    ph.exit()
+###
+
+
+###
+# phatntom 1
+phantom= require 'phantom'
+
+ph = null
+page = null
+phantom.create()
+  .then (i)->
+    ph = i
+    i.createPage()
+  .then (p)-> 
+    page = p
+    p.open 'http://github.com/'
+  .then (s)->
+    if s == "success"
+      console.log "done"
+      page.render("gp.png")
+    else
+      throw new Error("error")
+    ph.exit()
+  .catch (e)->
+    console.log "e:", e
+    ph.exit()
+###
+
+###
+require('webpage') 'http://github.com/', (a,b)->
+  console.log a,b
+  # page.render('github.png')
+  # phantomjs.exit();
+###
+
+
+###
+ws = require "webshot"
+
+hardcopy = (url, name, option)-> new Promise (f,r)->
+  # ws url, name + ".png", siteType:'html', (e)->
+  ws url, name + ".png", option, (e)->
+    if e?
+      console.log "e",e
+      r e
+    else 
+     f "done"
+
+hardcopy "http://localhost:3000/spa", "spa", 
+  screenSize: { width: 320, height: 480}
+  shotSize: { width: 320, height: 'all'}
+  defaultWhiteBackground: true
+  renderDelay: 7000
+  onLoadFinished: -> console.log "finnn"
+.then (v)-> console.log "v:",v
+.catch (e)-> console.log "e:",e
+###
+
+
+###
+# なぜか画像サイズが小さい
+rs = ws "http://localhost:3000/spa"
+file = require("fs").createWriteStream 'spaspa.png', encoding: 'binary'
+rs.on 'data', (data)-> file.write(data.toString('binary'), 'binary')
+###
+
+###
+hardcopy "http://localhost:3000/spa", "spa"
+.then (v)-> console.log "v:",v
+.catch (e)-> console.log "e:",e
+###
+
+###
+hardcopy "google.com", "test"
+.then (v)-> console.log "v:",v
+.catch (e)-> console.log "e:",e
+###
+
+###
+html = "<html><body>Hell World</body></html>"
+hardcopy html, "html"
+.then (v)-> console.log "v:",v
+.catch (e)-> console.log "e:"
+###
+
+
+###
+fs = require "fs"
+
+kakikomi = (msg)-> new Promise (f, r)->
+  fs.appendFile "xidy.csv", msg, (e)->
+    if e?
+      console.log e
+      r e
+    else
+      f()
+
+require("co") ->
+  yield kakikomi "件数" + "," + "バイト" + "," + "CU" + "\r\n"
+  yield kakikomi "untarakanntara" + "\r\n"
+  yield kakikomi "untarakanntara" + "\r\n"
+  yield kakikomi "untarakanntara" + "\r\n"
+  yield kakikomi "untarakanntara" + "\r\n"
+###
+
+
+###
+# async NG
+Main = async ->
+  console.log("a");
+  await new Promise (resolve)=> setTimeout(resolve,2000)
+  console.log("b");
+  await new Promise (resolve)=> setTimeout(resolve,1000)
+  console.log("c");
+
+Main()
+###
+
+
+###
+# async(koa内部でも使えそう)
+Main = (g)->
+  p = g.next()
+  return if(p.done)
+  p.value.then =>
+    Main(g)
+
+Gen = ->
+  console.log "a"
+  
+  yield new Promise (resolve)=>
+    setTimeout(resolve,2000)
+  
+  console.log "b"
+  
+  yield new Promise (resolve)=>
+    setTimeout(resolve,1000)
+     
+  console.log "c"
+
+Main Gen()
+###
+
+
+
+###
+xml2js = require "xml2js"
+
+xml = """
+"""
+
+ps = xml2js.parseString
+ps xml, (e,d)->
+  console.log d.entry.content[0].$.src
+  console.log d.entry.content[0].$.thumbnail
+###
+
+
+
+
+###
+text = """
+ichitanokuta  
+nisannmyaku
+sansannogai
+shi
+go
+"""
+console.log text.split("\n")[0].trim()
+console.log text.split("\n")[1..2]
+console.log text.split("\n")[1...2]
+# console.log text.split("\n")[1..].join("\n")
+###
+
+
+
+###
+# atompub
+rtend = ""
+username = ""
+password = ""
+
+wsse = require 'wsse'
+xml2js = require 'xml2js'
+
+token = new wsse.UsernameToken "username":username, "password": password
+header =
+  'Authorization': 'WSSE profile="UsernameToken"'
+  'X-WSSE': token.getWSSEHeader(nonceBase64: true)
+  "Content-Type": "image/jpeg"
+
+
+
+require("request").post
+  uri: rtend + "/image"
+  body: new Buffer("00")
+  headers: header
+  , (e,r,b)->
+    if e?
+      console.log "e:",e
+    else
+      console.log "b:",b
+###
+
+
+
+
+
+
+
+
+###
+'X-WSSE': 'UsernameToken ' \
+  + 'Username="' + token.getUsername() + '", ' \
+  + 'PasswordDigest="' + token.getPasswordDigest() + '", ' \
+  + 'Nonce="' + token.getNonceBase64() + '", ' \  
+  + 'Created="' + token.getCreated() + '"'
+###
+
+
+
+
+
+
+
+###
+
+
+# console.log header
+# console.log token.getWSSEHeader(nonceBase64: true)
+
+param = {}
+param.title = "test"
+param.content = "ctest"
+param.updated = new Date()
+
+builder = new xml2js.Builder(rootName : "entry")
+xml = builder.buildObject param
+console.log xml
+
+require("request").post
+  uri: rtend + "/article"
+  body: xml
+  headers: header
+  , (e,r,b)->
+    if e?
+      console.log "e:",e
+    else
+      console.log "b:",b
+###
+
+
+
+
+
+###
+# i = 100000000000000000
+# i = 8639977849199000
+# i = 8639977849099000
+# i = 8639997849199000
+i = 8639999999699000
+while true
+  console.log "dat", i, Date.parse(new Date(i))
+  # console.log typeof Date.parse(i)
+  if isNaN(Date.parse(new Date(i)))
+    break
+  
+  i++
+
+console.log i
+###
+
+
+
+
+
+
+###
+# node-canvas
+Canvas = require "canvas"
+i = Canvas.Image
+c = new Canvas(200,200)
+ctx = c.getContext('2d')
+
+ctx.font = '30px Impact'
+ctx.rotate(.1)
+ctx.fillText("Awesome!", 50, 100)
+
+te = ctx.measureText('Awesome!')
+ctx.strokeStyle = 'rgba(0,0,0,0.5)'
+ctx.beginPath()
+ctx.lineTo(50, 102)
+ctx.lineTo(50 + te.width, 102)
+ctx.stroke()
+
+console.log c.toDataURL()
+###
+
+
+
+
 ###
 pg = require "pg"
 
@@ -49,7 +573,6 @@ query """
 .catch (e)->
   console.error 'error running query'
 ###
-
 
 
 ###

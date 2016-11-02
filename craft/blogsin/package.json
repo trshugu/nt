@@ -1,0 +1,37 @@
+{
+  "name": "koagen",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "coffee --nodejs --harmony app.coffee",
+    "test": "mocha --harmony"
+  },
+  "dependencies": {
+    "co-body": "*",
+    "co-views": "*",
+    "coffee-script": "*",
+    "koa": "*",
+    "koa-coffee-script": "*",
+    "koa-compress": "*",
+    "koa-logger": "*",
+    "koa-multer": "^0.0.2",
+    "koa-route": "*",
+    "koa-static": "*",
+    "koa-stylus": "*",
+    "pug": "^2.0.0-beta4",
+    "wsse": "^2.3.0",
+    "xml2js": "^0.4.17"
+  },
+  "devDependencies": {
+    "coffee-script": "*",
+    "gulp": "*",
+    "gulp-coffee": "*",
+    "gulp-livereload": "*",
+    "gulp-plumber": "*",
+    "gulp-pug": "^3.0.3",
+    "gulp-stylus": "*",
+    "koa-static-cache": "^3.1.7",
+    "mocha": "*",
+    "supertest": "*"
+  }
+}
