@@ -10,6 +10,83 @@ console.time "tmp"
 
 
 
+
+###
+# node-yaml
+yaml = require 'node-yaml'
+
+yaml.read './tmp.yml',
+  encoding: 'utf8'
+  schema: yaml.schema.defaultSafe,
+  (err, data) ->
+    if err
+      throw err
+    console.log data
+
+
+yaml.readPromise './tmp.yml'
+.then (data)->
+  console.log data
+  # yaml.write './ny2.yaml', data, 'utf8', (err) -> throw err if err
+  yaml.writePromise './ny3.yaml', data
+  .then ->
+    console.log "done"
+  .catch (e)->
+    console.log "e1:",e
+.catch (e)->
+  console.log "e2:",e
+
+
+data =
+  "root":
+    "foo": "foo"
+    "bar": "bar"
+
+yaml.write './ny.yaml', data, 'utf8', (err) -> throw err if err
+
+console.log "kiteru"
+data = """
+  foo: foo
+  bar: bar
+"""
+
+console.log yaml.parse(data).foo
+
+datam =
+  root:
+    foo: "foo"
+    bar: "bar"
+
+console.log yaml.dump datam
+###
+
+
+
+###
+# yamljs
+Yaml = require("yamljs")
+
+console.log Yaml.parseFile("./tmp.yml")
+console.log Yaml.parse require("fs").readFileSync("./tmp.yml").toString()
+
+require("fs").readFile "./tmp.yml", (e,d)->
+  # console.log d.toString()
+  y = Yaml.parse d.toString()
+  console.log y
+  console.log Yaml.stringify(y, 4)
+  require("fs").writeFileSync "./test.yml", Yaml.stringify(y, 4)
+
+Yaml.load "./tmp.yml", (res)->
+  console.log res
+
+###
+
+
+
+
+
+
+
 ###
 # spooky2
 Spooky = require('spooky')
