@@ -5,8 +5,14 @@ console.time "tmp"
 
 
 
+c = require = "canvas"
+i = c.Image
+# conc = new i(200,200)
+# ctx =  conc.getContext("2d")
 
 
+
+###
 pg = require "pg"
 
 createClient = -> new Promise (f,r)->
@@ -42,6 +48,7 @@ query """
   console.log v[0].theTime
 .catch (e)->
   console.error 'error running query'
+###
 
 
 
