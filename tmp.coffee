@@ -4,12 +4,87 @@ console.time "tmp"
 # console.timeEnd "tmp"
 
 
+###
+# 日本語reverse
+full2half = (ch)->
+  switch ch
+    when "あ" then "a"
+    when "い" then "i"
+    when "う" then "u"
+    when "え" then "e"
+    when "お" then "o"
+    when "か" then "ka"
+    when "き" then "ki"
+    when "く" then "ku"
+    when "け" then "ke"
+    when "こ" then "ko"
+    when "さ" then "sa"
+    when "し" then "si"
+    when "す" then "su"
+    when "せ" then "se"
+    when "そ" then "so"
+    when "た" then "ta"
+    when "ち" then "ti"
+    when "つ" then "tu"
+    when "て" then "te"
+    when "と" then "to"
+    when "な" then "na"
+    when "に" then "ni"
+    when "ぬ" then "nu"
+    when "ね" then "ne"
+    when "の" then "no"
+    when "は" then "ha"
+    when "ひ" then "hi"
+    when "ふ" then "hu"
+    when "へ" then "he"
+    when "ほ" then "ho"
+    when "ま" then "ma"
+    when "み" then "mi"
+    when "む" then "mu"
+    when "め" then "me"
+    when "も" then "mo"
+    when "や" then "ya"
+    when "ゆ" then "yu"
+    when "よ" then "yo"
+    when "ゃ" then "ya"
+    when "ゅ" then "yu"
+    when "ょ" then "yo"
+    when "ら" then "ra"
+    when "り" then "ri"
+    when "る" then "ru"
+    when "れ" then "re"
+    when "ろ" then "ro"
+    when "わ" then "wa"
+    when "ゐ" then "wi"
+    when "ゑ" then "we"
+    when "を" then "wo"
+    else ""
 
+half2full = (ch)->
+  switch ch
+    when "a" then "あ"
+    when "ka" then "か"
+    when "sa" then "さ"
+    else ""
+
+rConvert = (str)->
+  arrHalf = str.split("").map((i)-> full2half i)
+  rHalf = arrHalf.join("").split("").reverse().join("")
+  return  rHalf
+  
+
+str = "あのくたらさんみゃく"
+console.log rConvert str
+###
+
+
+
+###
 c = require = "canvas"
 i = c.Image
 # conc = new i(200,200)
 # ctx =  conc.getContext("2d")
-
+###
 
 
 
