@@ -99,7 +99,7 @@ rConvert = (str)->
   return  rHalf
   
 
-str = "いいいしゃらぶ"
+str = "いいいしゃらぶす"
 console.log rConvert str
 
 
