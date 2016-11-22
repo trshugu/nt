@@ -5,6 +5,7 @@ console.time "tmp"
 
 
 ###
+###
 # 日本語reverse
 full2half = (ch)->
   switch ch
@@ -58,6 +59,31 @@ full2half = (ch)->
     when "ゐ" then "wi"
     when "ゑ" then "we"
     when "を" then "wo"
+    when "が" then "ga"
+    when "ぎ" then "gi"
+    when "ぐ" then "gu"
+    when "げ" then "ge"
+    when "ご" then "go"
+    when "ざ" then "za"
+    when "じ" then "zi"
+    when "ず" then "zu"
+    when "ぜ" then "ze"
+    when "ぞ" then "zo"
+    when "だ" then "da"
+    when "ぢ" then "di"
+    when "づ" then "du"
+    when "で" then "de"
+    when "ど" then "do"
+    when "ば" then "ba"
+    when "び" then "bi"
+    when "ぶ" then "bu"
+    when "べ" then "be"
+    when "ぼ" then "bo"
+    when "ぱ" then "pa"
+    when "ぴ" then "pi"
+    when "ぷ" then "pu"
+    when "ぺ" then "pe"
+    when "ぽ" then "po"
     else ""
 
 half2full = (ch)->
@@ -73,9 +99,8 @@ rConvert = (str)->
   return  rHalf
   
 
-str = "あのくたらさんみゃく"
+str = ""
 console.log rConvert str
-###
 
 
 
