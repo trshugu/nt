@@ -4,7 +4,9 @@ console.time "tmp"
 # console.timeEnd "tmp"
 
 
-###
+
+
+
 ###
 # 日本語reverse
 full2half = (ch)->
@@ -101,6 +103,8 @@ rConvert = (str)->
 
 str = "いいいしゃらぶす"
 console.log rConvert str
+
+###
 
 
 
