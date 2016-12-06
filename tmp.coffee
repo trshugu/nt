@@ -7,6 +7,16 @@ console.time "tmp"
 
 
 
+
+###
+five = require('johnny-five')
+board = new five.Board()
+ 
+board.on 'ready', ->
+  led = new five.Led(13)
+  led.blink(500)
+###
+
 ###
 # 日本語reverse
 full2half = (ch)->
