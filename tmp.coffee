@@ -8,6 +8,41 @@ console.time "tmp"
 
 
 
+
+
+
+
+###
+###
+# やっぱり規格倒れ
+isNishimuku = (m)->
+  switch m
+    when 2,4,6,9,11
+      true
+    else
+      false
+
+isUruu = (y)-> ( ( y % 4 == 0 && y % 100 != 0) || y % 400 == 0)
+
+wdCounter = ->
+  cnt = 0
+  return ->
+    cnt = cnt + 1
+    if cnt > 7
+      cnt = 1
+    
+    return cnt
+
+[2017..2017].forEach (y)->
+  [1..12].forEach (m)->
+    [1..31].forEach (d)->
+      return if (m == 2 && d >= 29) && isUruu(y) == false
+      return if d >= 31 && isNishimuku m
+      
+      date = y + "/" + ("0" + m).slice(-2) + "/" + ("0" + d).slice(-2)
+      console.log date + "(" +  '日月火水木金土'[new Date(date).getDay()] + ")," +  new Date(date).getDay()
+
+
 ###
 five = require('johnny-five')
 board = new five.Board()
