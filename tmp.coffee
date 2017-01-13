@@ -11,8 +11,44 @@ console.time "tmp"
 
 
 
+###
+exec = require('child_process').exec
+exec "ping -c 3 yahoo.co.jp", (e, out, err) -> console.log new Buffer(out)
+###
+
+
 
 ###
+ping = require ("net-ping")
+
+session = ping.createSession()
+
+session.pingHost "yahoo.co.jp", (error, target)->
+  if error
+    console.log target + ": " + error.toString()
+  else
+    console.log target + ": Alive"
+###
+
+###
+# ping
+ping = require "ping"
+
+Iconv = require('iconv').Iconv
+sjis_utf8 = new Iconv('utf-8', 'shift-jis')
+
+jschardet = require('jschardet');
+
+console.time "ping"
+ping.promise.probe "yahoo.co.jp"
+.then (a)->
+  console.log a
+  require("fs").writeFileSync "aa.txt", a.output
+  console.log jschardet.detect(a)
+  console.log sjis_utf8.convert(new Buffer(a.output))
+  console.timeEnd "ping"
+###
+
 ###
 # やっぱり規格倒れ
 isNishimuku = (m)->
@@ -41,6 +77,7 @@ wdCounter = ->
       
       date = y + "/" + ("0" + m).slice(-2) + "/" + ("0" + d).slice(-2)
       console.log date + "(" +  '日月火水木金土'[new Date(date).getDay()] + ")," +  new Date(date).getDay()
+###
 
 
 ###
