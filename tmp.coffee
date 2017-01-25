@@ -10,6 +10,31 @@ console.time "tmp"
 
 
 
+###
+# WeakSet
+key = {aa:"dondno"}
+ws = new WeakSet()
+
+console.log ws.has(key)
+ws.add key
+
+console.log ws.has(key)
+console.log ws.has({})
+###
+
+
+###
+# Weakmap
+wm = new WeakMap()
+aa={aa:"dfdf"}
+wm.set(aa, "198")
+
+console.log wm.get aa
+console.log wm
+for a,b of wm
+  console.log a,b
+###
+
 
 ###
 exec = require('child_process').exec
