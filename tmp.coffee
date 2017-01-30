@@ -9,6 +9,9 @@ console.time "tmp"
 
 
 
+# y2j
+y = require("yaml2json")
+
 
 ###
 # WeakSet
