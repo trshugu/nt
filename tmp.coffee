@@ -6,6 +6,60 @@ console.time "tmp"
 
 
 
+# re bunyan2
+bunyan = require('bunyan')
+log = bunyan.createLogger
+  name: 'buunyan'
+  src: true
+
+log.trace('trace log')
+log.debug('debug log')
+
+log.info('info log')
+log.warn('warn\n log')
+log.error('error log')
+log.fatal('fatal log')
+
+
+
+###
+# re bunyan
+bunyan = require('bunyan')
+log = bunyan.createLogger
+  name: 'buunyan'
+  # stream: process.stdout
+  # stream: process.stderr
+  # stream: require("fs").createWriteStream 'nyan.log'
+  # level: 'trace'
+  streams:[
+    level:"error"
+    path: "./path.log"
+  ,
+    level:"trace"
+    path: "./pathtrace.log"
+  ,
+    # ログローテーションも可能
+    type: 'rotating-file',
+    path: './rota.log',
+    period: '1d',
+    count: 3
+  ]
+  
+
+# log.info 'hi'
+# log.warn lang: 'fr', balbal:"valval", 'au revoir'
+
+log.trace('trace log')
+log.debug('debug log')
+
+log.info('info log')
+log.warn('warn\n log')
+log.error('error log')
+log.fatal('fatal log')
+
+# [0...1000].forEach ->
+#   log.info 'hi'
+###
 
 
 ###
