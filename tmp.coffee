@@ -6,6 +6,25 @@ console.time "tmp"
 
 
 
+
+
+###
+cluster = require "cluster"
+if cluster.isMaster
+  [0...32].forEach ->
+    w = cluster.fork()
+    w.on "exit", (a)->
+      console.log "dead:", a
+      cluster.fork()
+  
+else
+  i = 1024 * 1024
+  while true
+    [1...i].reduce (p,q)-> p * q
+###
+
+
+###
 # re bunyan2
 bunyan = require('bunyan')
 log = bunyan.createLogger
@@ -19,7 +38,7 @@ log.info('info log')
 log.warn('warn\n log')
 log.error('error log')
 log.fatal('fatal log')
-
+###
 
 
 ###
