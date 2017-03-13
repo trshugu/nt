@@ -6,6 +6,21 @@ console.time "tmp"
 
 
 
+###
+j = JSON.parse('');
+arr=[]
+for k,v of j
+  arr.push [k,parseInt(v)]
+
+console.log arr
+
+obj = {}
+for k,v of j
+  obj[k] = parseInt(v)
+
+console.log obj
+###
+
 
 
 ###
