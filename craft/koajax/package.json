@@ -13,6 +13,7 @@
     "koa": "*",
     "koa-coffee-script": "*",
     "koa-compress": "*",
+    "koa-helmet": "^1.1.0",
     "koa-logger": "*",
     "koa-route": "*",
     "koa-static": "*",

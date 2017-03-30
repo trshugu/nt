@@ -8,6 +8,44 @@ console.time "tmp"
 
 
 
+
+###
+# NG
+j2y = require "json2yaml"
+
+rs = require("fs").createReadStream("ndjson.json")
+ws = require("fs").createWriteStream("ndjson.yaml")
+
+through2 = require("through2")
+stm = through2 (c,e,n)->
+  console.log "kiteru"
+  console.log c,e
+  @push c
+  n()
+
+
+rl = require("readline").createInterface rs, stm
+
+
+# 逐次処理ではなくストリームで変換しないと
+# rl.on "line", (l)->
+#   y = j2y.stringify JSON.parse(l)
+#   console.log y
+###
+
+
+
+
+
+###
+i = 1024 * 1024
+while true
+  console.time "tmp"
+  [1...i].reduce (p,q)-> p * q
+  console.timeEnd "tmp"
+###
+
+
 ###
 cluster = require "cluster"
 if cluster.isMaster

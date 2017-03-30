@@ -1,6 +1,9 @@
 app = module.exports = require('koa')()
 sc = require 'koa-static-cache'
 
+helmet = require("koa-helmet")
+app.use helmet()
+
 app.use sc( require("path").join(__dirname + '/public'), maxAge: 1*24*60*60 )
 
 # Logger
