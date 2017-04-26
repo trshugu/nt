@@ -1,9 +1,24 @@
 ###
 ###
-console.time "tmp"
-# console.timeEnd "tmp"
 
 
+
+
+###
+buf = new Buffer([1, 256])
+console.log buf
+# str = buf.readUInt32LE(0)
+str = buf.readUInt8(0) + 8
+console.log str
+###
+
+###
+[0...100].forEach (i)->
+  a = createHash i.toString(), "SHA256"
+  b = createFujitsuHash i.toString(), "SHA256"
+  if a != b
+    console.log i
+###
 
 
 ###
