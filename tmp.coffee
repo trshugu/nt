@@ -5,6 +5,58 @@
 
 
 ###
+# 指定回数分文字を繰り返す
+str = ""
+if process.argv[2]?
+  [0...process.argv[2]].forEach ->
+    str += "abc"
+
+  console.log str
+###
+
+###
+suff = (entries) -> 
+  random = entries.map(Math.random)
+  i = 0
+  idx = entries.map ()->i++
+  
+  idx.sort (a, b) -> random[a] - random[b]
+  
+  res = idx.map (i)-> entries[i]
+  
+  return res
+
+obj = [0...100]
+
+console.log suff obj
+###
+
+
+###
+redis = require "redis"
+cli = redis.createClient()
+
+cli.set "tt", obj, (e,d)->
+  if e?
+    console.log e
+  else
+    console.log d
+###
+
+
+
+###
+cli.get id, (e,d)->
+  if e?
+    console.log e
+  else
+    # console.log d
+    cli.end()
+    cb JSON.parse d
+###
+
+
+###
 b.sort (a,b)->
   if a.toString().length > 1
     if a.toString() > b.toString()
@@ -25,10 +77,12 @@ b.sort (a,b)->
     return -1
   
   return 0
-###
 
 console.log b,"b"
 console.log a,"a"
+###
+
+
 
 
 ###

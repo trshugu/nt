@@ -76,9 +76,8 @@ app.use (err, req, res, next) ->
   return
 
 app.set 'port', process.env.PORT || 3000
-server = http.createServer(app)
-# io = require('socket.io').listen(server)
-server.listen app.get('port'), ->
+server = http.createServer(app).listen app.get('port'), ->
+  server.setTimeout 2
   debug "Express server listening on portee " + server.address().port
 
 
