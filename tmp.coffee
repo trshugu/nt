@@ -5,6 +5,33 @@
 
 
 ###
+b.sort (a,b)->
+  if a.toString().length > 1
+    if a.toString() > b.toString()
+      return 1
+    if a.toString() < b.toString()
+      return -1
+  
+    if a.toString().length > 2
+      if a.toString() < b.toString()
+        return 1
+      if a.toString() > b.toString()
+        return -1
+  
+  
+  if a.toString() > b.toString()
+    return 1
+  if a.toString() < b.toString()
+    return -1
+  
+  return 0
+###
+
+console.log b,"b"
+console.log a,"a"
+
+
+###
 buf = new Buffer([1, 256])
 console.log buf
 # str = buf.readUInt32LE(0)
