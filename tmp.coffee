@@ -6,6 +6,269 @@
 
 
 
+
+###
+# その他関数
+shuffle = (arr) ->
+  i = undefined
+  j = undefined
+  temp = undefined
+  arr = arr.slice()
+  i = arr.length
+  if i == 0
+    return arr
+  while --i
+    j = Math.floor(Math.random() * (i + 1))
+    temp = arr[i]
+    arr[i] = arr[j]
+    arr[j] = temp
+  arr
+
+
+# 配列ソート
+arr = []
+
+dynamock = ->
+  shuffle [
+      prev: "root", id: "a", val: "あ"
+    ,
+      prev: "a", id: "b", val: "い"
+    ,
+      prev: "b", id: "c", val: "う"
+    ,
+      prev: "c", id: "d", val: "え"
+    ,
+      prev: "d", id: "e", val: "お"
+    ,
+      prev: "e", id: "f", val: "か"
+  ]
+
+seqsort = (list)->
+  li = []
+  li.push list.find (i)-> i.prev == "root"
+  
+  for cnt in [0...list.length]
+    # console.log cnt
+    if li[cnt]?.id?
+      li.push list.find (i)-> i.prev == li[cnt].id
+  
+  li
+    .filter (i)-> i
+    .map (i)-> i
+  
+
+sor = (list, before, after)->
+  arr = []
+  
+  # eをcの位置へ
+  e = list.find (i)-> i.id == before
+
+  # 1.自分のprevを次のに渡す
+  arr = list.map (i)->
+    if i.prev == e.id
+      i.prev = e.prev
+    i
+
+  # 2.次の場所のprevをもらう
+  arr = arr.map (i)->
+    if i.id == after
+      e.prev = i.prev
+      # 3.もらったら自分を入れる
+      i.prev = e.id
+    i
+  
+  arr
+
+list1 = seqsort dynamock()
+list2 = seqsort sor list1, "e", "c"
+console.log list2
+arr = list2.map (i)-> i.val
+
+# チェック
+chk = ["あ","い","お","う","え","か"]
+
+if arr.toString() == chk.toString()
+  console.log "OK"
+else
+  console.log "NG", arr
+###
+
+
+###
+# その他関数
+shuffle = (arr) ->
+  i = undefined
+  j = undefined
+  temp = undefined
+  arr = arr.slice()
+  i = arr.length
+  if i == 0
+    return arr
+  while --i
+    j = Math.floor(Math.random() * (i + 1))
+    temp = arr[i]
+    arr[i] = arr[j]
+    arr[j] = temp
+  arr
+
+
+# 配列ソート
+arr = []
+
+dynamock = ->
+  shuffle [
+      prev: "root", id: "a", val: "あ"
+    ,
+      prev: "a", id: "b", val: "い"
+    ,
+      prev: "b", id: "c", val: "う"
+    ,
+      prev: "c", id: "d", val: "え"
+    ,
+      prev: "d", id: "e", val: "お"
+    ,
+      prev: "e", id: "f", val: "か"
+  ]
+
+
+# console.log dynamock()
+arr = dynamock()
+# o = arr.find (i)-> i.prev == "root"
+# console.log o.id
+# n = arr.find (i)-> i.prev == (arr.find (i)-> i.prev == "root").id
+# console.log n
+
+
+# findnextobj = (list, previd = "root")->
+#   list.find (i)-> i.prev == previd
+
+# console.log findnextobj arr
+
+li = []
+li.push arr.find (i)-> i.prev == "root"
+
+for cnt in [0...arr.length]
+  # console.log cnt
+  if li[cnt]?.id?
+    li.push arr.find (i)-> i.prev == li[cnt].id 
+
+# console.log li
+
+arr = li
+  .filter (i)-> i
+  .map (i)-> i
+
+console.log arr
+
+# eをcの位置へ
+e = arr.find (i)-> i.id == "e"
+
+# 1.自分のprevを次のに渡す
+arr = arr.map (i)->
+  if i.prev == e.id
+    i.prev = e.prev
+  i
+
+# console.log arr
+
+# 2.次の場所のprevをもらう
+arr = arr.map (i)->
+  if i.id == "c"
+    e.prev = i.prev
+    # 3.もらったら自分を入れる
+    i.prev = e.id
+  i
+
+# console.log arr
+# console.log e
+
+
+li2 = []
+li2.push arr.find (i)-> i.prev == "root"
+
+for cnt in [0...arr.length]
+  # console.log cnt
+  if li2[cnt]?.id?
+    li2.push arr.find (i)-> i.prev == li2[cnt].id 
+
+console.log li2
+arr = li2
+  .filter (i)-> i?
+  .map (i)-> i.val
+
+
+#  .sort (a,b)->
+#    if a.prev == "root"
+#      return -1
+#    
+#    if b.prev == "root"
+#      return 1
+#    return -1
+#  .map (i)->
+#    o = {}
+#    o[i.id] = i
+#    o
+
+
+
+
+
+# チェック
+chk = ["あ","い","お","う","え","か"]
+
+if arr.toString() == chk.toString()
+  console.log "OK"
+else
+  console.log "NG", arr
+###
+
+
+
+
+
+###
+# sort is
+arr = ["a","b","c"]
+
+arr.sort (f,s)->
+  console.log "f=",f,",s=",s
+  
+  return true
+  #if s == "c"
+  #  return 0
+  #else
+  #  return 1
+
+console.log "res", arr
+###
+
+
+
+###
+# sort num
+arr = [3,5,3,26,69,7,4,6]
+
+arr.sort (f,s)->
+  console.log "f=",f,",s=",s
+  if f == 3
+    return 0
+  if s == 6
+    return 1
+  else
+    return 0
+  
+  #return f - s # 左-右=昇順
+  #return s - f # 右-右=降順
+  #if s == "c"
+  #  return 0
+  #else
+  #  return 1
+
+console.log "res", arr
+###
+
+
+
 ###
 # オブジェクトの配列を記述する方法(カンマとインデントに注意)
 obj = [
