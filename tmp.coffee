@@ -4,6 +4,22 @@
 
 
 
+
+
+
+###
+# 乱数*数字の範囲/最大値
+# console.log Math.random()
+# console.log Math.floor(Math.random() * (100 + 1))
+r = Math.floor(Math.random() * (100 + 1))
+console.log "r", r
+console.log r * 12
+console.log r / 100
+console.log r * 12 / 100
+console.log 12 / (r * 12 / 100)
+###
+
+
 ###
 j = 0
 [200..1000].forEach (i)->
