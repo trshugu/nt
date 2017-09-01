@@ -9,6 +9,15 @@ app.use sc( require("path").join(__dirname + '/public'), maxAge: 1*24*60*60 )
 # Logger
 app.use require('koa-logger')()
 
+###
+app.use (a,b,next)->
+  console.log "ok",a,b,next
+  yield []
+  console.log "ok2"
+###
+
+
+
 # route
 route = require('koa-route')
 render = require('co-views')(require("path").join(__dirname + '/views'), default: "pug")
