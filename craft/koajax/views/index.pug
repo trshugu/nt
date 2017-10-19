@@ -7,7 +7,7 @@ html
     //-
       script(src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous")
     script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/bacon.js/0.7.84/Bacon.min.js")
-    script(type="text/javascript", src="http://coffeescript.org/extras/coffee-script.js")
+    script(type="text/javascript", src="http://coffeescript.org/v2/browser-compiler/coffeescript.js")
     script(type="text/javascript", src="scripts/tmp.js")
     link(rel="stylesheet" href="styles/tmp.css")
     
@@ -17,6 +17,20 @@ html
   body
     #tmp(onClick="add()") tmp
     
+    h1 hls
+    script(src="https://cdn.jsdelivr.net/hls.js/latest/hls.min.js")
+    video#video
+    script(type="text/coffeescript").
+      if Hls.isSupported()
+        video = document.getElementById('video')
+        hls = new Hls()
+        hls.loadSource('http://www.streambox.fr/playlists/test_001/stream.m3u8')
+        hls.attachMedia(video)
+        hls.on Hls.Events.MANIFEST_PARSED, -> video.play()
+
+
+
+
     #con ser4
     #ado
     
