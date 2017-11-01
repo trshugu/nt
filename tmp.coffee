@@ -5,6 +5,12 @@
 
 
 
+###
+foo = require "./foo"
+obj = new foo.Foo()
+console.log obj.methodA()
+###
+
 
 
 ###

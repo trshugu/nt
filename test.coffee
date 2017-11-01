@@ -8,6 +8,27 @@
 
 
 ###
+chai = require "chai"
+describe "allow",->
+  it "one", (done)->
+    foo = require "./foo"
+    obj = new foo.Foo()
+    console.log "obj",obj
+    console.log "obj-f",obj.methodA
+    chai.assert.isFunction obj.methodA
+    chai.assert.equal "foovee", obj.methodA()
+    obj.methodA()
+    done()
+  
+  it "two", (done)->
+    foo = require "./foo"
+    obj = new foo.Foo()
+    chai.assert.equal "vee", obj.methodB()
+    obj.methodA()
+    done()
+###
+
+###
 # リスコフの置換原則に於けるTDD
 chai = require "chai"
 tmp = require "./Bungu"
