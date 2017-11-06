@@ -4,6 +4,16 @@
 
 
 
+###
+# 827文字くらいいける
+text = """
+"""
+
+console.log text.length
+require("qrcode").toFile "qrc.png", text, (e)-> if e? then console.log e else console.log "ok"
+###
+
+
 
 ###
 foo = require "./foo"
