@@ -4,6 +4,36 @@
 
 
 
+
+
+
+
+###
+net = require('net')
+HOST = ''
+PORT = 80
+
+client = new net.Socket()
+client.connect PORT, HOST, ->
+  console.log('conn: ' + HOST + ':' + PORT)
+  # client.write "GET http://www. HTTP/1.1\n"
+  client.write "GET http://www. HTTP/1.1\n"
+  client.write "HOST: \n"
+  # client.write "SERVER_ADDR: 192.168.1.100\n"
+  # client.write "REMOTE_ADDR: 106.169.173.29\n"
+  
+  client.write "\n\n"
+
+client.on 'data', (data)->
+  console.log('DAT: ' + data)
+  # client.destroy()
+
+client.on 'close', -> console.log('Conn close)
+###
+
+
+
+
 ###
 # 827文字くらいいける
 text = """

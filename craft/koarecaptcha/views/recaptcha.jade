@@ -1,0 +1,29 @@
+extends layout
+block head
+  script(type="text/javascript", src="coffee-script/extras/coffee-script.js")
+  script(src="https://www.google.com/recaptcha/api.js?hl=ja" async defer)
+  script(type="text/coffeescript")
+
+  script(type="text/coffeescript").
+    window.onload = ->
+      @doSubmit = -> grecaptcha.execute()
+      @f = document.getElementById("rec")
+      @onSubmit = -> @f.submit()
+
+
+block title
+  | Messages
+
+block content
+  form#rec(method="POST" action="/recaptcha" )
+    .g-recaptcha(
+       data-sitekey="6LfzZDgUAAAAAAau2Dz9-V-Dha1paQGSO5r7ycFi"
+       data-callback="onSubmit"
+       data-size="invisible"
+       data-theme="dark")
+   
+    .regbtn_area.btn01_off
+      a(href="javascript:void(0);" onclick="doSubmit()") 設定
+
+
+
