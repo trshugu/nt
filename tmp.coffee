@@ -6,7 +6,6 @@ console.time "tmp"
 
 
 
-
 # シェルコマンド実行spawn
 spawn = require("child_process").spawn
 git = spawn "git",["status"]
