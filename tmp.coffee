@@ -1,8 +1,56 @@
+console.time "tmp"
 ###
 ###
 
 
 
+
+
+
+# シェルコマンド実行spawn
+spawn = require("child_process").spawn
+git = spawn "git",["status"]
+git.stdout.setEncoding('utf8')
+
+git.stdout.on "data", (data)->
+  console.log "d", data
+git.stdout.on "exit", -> process.exit(0)
+
+
+
+
+###
+# シェルコマンド実行sync
+es = require("child_process").execSync
+res = es "git status"
+console.log res.toString()
+###
+
+
+###
+# シェルコマンド実行
+exec = require("child_process").exec
+
+# exec "echo 'so' >&2", (e,so,se)->
+exec "git status", (e,so,se)->
+  if e?
+    console.log "e",e
+    throw e
+  else
+    if so?
+      console.log "t"
+      if so == ""
+        console.log "kara"
+      else
+        console.log "karadenai"
+      
+    else
+      console.log "f"
+    
+    console.log "so:",so
+    console.log "se:",se
+
+###
 
 
 
