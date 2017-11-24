@@ -5,6 +5,74 @@ console.time "tmp"
 
 
 
+
+
+
+
+
+###
+# メモリ使用量の確認
+i=require('iconv').Iconv
+c=new i("SHIFT_JIS","utf-8")
+
+doit = ->
+  a = require("child_process").execSync("systeminfo")
+  b = c.convert a
+  d = b.toString()
+  arr = d.split("\r\n")
+  # console.log arr[24]
+  # console.log arr[25]
+  # console.log arr[26] # 仮想メモリ: 最大サイズ
+  # console.log arr[27] # 仮想メモリ: 利用可能
+  e = arr[24].split(":")[1].trim()
+  f = arr[25].split(":")[1].trim()
+  all = parseInt e.split(" ")[0].replace(/,/g,"")
+  free = parseInt f.split(" ")[0].replace(/,/g,"")
+  console.log free + "/" + all
+  # console.log 100 - (Math.floor(free / all * 100)) + "%利用中"
+  setTimeout ->
+    doit()
+  , 1
+  
+
+doit()
+###
+
+
+
+
+###
+# ディスク容量の確認
+i=require('iconv').Iconv
+c=new i("SHIFT_JIS","utf-8")
+
+doit = ->
+  a = require("child_process").execSync("fsutil volume diskfree c:")
+  b = c.convert a
+  # console.log b.toString()
+  # 配列に変換
+  d = b.toString()
+  arr = d.split("\r\n")
+  # console.log arr[1]
+  # console.log arr[2]
+  # console.log arr[1].split(": ")
+  # console.log arr[2].split(": ")
+  all = parseInt arr[1].split(": ")[1]
+  free = parseInt arr[2].split(": ")[1]
+  console.log all
+  console.log free
+  console.log 100-Math.floor((free / all) * 100) + "%使えます"
+  
+  
+  setTimeout ->
+    doit()
+  , 1000
+  
+
+doit()
+###
+
+
 ###
 # console.log require("child_process").execSync("git status").toString()
 console.log require("child_process").execSync("echo %windir%").toString()
