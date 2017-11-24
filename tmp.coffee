@@ -5,7 +5,15 @@ console.time "tmp"
 
 
 
+###
+# console.log require("child_process").execSync("git status").toString()
+console.log require("child_process").execSync("echo %windir%").toString()
+echo = require("child_process").execSync("echo %windir%").toString()
+console.log echo
+###
 
+
+###
 # シェルコマンド実行spawn
 spawn = require("child_process").spawn
 git = spawn "git",["status"]
@@ -14,6 +22,7 @@ git.stdout.setEncoding('utf8')
 git.stdout.on "data", (data)->
   console.log "d", data
 git.stdout.on "exit", -> process.exit(0)
+###
 
 
 
