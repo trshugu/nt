@@ -8,6 +8,65 @@ console.time "tmp"
 
 
 
+
+
+###
+# asyncの利用方法。awaitがあれば自動判別される
+Koa = require('koa')
+app = new Koa()
+
+# ctx is the context for one request
+app.use (ctx, next)->
+  console.log "kiteru"
+  next()
+
+app.use (ctx, next) ->
+  start = Date.now()
+  await next()
+  ms = Date.now() - start
+  console.log ctx.method, ctx.url, ms
+
+app.use (ctx)->
+  ctx.body = "hell"
+
+app.listen 3000, -> console.log "start"
+###
+
+
+
+
+###
+# 最小koa2
+new (require 'koa')().use((ctx)-> ctx.body = "hell").listen 3000
+
+# app = new (require 'koa')()
+# app.use (ctx)-> ctx.body = "hell"
+# app.listen 3000, -> console.log "start"
+
+# deprecate
+# new (require('koa'))().use(->@body = yield ["hell" + @url]).listen 3000
+###
+
+###
+# koa2
+Koa = require('koa')
+app = new Koa()
+
+app.use (ctx, next)->
+  console.log "kiteru"
+  next()
+
+app.use (ctx)->
+  ctx.body = "hell"
+
+app.listen 3000, -> console.log "start"
+###
+
+
+
+
+
+
 ###
 # expressでviewをhtmlに
 app = require("express")()
