@@ -8,6 +8,21 @@ console.time "tmp"
 
 
 
+###
+# expressでviewをhtmlに
+app = require("express")()
+app.set "views", __dirname
+app.engine('html', require('pug').renderFile)
+app.get "/", (req, res)->
+  res.render "expressviewhtml.html", {key:"value", bun:"あああ<br>iii"}
+
+app.set 'port', 3000
+server = require("http").createServer(app).listen app.get('port'), ->
+  console.log "Express server listening on portee " + server.address().port
+###
+
+
+
 
 
 ###
