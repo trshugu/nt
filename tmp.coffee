@@ -9,6 +9,61 @@ console.time "tmp"
 
 
 
+
+###
+# 真打
+messageValues = {}
+messageValues.temperature = 20
+messageValues.humidity = 64
+
+# 水蒸気圧の計算
+august = (t)-> Math.ceil(6.1078 * 10 ** ( (7.5 * t) / (t + 237.3) ) * 1000, 2) / 1000
+# 飽和水蒸気量の計算
+tetens = (t)-> Math.ceil(  (217 * august(t)) / (t + 273.15) * 1000, 2) / 1000
+
+checkInfluenza = (t, h)->
+  res = {}
+  wm = tetens t
+  wa = wm * (h / 100)
+  hm =  Math.ceil((11 / wm) * 100)
+  hn = hm - h
+  msg = ""
+  
+  if wa >= 11
+    status = "安全"
+  else
+    status = "危険"
+    msg = hn + "%不足しています"
+  
+  res.wm = Math.floor(wm)
+  res.wa = Math.floor(wa)
+  res.hm = hm
+  res.hn = hn
+  res.status = status
+  res.msg = msg
+  res
+
+
+param = checkInfluenza messageValues.temperature, messageValues.humidity
+
+string = param.status + "です\n"
+string += "温度:" + messageValues.temperature + "/湿度:" + messageValues.humidity + "\n"
+string += "水分量:" + param.wa + "/" + param.wm + "→" + "必要湿度:" + param.hm + "%"
+string += "\n" + param.msg if param.msg != "" 
+
+console.log string
+###
+
+
+
+
+
+
+
+
+
+
+###
 # 水蒸気圧の計算
 august = (t)-> Math.ceil(6.1078 * 10 ** ( (7.5 * t) / (t + 237.3) ) * 1000, 2) / 1000
 # 飽和水蒸気量の計算
@@ -43,7 +98,7 @@ checkInfluenza = (t, h)->
 # checkInfluenza 20, 63
 # checkInfluenza 20, 64
 # checkInfluenza 20, 65
-
+###
 
 
 
