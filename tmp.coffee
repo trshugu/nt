@@ -9,6 +9,45 @@ console.time "tmp"
 
 
 
+# 水蒸気圧の計算
+august = (t)-> Math.ceil(6.1078 * 10 ** ( (7.5 * t) / (t + 237.3) ) * 1000, 2) / 1000
+# 飽和水蒸気量の計算
+tetens = (t)-> Math.ceil(  (217 * august(t)) / (t + 273.15) * 1000, 2) / 1000
+
+# console.log august(20) 
+# console.log tetens(20)
+# console.log august(20.1)
+# console.log tetens(20.1)
+
+checkInfluenza = (t, h)->
+  wm = tetens t
+  
+  wa =wm * (h / 100)
+  
+  if wa >= 11
+    console.log "安全"
+  else
+    console.log "危険"
+  
+  hm =  Math.ceil((11 / wm) * 100)
+  hn = hm - h
+  
+  console.log "MAX水分量:", wm
+  console.log "現在の水分量:", wa
+  console.log "必要湿度:", hm
+  console.log "不足湿度:", hn
+  
+
+# checkInfluenza 20, 50
+# checkInfluenza 20, 62
+# checkInfluenza 20, 63
+# checkInfluenza 20, 64
+# checkInfluenza 20, 65
+
+
+
+
+
 
 ###
 # asyncの利用方法。awaitがあれば自動判別される
