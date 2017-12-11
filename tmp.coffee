@@ -6,6 +6,27 @@ console.time "tmp"
 
 
 
+
+
+
+
+###
+gen = ->
+  yield "bo"
+  y = yield "bb"
+  x = yield "aa"
+  console.log "yy", yield "i-rudo"
+  return "ret"
+
+
+g = gen()
+console.log "a", g.next("a")
+console.log "b", g.next("b")
+console.log "c", g.next("c")
+console.log "d", g.next("d")
+console.log "e", g.next("e")
+###
+
 ###
 gen = ->
   console.log "gen1"
