@@ -6,6 +6,36 @@ console.time "tmp"
 
 
 
+###
+gen = ->
+  console.log "gen1"
+  yield "bo"
+  console.log "gen2"
+  y = yield
+  console.log "gen3"
+  console.log "y", y
+  console.log "gen4"
+  x = yield
+  console.log "gen5"
+  console.log "x", x
+  console.log "gen6"
+
+
+console.log "g1"
+g = gen()
+console.log "g2"
+console.log "a", g.next("a")
+console.log "g3"
+console.log "b", g.next("b")
+console.log "g4"
+console.log "c", g.next("c")
+console.log "g5"
+console.log "d", g.next("d")
+console.log "g6"
+console.log "e", g.next("e")
+console.log "g7"
+###
+
 
 ###
 # 封印・凍結
