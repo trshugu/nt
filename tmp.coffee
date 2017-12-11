@@ -11,6 +11,63 @@ console.time "tmp"
 
 
 ###
+gen=(w)->
+  console.log "3"
+  console.log('w:', w)
+  console.log "4"
+  x = yield
+  console.log "6"
+  console.log('x:', x)
+  console.log "7"
+  y = yield
+  console.log "9"
+  console.log('y:', y)
+  console.log "10"
+  z = yield
+  console.log "-"
+  console.log('z:', z)
+  console.log "-"
+
+
+console.log "1"
+g = gen(1)
+console.log "2"
+g.next(10)
+console.log "5"
+g.next(100)
+console.log "8"
+g.next(1000)
+console.log "11"
+###
+
+
+###
+gen=(x)->
+  console.log "3"
+  console.log('x:', x)
+  console.log "4"
+  y = yield
+  console.log "6"
+  console.log('y:', y)
+  console.log "7"
+  z =yield
+  console.log "9"
+  console.log('z:', z)
+  console.log "10"
+
+
+console.log "1"
+g = gen 10
+console.log "2"
+g.next()
+console.log "5"
+g.next(100)
+console.log "8"
+g.next(1000)
+console.log "11"
+###
+
+###
 gen = ->
   yield "bo"
   y = yield "bb"
