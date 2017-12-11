@@ -1,0 +1,24 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    title tmp
+    
+    //-
+      script(src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous")
+      script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/bacon.js/0.7.84/Bacon.min.js")
+      script(type="text/javascript", src="http://coffeescript.org/v2/browser-compiler/coffeescript.js")
+      script(type="text/javascript", src="scripts/tmp.js")
+      link(rel="stylesheet" href="styles/tmp.css")
+    
+    style(type="text/css")
+    script(type="text/coffeescript")
+    
+  body
+    #tmp(onClick="add()") tmp
+    = msg
+    
+    .nanigasi(data-foe="nonioi") boiboi
+    script.
+      console.log(Element.dataset);
+

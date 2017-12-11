@@ -13,4 +13,5 @@ module.exports = (app, route, render)->
   app.use route.get '/sub', require('./sub')(render)
   app.use route.post '/sub', require('./sub')(render)
   app.use route.get '/sh', require('./sh')(render)
+  app.use route.get '/dataset', require('./dataset')(render)
   
