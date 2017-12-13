@@ -9,6 +9,94 @@ console.time "tmp"
 
 
 
+###
+a =
+  aaa: ->
+    get: ->3,
+    set: ->
+
+console.log a.aaa
+a.aaa=5;
+console.log a.aaa
+console.log a
+###
+
+
+
+###
+fun = ->
+ob = {fun}
+
+console.log ob.fun.name
+console.log((->).name)
+###
+
+
+
+###
+foo = "astai"
+obj = {foo}
+console.log obj
+
+
+siym = 1e5
+jet = {siym}
+console.log jet
+
+lit = {}
+lit[1e5]="a"
+console.log lit
+###
+
+###
+# Proxy
+target = {}
+obj = new Proxy target, get: (target, name, receiver)-> name
+
+
+console.log obj.foo
+console.log obj['あいうえお']
+
+obj.name = "Mary Sue"
+console.log obj.name
+console.log target.name
+###
+
+
+###
+gen=(w)->
+  console.log yield* [1,2,3]
+
+g = gen(9)
+console.log g.next(90)
+console.log g.next(900)
+console.log g.next()
+console.log g.next()
+console.log g.next()
+###
+
+
+###
+gen=(w)->
+  try
+    console.log('w:', w)
+    x = yield
+    console.log('x:', x)
+    y = yield
+    console.log('y:', y)
+    z = yield
+    console.log('z:', z)
+  catch e
+    yield -1
+
+
+console.log "1"
+g = gen(1)
+console.log g.next(10)
+console.log g.throw(new Error("erata"))
+console.log g.return(1000)
+###
+
 
 ###
 gen=(w)->
