@@ -7,6 +7,58 @@ console.time "tmp"
 
 
 
+###
+# influenzatmosphere
+# https://
+
+
+sendEs = (obj)-> new Promise (f,r)->
+  idx = "influenzatmosphere-" + "01"
+  
+  req = require("https").request
+    host: ""
+    path: "/" + idx + "/bbbb"
+    method: "POST"
+    headers:
+      "content-type": "application/json"
+    , (res)->
+      res.on "data", (c)-> f c.toString()
+  
+  req.on "error", (e)-> r e
+  req.write JSON.stringify obj
+  req.end()
+
+
+obj = {}
+obj.timestamp = 
+obj.kasen = "gakireru"
+
+sendEs obj
+.then (v)-> console.log v
+.catch (e)-> console.log e
+
+
+getEs = -> new Promise (f,r)->
+  require("https").get "https://"
+  , (res)->
+    res.on "data", (c)-> f JSON.parse c.toString()
+  .on "error", (e)-> r e
+
+
+# getEs()
+# .then (v)-> console.log v
+# .catch (e)-> console.log e
+###
+
+
+###
+a = require("https").get "https://"
+
+a.on "response", (res)->
+  console.log "kiteru"
+  res.on "data", (c)->
+    console.log c.toString()
+###
 
 
 ###
