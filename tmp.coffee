@@ -7,22 +7,57 @@ console.time "tmp"
 
 
 
+
+
+###
+deleteEs = (idx)-> new Promise (f,r)->
+  req = require("https").request
+    host: "com"
+    path: "/" + idx
+    method: "DELETE"
+    headers:
+      "content-type": "application/json"
+    , (res)->
+      res.on "data", (c)->
+        f c.toString()
+        # f()
+  
+  req.on "error", (e)-> r e
+  # req.write JSON.stringify 
+  req.end()
+
+idx = "influenzatmosphere-2017.12.19"
+deleteEs idx
+.then (v)-> console.log v
+.catch (e)-> console.log e
+###
+
+
 ###
 # influenzatmosphere
 # https://
 
+logstashdateformat = ->
+  d = new Date()
+  d.getFullYear() + "." \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "." \
+   + ("0" + d.getDate()).slice(-2) + ""
 
 sendEs = (obj)-> new Promise (f,r)->
-  idx = "influenzatmosphere-" + "01"
+  # indexはYYYY.MM.DD
+  idx = "-" + logstashdateformat()
+  # console.log "idx:", idx
   
   req = require("https").request
-    host: ""
-    path: "/" + idx + "/bbbb"
+    host: "localhost"
+    path: "/" + idx + "/logs"
     method: "POST"
     headers:
       "content-type": "application/json"
     , (res)->
-      res.on "data", (c)-> f c.toString()
+      res.on "data", (c)->
+        # f c.toString()
+        f()
   
   req.on "error", (e)-> r e
   req.write JSON.stringify obj
@@ -30,12 +65,16 @@ sendEs = (obj)-> new Promise (f,r)->
 
 
 obj = {}
-obj.timestamp = 
-obj.kasen = "gakireru"
+obj["@timestamp"] = new Date()
+obj.temperature = 40
+obj.humidity = 30
+obj.wva = 6
+console.log obj
 
 sendEs obj
 .then (v)-> console.log v
 .catch (e)-> console.log e
+
 
 
 getEs = -> new Promise (f,r)->
@@ -49,6 +88,8 @@ getEs = -> new Promise (f,r)->
 # .then (v)-> console.log v
 # .catch (e)-> console.log e
 ###
+
+
 
 
 ###
