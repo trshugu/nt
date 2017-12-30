@@ -7,7 +7,31 @@ console.time "tmp"
 
 
 
+###
+# callbackmethod
+console.log "start"
 
+cb = ->
+  console.log "cb"
+
+asyn = new Promise (f,r) ->
+  f()
+
+asynrap = -> new Promise (f,r) ->
+  f()
+
+
+console.log "1"
+cb()
+console.log "2"
+asyn.then -> console.log "asyn"
+console.log "3"
+asynrap().then -> console.log "asynrap"
+console.log "4"
+console.log "5"
+
+console.log "end"
+###
 
 ###
 deleteEs = (idx)-> new Promise (f,r)->
