@@ -1,0 +1,29 @@
+{
+  "name": "nt",
+  "version": "1.0.0",
+  "description": "nt\r ==",
+  "main": "tmp.coffee",
+  "dependencies": {
+    "co": "^4.6.0",
+    "co-view": "^0.0.1",
+    "co-views": "^2.1.0",
+    "koa": "^2.4.1",
+    "koa-route": "^3.2.0",
+    "pug": "^2.0.0-rc.4",
+    "node-uuid": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trshugu/nt.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/trshugu/nt/issues"
+  },
+  "homepage": "https://github.com/trshugu/nt#readme"
+}

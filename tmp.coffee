@@ -1,9 +1,26 @@
 console.time "tmp"
+helper = require "./helper"
 ###
 ###
 
 
 
+
+
+
+helper.makeDir "po/bag/asdf/asdf/fe/fe/asdf/efe/sasdf/efda/sdfe/fa/"
+.then (v)-> console.log v
+.catch (e)-> console.log e
+
+
+###
+# ディレクトリ構造解析
+dir = "./asdf/jjiji/dkjd"
+
+# fs = require "fs"
+
+console.log dir.split("/")[0...-1].join("/")
+###
 
 
 
