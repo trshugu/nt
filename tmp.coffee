@@ -7,10 +7,38 @@ helper = require "./helper"
 
 
 
+###
+# json 配列
+a = [
+  aa : 1
+  bb : 2
+,
+  aa : 1
+  bb : 2
+]
 
+console.log a
+###
+
+###
+# objectにobjectを入れる
+j = 
+  aa : 1
+  kore :
+    asdf : "dhi"
+    fewf : "can"
+  bb : 2
+
+
+console.log j
+###
+
+###
 helper.makeDir "po/bag/asdf/asdf/fe/fe/asdf/efe/sasdf/efda/sdfe/fa/"
 .then (v)-> console.log v
 .catch (e)-> console.log e
+###
+
 
 
 ###
