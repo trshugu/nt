@@ -8,6 +8,19 @@ helper = require "./helper"
 
 
 ###
+# ナノ秒計測
+NS_PER_SEC = 1e9
+nano = process.hrtime()
+
+process.nextTick ->
+  diff = process.hrtime(nano)
+  console.log diff[0] * NS_PER_SEC + diff[1]
+###
+
+
+
+
+###
 # json 配列
 a = [
   aa : 1
