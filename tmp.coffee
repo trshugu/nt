@@ -6,6 +6,25 @@ helper = require "./helper"
 
 
 
+###
+# temperature-humidity index thidx
+temp = 35
+humi = 0
+
+
+
+thidx = (t, h)-> 0.81 * t + 0.01 * h * (0.99 * t - 14.3) + 46.3
+
+dc = thidx temp, humi
+
+console.log dc
+if 75 > dc && dc >= 60 
+  console.log "t"
+  
+else
+  console.log "f"
+###
+
 
 ###
 # ナノ秒計測
