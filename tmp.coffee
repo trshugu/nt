@@ -6,6 +6,48 @@ helper = require "./helper"
 
 
 
+
+###
+
+# Arrayにprototypeがでてしまう場合
+Ins = (name)-> @name = name
+Ins.prototype =
+  # medo: -> console.log @name, "emdo"
+  doro: -> console.log @name, "dorojii"
+
+
+Object.defineProperty Ins.prototype, "medo",
+  writable:true
+  enumerable:true
+  configurable:true
+  value:-> console.log @name, "emdohodheo"
+
+tans = new Ins "namae"
+
+# tans.medo()
+# tans.doro()
+
+# console.log Object.keys tans
+# console.log tans
+# console.log tans.medo
+
+
+
+Object
+.keys tans
+.forEach (n)->
+  console.log tans[n]
+
+# coffeeではfor-inは (i = 0, len = tans.length; i < len; i++) に書き換わる
+for k in tans
+  console.log "kottiha?"
+  console.log tans[k]
+###
+
+
+
+
+
 ###
 # temperature-humidity index thidx
 temp = 35
