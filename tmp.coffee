@@ -6,6 +6,78 @@ helper = require "./helper"
 
 
 
+###
+# 0101から1231の365個の配列作成
+cal = [1..12]
+  .map (i)->
+    switch i
+      when 4,6,9,11
+        [1..30].map((j)->i.toString() + ("0" + j.toString()).slice(-2))
+      when 2
+        [1..28].map((j)->i.toString() + ("0" + j.toString()).slice(-2))
+      else
+        [1..31].map((j)->i.toString() + ("0" + j.toString()).slice(-2))
+
+calarr = Array.prototype.concat.apply [],cal
+
+
+# 0～10000人マイミクがいた場合の特定の日が非誕生日な割合
+unbirthday = [0...10000].map (index)->
+  console.log index
+  mymiku = [0...index].map -> calarr[Math.floor(Math.random() * calarr.length)]
+
+  # 一万回試行して精度を高める
+  n = 10000
+  sample = [0...n]
+    .map -> mymiku.findIndex (i)-> i == calarr[Math.floor(Math.random() * calarr.length)]
+    .filter (i)-> i == -1
+    .length
+
+  Math.floor((sample / n) * 100)
+
+
+# csvにする
+require("fs").appendFile "mymikuubd.csv", unbirthday.join("\n"), (e)->
+  if e?
+    console.log e
+  else
+    console.log "end"
+###
+
+
+
+###
+# 0101から1231の366個の配列作成
+cal = [1..12]
+  .map (i)->
+    switch i
+      when 4,6,9,11
+        [1..30].map((j)->i.toString() + ("0" + j.toString()).slice(-2))
+      when 2
+        [1..28].map((j)->i.toString() + ("0" + j.toString()).slice(-2))
+      else
+        [1..31].map((j)->i.toString() + ("0" + j.toString()).slice(-2))
+
+calarr = Array.prototype.concat.apply [],cal
+
+
+unbirthday = [0...20].map ->
+  mymiku = [0...1000].map -> calarr[Math.floor(Math.random() * calarr.length)]
+
+  # 一万回試行して割合を求める
+  n = 10000
+  sample = [0...n]
+    .map -> mymiku.findIndex (i)-> i == calarr[Math.floor(Math.random() * calarr.length)]
+    .filter (i)-> i == -1
+    .length
+
+  Math.floor((sample / n) * 100)
+
+console.log unbirthday
+###
+
+
+
 
 ###
 
