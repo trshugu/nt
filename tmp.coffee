@@ -6,6 +6,56 @@ helper = require "./helper"
 
 
 
+# ハッシュ某01
+NS_PER_SEC = 1e9
+
+# h = helper.getHash()
+
+
+# 1..64
+# n=1
+# h.substr(0,n)
+
+[1..5].map (i)->
+  console.time "hash"
+  # =========================================
+  lhashes = [0...10].map (j)-> helper.getHash().substr(0,i)
+  
+  fil = lhashes.filter (v,ind,s)-> s.indexOf(v) != ind
+  console.log lhashes
+  console.log "fil",fil
+  # =========================================
+  console.timeEnd "hash"
+  
+
+
+
+###
+
+# csvつくる
+require("fs").appendFile "hhash.csv", "moj,iretu"+"\n", (e)->
+  if e?
+    console.log e
+  else
+    console.log "end"
+
+###
+
+
+
+###
+# 無限ハッシュ
+i = 0
+noroi = (h)->
+  h2 = helper.getHash h
+  console.log i,h2
+  ++i
+  noroi h2
+
+noroi helper.getHash()
+###
+
+
 ###
 # 0101から1231の365個の配列作成
 cal = [1..12]
