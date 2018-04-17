@@ -5,7 +5,7 @@ helper = require "./helper"
 
 
 
-
+###
 # ハッシュ某01
 NS_PER_SEC = 1e9
 
@@ -26,7 +26,172 @@ NS_PER_SEC = 1e9
   console.log "fil",fil
   # =========================================
   console.timeEnd "hash"
+###
+
+
+
+
+
+
+console.log helper.getHash64()
+
+
+###
+# モジュロ演算にて→NG 閏年自信の計算に難あり
+convert_dow = (i)->
+  switch i
+    when 0 then return "日"
+    when 1 then return "月"
+    when 2 then return "火"
+    when 3 then return "水"
+    when 4 then return "木"
+    when 5 then return "金"
+    when 6 then return "土"
+
+y = 1982
+m = 8
+d = 2
+
+one = d - m
+
+two = switch m
+  when 1,3,5,7,9,11 then 3
+  when 2,4,6,8,10,12 then 0
+
+thr = switch m
+  when 1,2 then 2
+  when 9,11 then 1
+  else 0
+
+four = y % 20
+five = switch four
+  when 0,1,2,3 then 1
+  when 4,5,6,7 then 2
+  when 8,9,10,11 then 3
+  when 12,13,14,15 then 4
+  when 16,17,18,19 then 5
+
+dow = (one + two + thr + four + five + 4) % 7
+console.log convert_dow dow
+###
+
+
+###
+# ツェラーの公式2
+convert_dow = (i)->
+  switch i
+    when 0 then return "日"
+    when 1 then return "月"
+    when 2 then return "火"
+    when 3 then return "水"
+    when 4 then return "木"
+    when 5 then return "金"
+    when 6 then return "土"
+
+
+y = 1982
+m = 1
+d = 2
+
+if m == 1 || m == 2 
+  m = 13 if m == 1
+  m = 14 if m == 2
+  y = y - 1
+
+dow = (y + Math.floor(y / 4) - Math.floor(y / 100) +  Math.floor(y / 400) + Math.floor((m * 13 + 8) / 5) + d) % 7
+
+console.log "あなたの誕生日は" + convert_dow(dow) + "曜日でした"
+###
+
+
+
+
+###
+# ツェラーの公式
+convert_dow = (i)->
+  switch i
+    when 0 then return "日"
+    when 1 then return "月"
+    when 2 then return "火"
+    when 3 then return "水"
+    when 4 then return "木"
+    when 5 then return "金"
+    when 6 then return "土"
+
+y = 1982
+m = 8
+d = 2
+
+one = y + Math.floor(y / 4)
+console.log one
+two = one - Math.floor(y / 100)
+console.log two
+three = two +  Math.floor(y / 400)
+console.log three
+four = Math.floor((m * 13 + 8) / 5)
+console.log four
+dow = (three + four + d) % 7
+console.log dow
+
+console.log "あなたの誕生日は" + convert_dow(dow) + "曜日でした"
+###
+
+
+
+
+
+
+
+###
+[1..10].forEach ->
+  console.log Math.floor(Math.random() * 10 + 1) # ゼロなし
+  console.log Math.floor(Math.random() * 10) # ゼロあり
+###
+
+
+###
+# 2/3くらいで失敗するレスポンス
+fs = require("fs")
+
+appendfile = (i)-> new Promise (f,r)->
+  fs.appendFile "sanbunnoni.csv", i + "\n", (e)->
+    if e?
+      r e
+    else
+      f "end"
+
+get = -> new Promise (f,r)->
+  require("http").get "http://localhost:3000"
+  , (res)->
+    res.on "data", (c)->
+      # f [c.toString(), res.statusCode]
+      f res.statusCode
+      
+  .on "error", (e)-> r e
+
+
+controller = (ctx)->
+  r = Math.floor(Math.random() * 10)
+  console.log "r", r
+  switch r
+    when 1,2,3,4,5,6
+      ctx.status = 404
   
+  ctx.body = "hell"
+
+new (require 'koa')().use( controller ).listen 3000
+
+cnt = 0
+[1..100].forEach (i)->
+  get()
+  .then (v)->
+    # console.log i,v
+    if v == 404
+      cnt++
+    console.log cnt
+    # appendfile v
+  .catch (e)-> console.log i,e
+###
 
 
 

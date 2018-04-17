@@ -12,6 +12,16 @@ module.exports.createHash = (src)->
   cry.update src, "utf8"
   cry.digest 'hex'
 
+module.exports.getHash64 = -> 
+  cry = require("crypto").createHash 'SHA512'
+  cry.update uuid.v4(), "utf8"
+  cry.digest 'hex'
+
+module.exports.createHash64 = (src)-> 
+  cry = require("crypto").createHash 'SHA512'
+  cry.update src, "utf8"
+  cry.digest 'hex'
+
 module.exports.epoch2date = (d)->
   d.getFullYear() + "/" \
    + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
