@@ -30,10 +30,53 @@ NS_PER_SEC = 1e9
 
 
 
+###
+# objectの中身が[object]とかなので展開
+o = {}
+
+o.b = {}
+o.b.j = [1,3,5,{a:1}]
+console.log JSON.stringify o
+###
 
 
 
-console.log helper.getHash64()
+
+arr = [1,3,4,5,6,7,8,9]
+console.log arr.includes
+console.log arr.includes 1
+console.log arr.includes 8, -1
+
+Array.prototype.includes = null
+
+if !Array.prototype.includes
+  Object.defineProperty Array.prototype, 'includes',
+    value: (s, index)->
+      throw new TypeError '"this" is null or not defined' if this == null
+      
+      o = Object this
+      len = o.length >>> 0
+      
+      return false if (len == 0)
+      
+      n = index | 0
+      k = Math.max( (if n >= 0 then n else len - Math.abs(n)) , 0)
+      
+      while (k < len)
+        return true if o[k] == s
+        
+        k++
+      
+      false
+
+console.log arr.includes
+console.log arr.includes 1
+console.log arr.includes 8, -1
+
+
+
+
+# console.log helper.getHash64()
 
 
 ###
