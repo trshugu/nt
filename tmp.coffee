@@ -30,6 +30,70 @@ NS_PER_SEC = 1e9
 
 
 
+
+
+
+
+
+
+
+
+
+###
+# ポート変えたサーバ同士で通信
+# process.argv[2]
+
+koa = require "koa"
+new koa()
+  .use (ctx)->
+    console.log ctx.header.host
+    
+    setTimeout ->
+      req = require("http").request
+        host: "localhost"
+        port: 3001
+        method: "get"
+        , (res)->
+          res.on "data", (c)->
+            console.log "res1:", c.toString()
+      
+      req.on "error", (e)-> console.log e
+      # req.write JSON.stringify 
+      req.end()
+            
+      console.log "done1"
+    , 1000
+    
+    ctx.body = "test1 " + ctx.header.host
+  .listen 3000
+
+
+new koa()
+  .use (ctx)->
+    console.log ctx.header.host
+    
+    setTimeout ->
+      req = require("http").request
+        host: "localhost"
+        port: 3000
+        method: "get"
+        , (res)->
+          res.on "data", (c)->
+            console.log "res2:", c.toString()
+      
+      req.on "error", (e)-> console.log e
+      # req.write JSON.stringify 
+      req.end()
+            
+      console.log "done2"
+    , 1000
+    
+    ctx.body = "test2 " + ctx.header.host
+  .listen 3001
+###
+
+
+
 ###
 # objectの中身が[object]とかなので展開
 o = {}
@@ -42,6 +106,9 @@ console.log JSON.stringify o
 
 
 
+
+
+###
 arr = [1,3,4,5,6,7,8,9]
 console.log arr.includes
 console.log arr.includes 1
@@ -72,6 +139,9 @@ if !Array.prototype.includes
 console.log arr.includes
 console.log arr.includes 1
 console.log arr.includes 8, -1
+###
+
+
 
 
 
