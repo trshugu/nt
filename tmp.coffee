@@ -35,9 +35,43 @@ NS_PER_SEC = 1e9
 
 
 
+###
+rs = require("fs").createReadStream "read.txt", encoding: "utf8", bufferSize: 1
+
+rs.on "data", (d)->
+  console.log "chun: "
+  console.log d
+rs.on "end", (d)-> console.log "end",d
+
+rs.pipe(process.stdout)
+###
 
 
+###
+# tcp wiki
+net = require 'net'
+server = net.createServer  (stream)->
+  stream.write 'hello\r\n'
+  
+  stream.on 'data', (data)->
+    console.log data.toString()
+  
+  stream.on 'end', ->
+    console.log 'end'
 
+server.listen 3000, 'localhost', -> console.log "bound"
+###
+
+###
+# http wiki
+http = require 'http'
+http.createServer (request, response)->
+  response.writeHead 200, 'Content-Type': 'text/plain'
+  response.end 'Hello World\n'
+.listen 3000
+
+console.log 'Server running at http://127.0.0.1:3000/'
+###
 
 ###
 # ポート変えたサーバ同士で通信
