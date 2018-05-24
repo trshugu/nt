@@ -34,6 +34,266 @@ NS_PER_SEC = 1e9
 
 
 
+# tdd説明資料向け
+zip = [
+  "北海道"
+  "青森県"
+  "岩手県"
+  "宮城県"
+  "秋田県"
+  "山形県"
+  "福島県"
+  "茨城県"
+  "栃木県"
+  "群馬県"
+  "埼玉県"
+  "千葉県"
+  "東京都"
+  "神奈川県"
+  "新潟県"
+  "富山県"
+  "石川県"
+  "福井県"
+  "山梨県"
+  "長野県"
+  "岐阜県"
+  "静岡県"
+  "愛知県"
+  "三重県"
+  "滋賀県"
+  "京都府"
+  "大阪府"
+  "兵庫県"
+  "奈良県"
+  "和歌山県"
+  "鳥取県"
+  "島根県"
+  "岡山県"
+  "広島県"
+  "山口県"
+  "徳島県"
+  "香川県"
+  "愛媛県"
+  "高知県"
+  "福岡県"
+  "佐賀県"
+  "長崎県"
+  "熊本県"
+  "大分県"
+  "宮崎県"
+  "鹿児島県"
+  "沖縄県"
+]
+
+
+zipobj = [
+  {j:"北海道",e:"hokkaido"}
+  {j:"青森県",e:"aomori"}
+  {j:"岩手県",e:"iwate"}
+  {j:"宮城県",e:"miyagi"}
+  {j:"秋田県",e:"akita"}
+  {j:"山形県",e:"yamagata"}
+  {j:"福島県",e:"fukushima"}
+  {j:"茨城県",e:"ibaraki"}
+  {j:"栃木県",e:"tochigi"}
+  {j:"群馬県",e:"gunma"}
+  {j:"埼玉県",e:"saitama"}
+  {j:"千葉県",e:"chiba"}
+  {j:"東京都",e:"tokyo"}
+  {j:"神奈川県",e:"kanagawa"}
+  {j:"新潟県",e:"niigata"}
+  {j:"富山県",e:"toyama"}
+  {j:"石川県",e:"ishikawa"}
+  {j:"福井県",e:"fukui"}
+  {j:"山梨県",e:"yamaguchi"}
+  {j:"長野県",e:"nagano"}
+  {j:"岐阜県",e:"gifu"}
+  {j:"静岡県",e:"shizuoka"}
+  {j:"愛媛県",e:"aichi"}
+  {j:"三重県",e:"mie"}
+  {j:"滋賀県",e:"shiga"}
+  {j:"京都府",e:"kyoto"}
+  {j:"大阪府",e:"osaka"}
+  {j:"兵庫県",e:"hyogo"}
+  {j:"奈良県",e:"nara"}
+  {j:"和歌山県",e:"wakayama"}
+  {j:"鳥取県",e:"tottori"}
+  {j:"島根県",e:"shimane"}
+  {j:"岡山県",e:"okayama"}
+  {j:"広島県",e:"hiroshima"}
+  {j:"山口県",e:"yamanashi"}
+  {j:"徳島県",e:"tokushima"}
+  {j:"香川県",e:"kagawa"}
+  {j:"愛知県",e:"ehime"}
+  {j:"高知県",e:"kochi"}
+  {j:"福岡県",e:"fukuoka"}
+  {j:"佐賀県",e:"saga"}
+  {j:"長崎県",e:"nagasaki"}
+  {j:"熊本県",e:"kumamoto"}
+  {j:"大分県",e:"oita"}
+  {j:"宮崎県",e:"miyazaki"}
+  {j:"鹿児島県",e:"kagoshima"}
+  {j:"沖縄県",e:"okinawa"}
+]
+
+zipobjusa = [
+  {j:"アラバマ",e:"Alabama"}
+  {j:"アラスカ",e:"Alaska"}
+  {j:"アリゾナ",e:"Arizona"}
+  {j:"アーカンソー",e:"Arkansas"}
+  {j:"カリフォルニア",e:"California"}
+  {j:"コロラド",e:"Colorado"}
+  {j:"コネチカット",e:"Connecticut"}
+  {j:"デラウェア",e:"Delaware"}
+  {j:"フロリダ",e:"Florida"}
+  {j:"ジョージア",e:"Georgia"}
+  {j:"ハワイ",e:"Hawaii"}
+  {j:"アイダホ",e:"Idaho"}
+  {j:"イリノイ",e:"Illinois"}
+  {j:"インディアナ",e:"Indiana"}
+  {j:"アイオワ",e:"Iowa"}
+  {j:"カンザス",e:"Kansas"}
+  {j:"ケンタッキー",e:"Kentucky"}
+  {j:"ルイジアナ",e:"Louisiana"}
+  {j:"メーン",e:"Maine"}
+  {j:"メリーランド",e:"Maryland"}
+  {j:"マサチューセッツ",e:"Massachusetts"}
+  {j:"ミシガン",e:"Michigan"}
+  {j:"ミネソタ",e:"Minnesota"}
+  {j:"ミシシッピ－",e:"Mississippi"}
+  {j:"ミズーリ",e:"Missouri"}
+  {j:"モンタナ",e:"Montana"}
+  {j:"ネブラスカ",e:"Nebraska"}
+  {j:"ネバダ",e:"Nevada"}
+  {j:"ニューハンプシャー",e:"New Hampshire"}
+  {j:"ニュージャージー",e:"New jersey"}
+  {j:"ニューメキシコ",e:"New Mexico"}
+  {j:"ニューヨーク",e:"New York"}
+  {j:"ノースカロライナ",e:"North Carolina"}
+  {j:"ノースダコタ",e:"North Dakota"}
+  {j:"オハイオ",e:"Ohio"}
+  {j:"オクラホマ",e:"Oklahoma"}
+  {j:"オレゴン",e:"Oregon"}
+  {j:"ペンシルバニア",e:"Pennsylvania"}
+  {j:"ロードアイランド",e:"Rhode Island"}
+  {j:"サウスカロライナ",e:"South Carolina"}
+  {j:"サウスダコタ",e:"South Dakota"}
+  {j:"テネシー",e:"Tennessee"}
+  {j:"テキサス",e:"Texas"}
+  {j:"ユタ",e:"Utah"}
+  {j:"バーモント",e:"Vermont"}
+  {j:"バージニア",e:"Virginia"}
+  {j:"ワシントン",e:"Washington"}
+  {j:"ウェストバージニア",e:"West Virginia"}
+  {j:"ウィスコンシン",e:"Wisconsin"}
+  {j:"ワイオミング",e:"Wyoming"}
+]
+
+
+###
+nottdd1 = (i) ->
+  zip[i-1]
+
+console.log nottdd1 1 # 北海道
+console.log nottdd1 47 # 沖縄県
+
+
+nottdd2 = (i) ->
+  # zip[i+1]
+  obj = zipobj[i-1]
+  obj.e
+
+console.log nottdd2 1 # hokkaido
+console.log nottdd2 47 # okinawa
+
+
+nottdd4 = (i, region) ->
+  if region == "ja"
+    obj = zipobj[i-1]
+    obj.e
+  else
+    obj = zipobjusa[i-1]
+    obj.e
+
+console.log nottdd4 1, "ja" # hokkaido
+console.log nottdd4 47, "ja" # okinawa
+
+console.log nottdd4 1, "us" # Alabama
+console.log nottdd4 47, "us" # Washington
+
+nottdd5 = (i, region, language) ->
+  if region == "jp"
+    obj = zipobj[i-1]
+    if language == "us"
+      obj.e
+    else
+      obj.j
+  else
+    obj = zipobjusa[i-1]
+    if language =="us"
+      obj.e
+    else
+      obj.j
+
+
+console.log nottdd5 1, "jp", "ja" # 北海道
+console.log nottdd5 47, "jp", "ja" # 沖縄県
+
+console.log nottdd5 1, "us", "ja" # アラバマ
+console.log nottdd5 47, "us", "ja" # ワシントン
+###
+
+
+###
+# v0
+module.exports.tdd = ->
+  "北海道"
+###
+
+
+###
+# v1
+module.exports.tdd = (i)->
+  zip[i-1]
+###
+
+###
+# v2
+module.exports.tdd = (i, lang="ja")->
+  switch lang
+    when "ja"
+      zipobj[i-1].j
+    when "us"
+      zipobj[i-1].e
+###
+
+
+# v4 / v5
+zip_jp = (i, lang="ja")->
+  switch lang
+    when "ja"
+      zipobj[i-1].j
+    when "us"
+      zipobj[i-1].e
+
+zip_us = (i, lang="ja")->
+  switch lang
+    when "ja"
+      zipobjusa[i-1].j
+    when "us"
+      zipobjusa[i-1].e
+
+
+module.exports.tdd = (i, lang="ja", region="jp")->
+  switch region
+    when "jp"
+      zip_jp i,lang
+    when "us"
+      zip_us i,lang
+
+
+
+
 
 ###
 rs = require("fs").createReadStream "read.txt", encoding: "utf8", bufferSize: 1
@@ -42,7 +302,6 @@ rs.on "data", (d)->
   console.log "chun: "
   console.log d
 rs.on "end", (d)-> console.log "end",d
-
 rs.pipe(process.stdout)
 ###
 
