@@ -34,6 +34,54 @@ NS_PER_SEC = 1e9
 
 
 
+###
+# cookie
+# require("https").get "https://httpbin.org/cookies/set/fooo/baaaa" , (res)-> res.on "data", (c)->  console.log res.headers["set-cookie"]
+require("https").get "https://httpbin.org/cookies/set/fooo/baaaa"
+  , (res)->
+    res.on "data", (c)->
+      # f [c.toString(), res.statusCode]
+      console.log res.headers["set-cookie"]
+###
+
+
+
+
+
+###
+request = require("request")
+j = request.jar()
+j.setCookie request.cookie("vooo=beee"), "http://httpbin.org/cookies"
+
+request
+  url: "http://httpbin.org/cookies"
+  jar: j
+  , ->
+    request "http://httpbin.org/cookies"
+
+    request.get
+      uri: "http://httpbin.org/cookies"
+      , (e,r,b)->
+        if e?
+          console.log "e:",e
+        else
+          console.log "b:",b
+
+
+require("request").get
+  uri: "https://httpbin.org/cookies/set/node/jjss"
+  # headers: cookie: "asdf=asdf"
+  , (e,r,b)->
+    if e?
+      console.log "e:",e
+    else
+      console.log "b:",b
+      console.log "r:",r.headers
+      # console.log "r:",r
+###
+
+
+###
 # tdd説明資料向け
 zip = [
   "北海道"
@@ -188,6 +236,7 @@ zipobjusa = [
   {j:"ウィスコンシン",e:"Wisconsin"}
   {j:"ワイオミング",e:"Wyoming"}
 ]
+###
 
 
 ###
@@ -268,6 +317,8 @@ module.exports.tdd = (i, lang="ja")->
 ###
 
 
+
+###
 # v4 / v5
 zip_jp = (i, lang="ja")->
   switch lang
@@ -290,7 +341,7 @@ module.exports.tdd = (i, lang="ja", region="jp")->
       zip_jp i,lang
     when "us"
       zip_us i,lang
-
+###
 
 
 
