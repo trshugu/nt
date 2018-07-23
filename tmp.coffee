@@ -34,6 +34,125 @@ NS_PER_SEC = 1e9
 
 
 
+
+
+
+
+
+
+
+###
+@a = "adesu"
+console.log @
+
+func = ->
+  console.log "===="
+  # console.log @, "cool"
+  # console.log @a.toString()
+  # console.log @a.length
+  # console.log this.replace /n/g, "k"
+  # console.log @a
+  console.log @()
+  console.log "===="
+
+
+# func()
+# func.bind(this)()
+# func.bind("nanigoto")()
+func.bind(->console.log "kog")()
+###
+
+
+###
+# ファイル名を取得
+n = process.argv[2]
+console.log n
+console.log n.split("\\")
+console.log n.split("\\").pop()
+console.log n.split("\\").slice(-1)[0]
+
+setInterval ->
+  console.log 100
+, 10000
+###
+
+
+
+###
+y = 1930
+while y % 4 != 0
+  console.log y
+  console.log y % 4
+  y += 4
+
+
+console.log y
+###
+
+
+
+
+###
+# 機械的に学習
+
+q = [
+    k: 1
+  ,
+    k: 2
+  ,
+    k: 3
+  ,
+    k: 4
+]
+
+sample = q
+
+
+ml = (i)->
+  sample.filter (j)-> j.k == i
+
+
+# test
+console.log ml(q[0].k)
+console.log ml(q[0].k)
+console.log ml(q[0].k) == 0
+console.log ml(q[1].k) == 1
+console.log ml(q[2].k) == 0
+console.log ml(q[3].k) == 1
+###
+
+
+
+
+
+
+
+###
+a = -> ""
+b = -> ""
+
+# ccc = undefined
+# ccc = if a() != "" then a() else if b() != "" then b() else null
+# ccc = a() != "" && b() != "" 
+
+ccc = null
+ccc = a() || ccc = b()
+
+console.log ccc
+###
+
+
+
+
+###
+q = undefined
+q |= 1
+q |= 2
+console.log q
+###
+
+
+
 ###
 # cookie
 # require("https").get "https://httpbin.org/cookies/set/fooo/baaaa" , (res)-> res.on "data", (c)->  console.log res.headers["set-cookie"]

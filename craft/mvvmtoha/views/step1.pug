@@ -1,0 +1,56 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    title tmp
+    
+    script(src='https://cdn.rawgit.com/jashkenas/coffeescript/571e9df3/docs/v2/browser-compiler/coffeescript.js')
+    script(type="text/javascript" src="http://knockoutjs.com/downloads/knockout-3.4.2.js")
+    
+  body
+    script(type="text/coffeescript").
+      # Modelを定義
+      M = (value) ->
+        self = this
+        self.text = ko.observable(value)
+        return
+      
+      # ViewModelを定義
+      VM = ->
+        self = this
+        self.list = ko.observableArray() # todoリスト
+        self.inputValue = ko.observable("") # 追加todoテキスト
+        
+        # 追加
+        self.add = (obj, e) ->
+          # イベントバインディングで実行される関数の第1引数にはViewModel、第2引数にはイベントオブジェクトが渡される
+          return  unless self.inputValue() # 空文字の場合は処理しない
+          
+          # 入力されたテキストでModelを作りリストに挿入
+          self.list.unshift new M(self.inputValue())
+          self.inputValue ""
+          return
+        
+        # 削除
+        self.remove = (obj, e) ->
+          # イベントバインディングで実行される関数の第1引数にはModel、第2引数にはイベントオブジェクトが渡される
+          self.list.remove obj
+          return
+        
+        return
+      
+      # bindingスタート
+      ko.applyBindings new VM()
+    
+    
+    input(type="text" value="" data-bind="value: inputValue")
+    button(data-bind="click: add") add
+    
+    .list(data-bind="foreach: list, visible: list().length > 0")
+      .sep
+        span(data-bind="text: text") Todo
+        button(data-bind="click: $root.remove") delete
+
+
+
+

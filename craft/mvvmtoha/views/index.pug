@@ -1,0 +1,39 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    title tmp
+    
+    script(src='https://cdn.rawgit.com/jashkenas/coffeescript/571e9df3/docs/v2/browser-compiler/coffeescript.js')
+    script(type="text/javascript" src="http://knockoutjs.com/downloads/knockout-3.4.2.js")
+    
+    script(type="text/coffeescript").
+      artist_list = JSON.parse "#{list}".replace(/&quot;/g,"\"")
+      
+      VM = ->
+        self = this
+        self.list = ko.observableArray(artist_list)
+        
+        setTimeout ->
+          self.list.push artist_id: "d", name: "ついか"
+        , 2000
+        
+        return
+      
+      
+      ko.applyBindings new VM()
+    
+  body
+    table(border="1" bordercolor="#389df8")
+      tr
+        th id
+        th 名前
+      tbody(data-bind="foreach: list, visible: list().length > 0")
+        tr
+          td(data-bind="text: artist_id")
+          td(data-bind="text: name")
+
+
+
+
+

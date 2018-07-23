@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    meta(content="text/html" charset="utf-8")
+    title tmp
+    
+    script(src='https://cdn.rawgit.com/jashkenas/coffeescript/571e9df3/docs/v2/browser-compiler/coffeescript.js')
+    script(type="text/javascript" src="http://knockoutjs.com/downloads/knockout-3.4.2.js")
+    
+    script(type="text/coffeescript").
+      VM = ->
+        self = this
+        self.list = ko.observableArray()
+        
+        setTimeout ->
+          fetch "http://localhost:3000/api"
+          .then (res)->
+            res.json().then (v)->
+              v.map (i)->
+                self.list.push i
+        , 2000
+        
+        return
+      
+      
+      ko.applyBindings new VM()
+    
+  body
+    table(border="1" bordercolor="#389df8")
+      tr
+        th id
+        th 名前
+      tbody(data-bind="foreach: list, visible: list().length > 0")
+        tr
+          td(data-bind="text: artist_id")
+          td(data-bind="text: name")
+
+
+
+
+
