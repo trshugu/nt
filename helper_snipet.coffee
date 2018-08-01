@@ -1,5 +1,5 @@
 helper = @
-uuid = require "node-uuid"
+uuid = require "uuid"
 fs = require "fs"
 
 module.exports.getHash = -> 

@@ -5,6 +5,7 @@ helper = require "./helper"
 
 
 
+
 ###
 # ハッシュ某01
 NS_PER_SEC = 1e9
@@ -37,9 +38,88 @@ NS_PER_SEC = 1e9
 
 
 
+# マイクロなAPI
+app = new (require 'koa')()
+app.use (ctx)-> ctx.body = "hell"
+app.use require("koa-logger")()
+
+# routes
+route = require('koa-route')
+app.use route.get '/api', (ctx, msg)->
+  dp = {}
+  dp.api = "valuse"
+  ctx.body dp
+
+
+app.listen 3000, -> console.log "start"
 
 
 
+###
+console.log ch: helper.createHash("test")
+console.log gh: helper.getHash()
+console.log gh64: helper.getHash64()
+###
+
+
+###
+# 並列フォーク
+spawn = require('child_process').spawn
+ec = spawn "c:\\coffee.cmd", ["echoer.coffee", "ebs"]
+# ec = spawn "coffee", ["echoer.coffee", "ebs"]
+
+ec.stdout.on 'data', (d)-> console.log "out", d.toString()
+ec.stderr.on 'data', (d)-> console.log "err", d.toString()
+ec.on 'close', (code)-> console.log "code", code
+
+ef = spawn "c:\\coffee.cmd", ["echoer.coffee", "efs"]
+
+ef.stdout.on 'data', (d)-> console.log "out", d.toString()
+ef.stderr.on 'data', (d)-> console.log "err", d.toString()
+ef.on 'close', (code)-> console.log "code", code
+###
+
+
+
+
+###
+# カウントアップなrunner
+runner = (i, exec, c=1)-> new Promise (f,r)->
+  if i >= c
+    exec(c)
+    runner i, exec, c + 1
+  else
+    f()
+
+func = (c)->
+  console.log "run", c
+
+runner 30, func
+.then ->
+  console.log "done"
+.catch (e)->
+  console.log "e",e
+###
+
+
+###
+# カウントダウンなrunner
+runner = (i, exec)-> new Promise (f,r)->
+  if i > 0
+    exec()
+    runner i - 1, exec
+  else
+    f()
+
+func = ->
+  console.log "run"
+
+runner 3, func
+.then ->
+  console.log "done"
+.catch (e)->
+  console.log "e",e
+###
 
 ###
 @a = "adesu"
