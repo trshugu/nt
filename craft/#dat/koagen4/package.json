@@ -7,11 +7,11 @@
     "test": "mocha --harmony"
   },
   "dependencies": {
-    "co-body": "^0.0.1",
+    "co-body": "^6.0.0",
     "co-views": "^0.2.0",
-    "coffee-script": "^1.10.0",
+    "coffeescript": "*",
     "jade": "^1.11.0",
-    "koa": "^0.6.0",
+    "koa": "^2.5.2",
     "koa-compress": "^1.0.6",
     "koa-logger": "^1.2.0",
     "koa-route": "^1.1.4",
@@ -19,7 +19,7 @@
     "stylus": "^0.54.2"
   },
   "devDependencies": {
-    "supertest": "^0.12.1",
-    "mocha": "^1.18.2"
+    "mocha": "^5.2.0",
+    "supertest": "^3.1.0"
   }
 }

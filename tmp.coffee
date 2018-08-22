@@ -40,15 +40,19 @@ NS_PER_SEC = 1e9
 
 # マイクロなAPI
 app = new (require 'koa')()
-app.use (ctx)-> ctx.body = "hell"
 app.use require("koa-logger")()
 
 # routes
 route = require('koa-route')
-app.use route.get '/api', (ctx, msg)->
+app.use route.get '/api/:action/:value', (ctx, action, value)->
   dp = {}
-  dp.api = "valuse"
-  ctx.body dp
+  # dp.api = id
+  if action == "aaa"
+    dp.aaa = value
+  else
+    dp.other = "other action"
+  
+  ctx.body = dp
 
 
 app.listen 3000, -> console.log "start"
