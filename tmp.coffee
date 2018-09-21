@@ -32,12 +32,369 @@ NS_PER_SEC = 1e9
 
 
 
+###
+# 最大値と最小値を保持する
+class highpass
+  val: null
+  post: (i)->
+    if @val? == false || i > @val
+      @val = i
+
+class lowpass
+  val: null
+  post: (i)->
+    if @val? == false || i < @val
+      @val = i
+
+class bandpass
+  max: null
+  min: null
+  post: (i)->
+    if @max? == false || i > @max
+      @max = i
+    
+    if @min? == false || i < @min
+      @min = i
+  cen: ->
+    (@max + @min) / 2
+
+bp = new bandpass()
+###
+
+
+###
+bp.post 6
+bp.post 9
+bp.post 9
+bp.post 10
+bp.post 10
+bp.post 10
+bp.post 100
+console.log bp.cen()
+###
+
+
+
+###
+bp = new bandpass
+
+console.log bp.max
+console.log bp.min
+bp.post 5
+bp.post 7
+bp.post 3
+bp.post 4
+console.log bp.max
+console.log bp.min
+bp.post 6
+bp.post 5
+bp.post 5
+console.log bp.max
+console.log bp.min
+
+console.log bp.cen()
+###
+
+###
+lp = new lowpass()
+
+console.log lp.val
+lp.post 1
+console.log lp.val
+lp.post 2
+console.log lp.val
+lp.post 1
+console.log lp.val
+###
+
+###
+hp = new highpass()
+
+console.log hp.val
+hp.post 1
+console.log hp.val
+hp.post 2
+console.log hp.val
+hp.post 1
+console.log hp.val
+hp.post 5
+console.log hp.val
+hp.post 1
+console.log hp.val
+hp.post 5
+console.log hp.val
+hp.post 5
+console.log hp.val
+###
 
 
 
 
 
 
+
+###
+json = [['1の画面',['1-1','1-3','1-2']],['2の画面',['2-1','2-2','2-3']],['5の画面',['5-1','5-2','5-3']],['4の画面',['4-1','4-2','4-3']],['8の画面',['8-1','8-2','8-3']]];
+
+msort = (a,b)->
+  gamen = json.map (i)-> i[0]
+  
+  if gamen.indexOf(a[0]) > gamen.indexOf(b[0])
+    return 1
+  if gamen.indexOf(a[0]) < gamen.indexOf(b[0])
+    return -1
+  
+  if json[gamen.indexOf(a[0])][1].indexOf(a[1]) > json[gamen.indexOf(b[0])][1].indexOf(b[1])
+    return 1
+  if json[gamen.indexOf(a[0])][1].indexOf(a[1]) < json[gamen.indexOf(b[0])][1].indexOf(b[1])
+    return -1
+  else
+    return 0
+
+
+t = """
+|画面メイ | 小画面 | 日付１            |  日付２              |人ID |
+| 1の画面 | 1-1 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Aさん|
+| 1の画面 | 1-2 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Aさん|
+| 1の画面 | 1-3 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Aさん|
+| 2の画面 | 2-1 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Aさん|
+| 2の画面 | 2-2 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Aさん|
+| 2の画面 | 2-3 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Aさん|
+| 1の画面 | 1-1 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Bさん|
+| 1の画面 | 1-2 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Bさん|
+| 1の画面 | 1-3 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Bさん|
+| 5の画面 | 5-1 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Aさん|
+| 4の画面 | 4-1 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Bさん|
+| 4の画面 | 4-3 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Bさん|
+| 4の画面 | 4-2 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Bさん|
+| 1の画面 | 1-1 |　yyyy-mm-dd hh:mm:ss |　yyyy-mm-dd hh:mm:ss |Aさん|
+"""
+
+console.log json
+s = t.split("\n")
+s.shift()
+db = s.map (l)->
+  line = l.split("|")
+  line.shift()
+  line.pop()
+  line.map (i)-> i.trim()
+
+
+console.log db.sort(msort)
+###
+
+
+###
+###
+# ・1024から65536ランダムな値を返却する
+# ※同じ値を返さないようにしなくてはならない
+portDecider = ()->
+  # Math.floor(Math.random() * 65536 - 1024 + 1)
+  Math.floor(Math.random() * (65536 - 1024) + 1024)
+
+
+
+###
+[0...1000000].forEach ->
+  p = portDecider()
+  if p < 1023
+    console.log p
+###
+
+
+
+###
+# リクエストがあったらアクションを増やす2
+# →できなかった
+konopath = (path, action)->
+  console.log "a"
+  route = require('koa-route')
+  Koa = require('koa')
+  app = new Koa()
+  
+  console.log "b",path,action
+  app.use route.get path, action
+  
+  console.log "c"
+  # port = portDecider()
+  port = 80
+  s = app.listen port, ->
+    console.log "listen", s._connectionKey
+    process.send port
+
+
+
+cluster = require "cluster"
+if cluster.isMaster
+  o = {}
+  o.path = "/create/:path" 
+  o.act = (ctx)->
+    ctx.set 'Content-Type': 'text/plain'
+    ctx.body = "done:" + process.pid
+  
+  
+  w = cluster.fork()
+  console.log o
+  w.send o
+  
+  cluster.on 'message',(w,msg)->
+    console.log "meg:", msg
+    c = cluster.fork()
+    c.send msg
+  
+  
+  # 終了したら通知
+  cluster.on 'exit',(worker, code, signal)->
+    console.log worker.process.pid + ' exit:' + worker.id
+
+else
+  
+  process.on "message", (msg,a,b)->
+    console.log "kiteruiuu", msg
+    konopath msg.path, msg.act
+###
+
+
+
+
+###
+# こうじゃない
+# リクエストがあったらアクションを増やす
+cluster = require "cluster"
+if cluster.isMaster
+  # for i in [1..require("os").cpus().length]
+  #   cluster.fork()
+  route = require('koa-route')
+  Koa = require('koa')
+  app = new Koa()
+  
+  app.use route.get '/:path', (ctx, path)->
+    ctx.set 'Content-Type': 'text/plain'
+    w = cluster.fork()
+    w.send path
+    ctx.body = "done:" + process.pid
+  
+  s = app.listen 80, -> console.log "listen", s._connectionKey
+  
+  cluster.on 'message',(w,msg)->
+    console.log "port", msg
+    
+    
+  # 終了したら通知
+  cluster.on 'exit',(worker, code, signal)->
+    console.log worker.process.pid + ' exit:' + worker.id
+
+else
+  process.on "message", (msg,a,b)->
+    console.log "kiteru", msg
+  
+    route = require('koa-route')
+    Koa = require('koa')
+    app = new Koa()
+    
+    path = "/" + msg + "/path"
+    
+    app.use route.get path, (ctx)->
+      console.log "ktiemasikane"
+      ctx.set 'Content-Type': 'text/plain'
+      ctx.body = "done:" + process.pid
+    
+    port = portDecider()
+    s = app.listen port, ->
+      console.log "listen", s._connectionKey
+      process.send port
+  
+  console.log "hajimari"
+
+###
+
+
+###
+
+cluster = require "cluster"
+if cluster.isMaster
+  for i in [1..require("os").cpus().length]
+    cluster.fork()
+else
+  route = require('koa-route')
+  Koa = require('koa')
+  app = new Koa()
+
+  app.use route.get '/', (ctx)->
+    ctx.set 'Content-Type': 'text/plain'
+    ctx.body = "done:" + process.pid
+
+  s = app.listen 80, -> console.log "listen", s._connectionKey
+
+###
+
+
+###
+cluster = require "cluster"
+cpu_count = require("os").cpus().length
+      
+if cluster.isMaster
+  console.log "cpu_count:" + cpu_count
+  for i in [1..cpu_count]
+    w = cluster.fork()
+    console.log "fork:" + w.process.pid
+  
+  cluster.on 'message', (w, msg)->
+    console.log w.id, w.process.pid
+    console.log 'Mmsg:' + msg
+  
+  # 終了を受け取って再起動する
+  cluster.on 'exit',(worker, code, signal)->
+    console.log worker.process.pid + ' exit:' + worker.id
+    cluster.fork()
+else
+  route = require('koa-route')
+  Koa = require('koa')
+  app = new Koa()
+
+  app.use route.get '/', (ctx)->
+    console.log "1kita"
+    process.send "1kita"
+    ctx.set 'Content-Type': 'text/plain'
+    # ctx.render "index", dp
+    # ctx.body = "mojiretudesu:" + dir + "/" + file
+    ctx.body = "done:" + process.pid
+
+  s = app.listen 80, -> console.log "listen", s._connectionKey
+  # s = app.listen portDecider(), -> console.log "listen", s._connectionKey
+###
+
+###
+# サーバーひとつふたつ
+route = require('koa-route')
+Koa = require('koa')
+app = new Koa()
+
+app.use route.get '/', (ctx)->
+  console.log "1kita"
+  ctx.set 'Content-Type': 'text/plain'
+  # ctx.render "index", dp
+  # ctx.body = "mojiretudesu:" + dir + "/" + file
+  ctx.body = "done"
+
+s = app.listen portDecider(), -> console.log "listen", s._connectionKey
+
+app2 = new Koa()
+
+app2.use route.get '/', (ctx)->
+  console.log "2kita"
+  ctx.set 'Content-Type': 'text/plain'
+  # ctx.render "index", dp
+  # ctx.body = "mojiretudesu:" + dir + "/" + file
+  ctx.body = "done2"
+
+s2 = app2.listen portDecider(), -> console.log "listen", s2._connectionKey
+###
+
+
+
+
+###
 # マイクロなAPI
 app = new (require 'koa')()
 app.use require("koa-logger")()
@@ -56,7 +413,7 @@ app.use route.get '/api/:action/:value', (ctx, action, value)->
 
 
 app.listen 3000, -> console.log "start"
-
+###
 
 
 ###

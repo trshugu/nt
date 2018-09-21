@@ -50,3 +50,4 @@ module.exports.makeDir = (path)-> new Promise (f, r)->
     else
       f()
 
+portDecider = -> Math.floor(Math.random() * (65536 - 1024) + 1024)
