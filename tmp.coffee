@@ -68,7 +68,7 @@ wget "https://twitter.com/search?f=tweets&q=" + "@asdlkjdfefe OR " + encodeURI q
 # そもそもforEachってどこまでいけるんよ？ver2
 # forEachで展開してみる
 # cnt = 75209225
-cnt = 33400000
+cnt = 33500000
 bool = false
 loop
   console.log [0...cnt].length
@@ -77,7 +77,7 @@ loop
     if i % 10000000 == 0
       console.log "p:",i
   
-  cnt = cnt + 100000
+  cnt = cnt + 10000
 
 
 ###
