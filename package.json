@@ -5,6 +5,7 @@
   "main": "tmp.coffee",
   "dependencies": {
     "chai": "^4.1.2",
+    "cheerio": "^1.0.0-rc.2",
     "co": "^4.6.0",
     "co-view": "^0.0.1",
     "co-views": "^2.1.0",

@@ -7,6 +7,131 @@ helper = require "./helper"
 
 
 ###
+request = require("request")
+cheerio = require("cheerio")
+
+wget = (url)-> new Promise (f,re)->
+  request url
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      res = {}
+      res.headers = r.headers
+      res.body = cheerio.load b
+      f res
+  
+
+
+q = "ウサギ"
+
+
+# wget "http://yahoo.co.jp"
+wget "https://twitter.com/search?f=tweets&q=" + "@asdlkjdfefe OR " + encodeURI q
+.then (v)->
+  scr = v.body(".tweet-text")
+  tws = [0...scr.length].map (i)->
+    cheerio.load(scr[i]).text().replace("\n"," ")
+  
+  # console.log tws
+  jo = tws.map (i)->
+    console.log "------------"
+    console.log i
+    console.log helper.createHash(i).substr(0,6)
+  
+  
+.catch (e)-> console.log "e",e
+###
+
+
+
+
+# getHashは平均n文字で重複し始めるver2
+# 一件ずつpush
+# 重複したら終了
+# をくりかえし
+# 1文字～n文字
+###
+[1..7].forEach (i)->
+  console.log i,"start"
+  [1..60].forEach (m)->
+  
+###
+
+
+
+
+
+# [0...10].forEach (i)->
+#   console.log i
+
+# そもそもforEachってどこまでいけるんよ？ver2
+# forEachで展開してみる
+# cnt = 75209225
+cnt = 30000000
+bool = false
+loop
+  console.log [0...cnt].length
+  [0...cnt].forEach (i)->
+    a = i.toString() + 1
+    if i % 10000000 == 0
+      console.log "p:",i
+  
+  cnt = cnt + 100000
+
+
+###
+# そもそもforEachってどこまでいけるんよ？ver1
+# rangeをみる
+cnt = 75209225
+bool = false
+loop
+  console.log [0...cnt].length
+  ###
+  [0...cnt].forEach (i)->
+    
+    if i > 49999999
+      console.log i
+  ###
+  
+  cnt = cnt + 1
+###
+
+
+
+###
+# マルチコアハッシュ生成器
+# 文字数を送る
+# 任意のタイミングで終了通知を送る
+cluster = require "cluster"
+if cluster.isMaster
+  w = cluster.fork()
+  
+  arr=[]
+  
+  cluster.on 'message', (w,msg)->
+    # console.log w.process.pid, "meg:", msg
+    arr.push msg
+    
+    # n個以上になったら終了
+    if arr.length > 5
+      w.process.kill()
+  
+  cluster.on 'exit',(worker, code, signal)-> console.log worker.process.pid + ' exit:' + worker.id
+  
+  setInterval ->
+    console.log arr
+  , 1500
+  
+  
+else
+  setInterval ->
+    process.send "test"
+  , 1500
+###
+
+
+###
 # ハッシュ某01
 NS_PER_SEC = 1e9
 
@@ -30,6 +155,170 @@ NS_PER_SEC = 1e9
 ###
 
 
+
+
+
+
+###
+# getHashは平均n文字で重複し始めるver
+# 1文字～n文字
+[9..20].forEach (i)->
+  console.log i,"start"
+  
+  avr = []
+  [0...4].forEach (o)->
+    broken = false
+    [1..1000].forEach (m)->
+      return if broken
+      
+      # m件作成
+      p = 2000 * m
+      console.log o, "回目", i, "文字", p, "件作成"
+      arr = {}
+      [0...p].forEach (j)->
+        arr[helper.getHash().substr(0,i)] = j
+      
+      if p != Object.keys(arr).length
+        # console.log i + "文字では" + p + "件で" + (p - Object.keys(arr).length) + "個重複"
+        avr.push p
+        broken = true
+    
+  console.log i + "文字は平均", Math.floor((avr.reduce (a,b)->a+b) / avr.length), "個まで耐えられる。"
+###
+
+
+
+
+###
+# hashは何文字目まで信頼性がどうなのか(1回でも重複したら次の文字ver2)
+
+# 1文字～n文字
+[1..17].forEach (i)->
+  console.log i,"start"
+  
+  avr = []
+  [0...4].forEach (o)->
+    broken = false
+    [1..60].forEach (m)->
+      return if broken
+      
+      # m件作成
+      p = 2000 * m
+      arr = {}
+      [0...p].forEach (j)->
+        arr[helper.getHash().substr(0,i)] = j
+      
+      if p != Object.keys(arr).length
+        console.log i + "文字では" + p + "件で" + (p - Object.keys(arr).length) + "個重複"
+        avr.push p
+        broken = true
+    
+    console.log (avr.reduce (a,b)->a+b) / avr.length
+###
+
+
+###
+# hashは何文字目まで信頼性がどうなのか(1回でも重複したら次の文字ver)
+
+# 1文字～n文字
+[10..20].forEach (i)->
+  console.log i,"start"
+  broken = false
+  
+  # くりかえし
+  [0...5].forEach (o)->
+    console.log o+1,"かいめ"
+    [1..5000].forEach (m)->
+      return if broken
+      
+      # m件作成
+      # m = 30
+      arr = {}
+      [0...m].forEach (j)->
+        arr[helper.getHash().substr(0,i)] = j
+      
+      if m != Object.keys(arr).length
+        console.log i + "文字では" + m + "件で" + (m - Object.keys(arr).length) + "個重複"
+        broken = true
+###
+
+
+
+
+###
+# xorshift
+xor=->
+  y = 2463534242
+  loop
+    y = y ^ (y << 13)
+    y = y ^ (y >> 17)
+    yield y = y ^ (y << 15)
+
+r32 = xor()
+# console.log [0...10].map -> r32.next().value
+
+xor64=->
+  x = 88172645463325252
+  loop
+    x = x ^ (x << 13)
+    x = x ^ (x >> 7)
+    yield x = x ^ (x << 17)
+
+r64 = xor64()
+# console.log [0...10].map -> r64.next().value
+
+
+xor96=->
+  x = 123456789
+  y = 362436069
+  z = 52128862
+  t = undefined
+  loop
+    t = (x ^ (x << 3)) ^ (y ^ (y >> 19)) ^ (z ^ (z << 6))
+    x = y
+    y = z
+    yield z = t
+
+r96 = xor96()
+# console.log [0...10].map -> r96.next().value
+
+xor128=->
+  x = 123456789
+  y = 362436069
+  z = 521288629
+  w = 88675123 
+  t
+  loop
+    t = x ^ (x << 11)
+    x = y
+    y = z
+    z = w
+    yield w = (w ^ (w >> 19)) ^ (t ^ (t >> 8))
+
+r128 = xor128()
+# console.log [0...10].map -> r128.next().value
+
+xorshift=(seed = 114514)->
+  x = 123456789
+  y = 362436069
+  z = 521288629
+  w = seed
+  
+  loop
+    t = x ^ (x << 11)
+    x = y
+    y = z
+    z = w
+    yield w = (w ^ (w >>> 19)) ^ (t ^ (t >>> 8))
+
+
+
+xs1 = xorshift()
+console.log [0...10].map -> xs1.next().value
+
+xs2 = xorshift(141421356)
+console.log [0...10].map -> xs2.next().value
+###
 
 
 ###
@@ -185,12 +474,12 @@ console.log db.sort(msort)
 
 
 ###
-###
 # ・1024から65536ランダムな値を返却する
 # ※同じ値を返さないようにしなくてはならない
 portDecider = ()->
   # Math.floor(Math.random() * 65536 - 1024 + 1)
   Math.floor(Math.random() * (65536 - 1024) + 1024)
+###
 
 
 
