@@ -62,22 +62,93 @@ wget "https://twitter.com/search?f=tweets&q=" + "@asdlkjdfefe OR " + encodeURI q
 
 
 
-# [0...10].forEach (i)->
-#   console.log i
 
-# そもそもforEachってどこまでいけるんよ？ver2
+# 1から一億のデータを処理する
+
+# 適当なデータを出力するモデルもどき
+modelModoki = (end)->
+  cnt = 0
+  loop
+    return if cnt >= end
+    
+    yield helper.getHash()
+    cnt++
+
+
+# hashGenelator = modelModoki 2
+# console.log hashGenelator.next()
+# console.log hashGenelator.next()
+# console.log hashGenelator.next()
+
+countOfDeath = ->
+  count = 0
+  return ->
+    count++
+    if count >= 5
+      console.log "death",count
+      process.exit()
+
+# cod = countOfDeath()
+# cod()
+# cod()
+# cod()
+# cod()
+# cod()
+# cod()
+
+###
+###
+i = 0
+recursive = (gen)->
+  o = gen.next()
+  i++ 
+  if o.done == false
+    # 処理
+    a = o.value + helper.getHash() + helper.getHash()
+    
+    if i % 10000000 == 0
+      console.log "p:",i
+    
+    process.nextTick ->
+      recursive gen
+  else
+    console.log "done"
+
+
+# recursive modelModoki(50139474)
+recursive modelModoki(75209225)
+
+
+
+
+###
+console.log [0...10].pop()
+a = [0...10]
+console.log a
+console.log a.pop()
+console.log a
+
+console.log [0...75209230].pop()
+###
+
+
+###
+# そもそもforEachってどこまでいけるんよ？verN2
 # forEachで展開してみる
 # cnt = 75209225
-cnt = 33500000
+# 展開すると50139474で終了
+
+# cnt = 34420000
+cnt = 50139474
 bool = false
 loop
   console.log [0...cnt].length
   [0...cnt].forEach (i)->
-    a = i.toString() + 1
+    a = i.toString() + helper.getHash() + helper.getHash()
     if i % 10000000 == 0
       console.log "p:",i
-  
-  cnt = cnt + 10000
+  cnt = cnt + 1
+###
 
 
 ###
@@ -87,12 +158,10 @@ cnt = 75209225
 bool = false
 loop
   console.log [0...cnt].length
-  ###
-  [0...cnt].forEach (i)->
-    
-    if i > 49999999
-      console.log i
-  ###
+  
+  # [0...cnt].forEach (i)->
+  #   if i > 49999999
+  #     console.log i
   
   cnt = cnt + 1
 ###
@@ -126,7 +195,7 @@ if cluster.isMaster
   
 else
   setInterval ->
-    process.send "test"
+    process.send helper.getHash()
   , 1500
 ###
 
