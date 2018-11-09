@@ -51,3 +51,19 @@ module.exports.makeDir = (path)-> new Promise (f, r)->
       f()
 
 portDecider = -> Math.floor(Math.random() * (65536 - 1024) + 1024)
+
+# 中央値を取る
+module.exports.getMedian = (arr)->
+  arr.sort (a, b) -> a - b
+  if arr.length % 2 == 0
+    return (arr[(arr.length/2) - 1] + arr[(arr.length/2)]) / 2
+  else
+    return arr[Math.floor(arr.length / 2)]
+
+module.exports.appendCsv = (filename, val)-> new Promise (f,r)->
+  fs.appendFile filename, val + "\r\n", (e)->
+    if e?
+      r e
+    else
+      f()
+

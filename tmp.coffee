@@ -6,7 +6,171 @@ helper = require "./helper"
 
 
 
+
+
+
+
+
+
+
+
+
 ###
+# 同じものが生成される確率は
+[1..64].forEach (i)->
+  console.log i + "文字：", (1 / 16 ** i) * 100
+###
+
+
+###
+# n回目が衝突する確率は試行するごとに上がっていきます。v2
+# 6文字目まではいける。
+[7..64].forEach (m)->
+  bo = 16 ** m
+  console.log m + "文字、" + bo + "通りが衝突する試行回数"
+
+  q=false
+  h=false
+  qh=false
+
+  i = 1
+  loop
+    cnt = Math.ceil((1 / (bo / i)) * 100)
+    console.log i,cnt
+    
+    if cnt >= 25 and q == false
+      console.log  i + "回:", cnt + "%"
+      q = true
+      
+    if cnt >= 50 and h == false
+      console.log  i + "回:", cnt + "%"
+      h = true
+      
+    if cnt >= 75 and qh == false
+      console.log  i + "回:", cnt + "%"
+      qh = true
+    
+    
+    if cnt >= 100
+      console.log  i + "回:", cnt + "%"
+      break
+    
+    i++
+###
+
+
+
+
+###
+# n回目が衝突する確率は試行するごとに上がっていきます。
+bo = 4026
+console.log bo + "通りが衝突する試行回数"
+
+q=false
+h=false
+qh=false
+
+i = 1
+loop
+  cnt = Math.ceil((1 / (bo / i)) * 100)
+  # console.log i,cnt
+  
+  if cnt >= 25 and q == false
+    console.log  i + "回:", cnt + "%"
+    q = true
+    
+  if cnt >= 50 and h == false
+    console.log  i + "回:", cnt + "%"
+    h = true
+    
+  if cnt >= 75 and qh == false
+    console.log  i + "回:", cnt + "%"
+    qh = true
+  
+  
+  if cnt >= 100
+    console.log  i + "回:", cnt + "%"
+    break
+  
+  i++
+###
+
+###
+# ハッシュ何通りか
+# 0-f 16文字
+[1..64].forEach (i)->
+  console.log i + "文字：",16 ** i
+###
+
+
+###
+# twGetter v0.01
+request = require("request")
+cheerio = require("cheerio")
+
+wget = (url)-> new Promise (f,re)->
+  request url
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      res = {}
+      res.headers = r.headers
+      res.body = cheerio.load b
+      f res
+  
+
+
+
+twGetter = (q)-> new Promise (f,r)->
+  wget "https://twitter.com/search?f=tweets&q=" + "@asdlkjdfefe OR " + encodeURI q
+  .then (v)->
+    scr = v.body(".tweet-text")
+    tws = [0...scr.length].map (i)-> cheerio.load(scr[i]).text().replace("\n"," ")
+    
+    jo = tws.map (i)->
+      obj = {}
+      obj._id = helper.createHash(i).substr(0,8)
+      obj.value = i
+      obj
+    
+    f jo
+  .catch (e)-> r e
+
+
+# なければ処理Aをし登録し、あったらしない。
+ids = []
+tws = []
+
+[0..3].map ->
+  twGetter "ウサギ"
+  .then (v)->
+    # console.log "done", v
+    v.forEach (i)->
+      if (ids.some (j)-> j == i._id)
+        # あった
+        console.log "atta"
+      else
+        # なかった
+        console.log "nakatta"
+        ids.push i._id
+        tws.push i.value
+    
+    ids
+  .catch (e)-> console.log "e", e
+
+
+setTimeout ->
+  console.log tws
+, 5000
+# console.log ids
+# console.log tws
+###
+
+
+
+###
+# twGetter v0.1
 request = require("request")
 cheerio = require("cheerio")
 
@@ -46,12 +210,534 @@ wget "https://twitter.com/search?f=tweets&q=" + "@asdlkjdfefe OR " + encodeURI q
 
 
 
+
+###
+# デバッグ時のみログを出すスタイル
+production = false
+production = true if process.argv[2]?
+
+console.log "dev" if production
+console.log "pro"
+###
+
+
+
+
+###
+# 最終系
+# とりあえずたんぱつなら8文字で十分かと
+# →統計的には4文字(0.0015%)でもよさげでは
+cpu = 1
+cpu = process.argv[2] if process.argv[2]?
+
+digit = 1
+digit = process.argv[3] if process.argv[3]?
+
+NS_PER_SEC = 1e9
+
+cluster = require "cluster"
+if cluster.isMaster
+  
+  for i in [1..cpu]
+    w = cluster.fork()
+    
+    # console.log "forked", "pid:",w.process.pid
+    w.send digit
+  
+  
+  result = []
+  cluster.on 'message', (w, msg)->
+    # console.log "res", "pid:", w.process.pid, msg
+    result.push msg
+  
+  cluster.on 'exit',(w, c, sig)->
+    # console.log "exit", "pid:", w.process.pid, c
+  
+  process.on "exit", (a,b,c,d)->
+    # console.log "deach", a, result
+    pt_med = helper.getMedian result.map((i)-> i.pt)
+    count_med = helper.getMedian result.map((i)-> i.cnt)
+    console.log digit, ",", pt_med, ",", count_med
+    
+  
+else
+  process.on "message", (msg)->
+    # console.log "check digit is", msg
+    
+    obj = {}
+    nano = process.hrtime()
+    loop
+      i = Object.keys(obj).length
+      h = helper.getHash().substr(0,msg)
+      obj[h] = undefined
+      
+      break if i == Object.keys(obj).length
+    
+    diff = process.hrtime(nano)
+    
+    res = {}
+    res.pt = diff[0] * NS_PER_SEC + diff[1]
+    res.cnt = Object.keys(obj).length
+    
+    process.send res
+    process.exit()
+###
+
+
+
+###
+# ハッシュのセットを分散して生成して衝突をチェックするには
+# ・フルセットを大量に作ってソートする→ソートがむり
+# 複数コアあるなら、並列で4つくらいやらせればよい。
+obj = {}
+cnt = 1
+loop
+  loop
+    i = Object.keys(obj).length
+    h = helper.getHash().substr(0,cnt)
+    obj[h] = undefined
+    
+    if i == Object.keys(obj).length
+      console.log h, "is duplex", Object.keys(obj).length, "count"
+      break
+  
+  cnt++
+###
+
+
+###
+obj = {}
+con = {}
+
+obj["a"] = undefined
+
+obj[helper.getHash()] = undefined
+con[helper.getHash()] = undefined
+con[helper.getHash()] = undefined
+con[helper.getHash()] = undefined
+con[helper.getHash()] = undefined
+con["a"] = undefined
+
+for k of con
+  i = Object.keys(obj).length
+  obj[k] = undefined
+  if i == Object.keys(obj).length
+    console.log k,"is duplex"
+
+console.log obj
+
+###
+
+###
+# マルチコアハッシュ生成器
+# 文字数を送る
+# 任意のタイミングで終了通知を送る
+cluster = require "cluster"
+if cluster.isMaster
+  arr=[]
+
+  # for i in [1..require("os").cpus().length]
+  for i in [1..4]
+    w = cluster.fork()
+    console.log "pid:",w.process.pid
+    
+    w.on 'message', (msg,w)->
+      # console.log msg
+      # arr.push msg
+      arr = arr.concat msg
+      
+      
+      # n個以上になったら終了
+      # if arr.length >= 1000000
+      #   w.process.kill()
+        # process.exit()
+      # else
+        arr.push msg
+      
+    
+    w.on 'exit',(w, c, sig)->
+      console.log "exit", w,c,sig
+  
+  hikaku = 0
+  setInterval ->
+    size = arr.length
+    console.log "ひかく", size - hikaku
+    hikaku = size
+    console.log size
+  , 1500
+  
+  
+else
+  # セットをおくる感じで
+  i = 0
+  recursive = (list)->
+    i++
+    
+    # 処理
+    if list.length >= 50000
+      process.send list
+      list = []
+    else
+      list.push helper.getHash()
+      
+    if i % 10000000 == 0
+      console.log "p:",i
+    
+    process.nextTick ->
+      recursive list
+  
+  li = []
+  recursive li
+  
+  # [0...50139474].forEach (i)->
+  #   process.send helper.getHash()
+  
+  # setInterval ->
+  #   process.send helper.getHash()
+  # , 1500
+###
+
+
+
+
+
+
+
+###
+# 一つの処理の最大速度
+NS_PER_SEC = 1e9
+
+# 速度の計測
+# 都度送るのはダメ
+# n件のセットにする
+# 5回やって中央値を取る
+# 調査の結果、loopのほうがスコアがたかかった
+# 250000件くらいのセットなら実用的
+
+# プロトタイプ v1.0
+cluster = require "cluster"
+if cluster.isMaster
+  arr=[]
+
+  # for i in [1..require("os").cpus().length]
+  for i in [1..8]
+    w = cluster.fork()
+    console.log "pid:",w.process.pid
+    
+    w.on 'message', (msg,w)->
+      # console.log msg,w
+      # arr.push msg
+      arr = arr.concat msg
+      
+      
+      # n個以上になったら終了
+      if arr.length >= 10000000
+        console.timeEnd "tmp"
+        process.exit()
+      else
+        arr.push msg
+      
+    
+    w.on 'exit',(w, c, sig)->
+      console.log "exit", w,c,sig
+  
+  hikaku = 0
+  setInterval ->
+    size = arr.length
+    console.log "現在：", size, "ひかく：", size - hikaku if size - hikaku != 0
+    hikaku = size
+  , 1000
+  
+  
+else
+  setInterval ->
+    k = 1
+    arr = []
+    while k < 250000
+      arr.push helper.getHash()
+      k++
+    
+    process.send arr
+  , 1
+###
+
+
+
+
+###
+# ループ
+# 何件までやるか
+n = 50000000
+# 何件試行して精度を高めるか(中央値)
+m = 4000
+
+looper = (cnt=1)->
+  if n >= cnt
+    # m回試行して中央値をとる
+    records = []
+    [0...m].forEach (i)->
+      nano = process.hrtime()
+      k = 0
+      arr = []
+      while k < cnt
+        arr.push helper.getHash()
+        k++
+      
+      diff = process.hrtime(nano)
+      records.push diff[0] * NS_PER_SEC + diff[1]
+      
+    result = helper.getMedian records
+    console.log cnt + "件は" + result + "ナノ秒かかる"
+    
+    helper.appendCsv "loop.csv", cnt + "," + result
+    .then -> looper cnt + 1
+    .catch (e)-> console.log "e",e
+
+looper()
+###
+
+###
+# 配列
+# 何件までやるか
+# n = 50000000
+n = 10000
+# 何件試行して精度を高めるか(中央値)
+# m = 4000
+m = 1000
+
+arraySender = (cnt=1)->
+  if n >= cnt
+    # m回試行して中央値をとる
+    records = []
+    [0...m].forEach ->
+      nano = process.hrtime()
+      
+      # 処理
+      arr = [0...cnt].map -> helper.getHash()
+      # console.log arr.length
+      
+      diff = process.hrtime(nano)
+      records.push diff[0] * NS_PER_SEC + diff[1]
+
+    result = helper.getMedian records
+    console.log cnt + "件は" + result + "ナノ秒かかる"
+    
+    helper.appendCsv "arraysend.csv", cnt + "," + result
+    .then -> arraySender cnt + 1
+    .catch (e)-> console.log "e",e
+
+arraySender()
+###
+
+
+
+
+
+
+
+
+
+###
+fs = require "fs"
+
+# 何文字目までやるか
+n = 50
+# 何件試行して精度を高めるか(中央値)
+m = 5000
+
+# n件までやる
+runner = (cnt=1)->
+# [1..n].forEach (j)->
+  if n >= cnt
+    # console.log cnt
+    # m回試行して中央値をとる
+    records = []
+    [0...m].forEach (i)->
+      nano = process.hrtime()
+      k = 0
+      arr = []
+      while k < cnt
+        arr.push k + helper.getHash() + helper.getHash()
+        k++
+      
+      diff = process.hrtime(nano)
+      records.push diff[0] * NS_PER_SEC + diff[1]
+      
+    result = helper.getMedian records
+    # console.log records.sort (a, b) -> a - b
+    console.log cnt + "件は" + result + "ナノ秒かかる"
+    # fs.appendFile "test.csv", j + "," + result + "\r\n", (e)-> console.log "e",e
+    
+    appendCsv "test.csv", cnt + "," + result
+    .then -> runner cnt + 1
+    .catch (e)-> console.log "e",e
+
+runner()
+###
+
+
+
+###
+fs = require "fs"
+
+# j件までやる
+[1..100].forEach (j)->
+  # i回試行して中央値をとる
+  records = []
+  [0...2000].forEach (i)->
+    nano = process.hrtime()
+    k = 0
+    arr = []
+    while k < j
+      arr.push k + helper.getHash() + helper.getHash()
+      k++
+    
+    # console.log arr
+    
+    diff = process.hrtime(nano)
+    records.push diff[0] * NS_PER_SEC + diff[1]
+  result = helper.getMedian records
+  # console.log records.sort (a, b) -> a - b
+  console.log j + "件は" + result + "ナノ秒かかる"
+  fs.appendFile "test.csv", j + "," + result, val + "\r\n", (e)-> console.log "e",e
+###
+
+
+
+
+
+
+
+
+
+###
+# 中央値を取る(時間)
+NS_PER_SEC = 1e9
+
+
+records = []
+[0...10].forEach (i)->
+  nano = process.hrtime()
+  [0..10000].forEach (i)->
+    a = i + helper.getHash() + helper.getHash() + helper.getHash()
+  
+  diff = process.hrtime(nano)
+  records.push diff[0] * NS_PER_SEC + diff[1]
+
+console.log records
+console.log helper.getMedian records
+console.log helper.getMedian [1,1,1,1,1,1,2,2,2,3,3,5,11]
+###
+
+###
+# 中央値を取る
+getMedian = (arr)->
+  arr.sort (a, b) -> a - b
+  if arr.length % 2 == 0
+    return (arr[(arr.length/2) - 1] + arr[(arr.length/2)]) / 2
+  else
+    return arr[Math.floor(arr.length / 2)]
+
+# console.log getMedian [1,2,3,4,5] # 3
+# console.log getMedian [1,2,3,4,5,100] # 3.5
+
+arr = []
+[0...5].forEach (i)->
+  console.log Math.floor(Math.random() * 6) + 1
+  arr.push Math.floor(Math.random() * 6) + 1
+
+console.log getMedian arr
+###
+
+
+
+###
+i = 0
+recursive = (list)->
+  i++
+  
+  # 処理
+  if list.length >= 200000
+    console.timeEnd "rec"
+    console.log list.length
+    list = []
+    console.time "rec"
+  else
+    list.push helper.getHash()
+    
+  if i % 10000000 == 0
+    console.log "p:",i
+  
+  process.nextTick ->
+    recursive list
+
+li = []
+recursive li
+###
+
+
+
+
+
+
+###
+# コードストリッパー
+# 行を読む
+# 255桁まで
+# →要件がいまいちだった
+rs = require("fs").createReadStream("tmp.java")
+
+ws = ->
+  r = new require('stream').Readable()
+  
+  r._read = (ch,enc,cb)->
+    console.log "aaa"
+    r.push ch
+    # cb null, "cbcb"
+  
+  return r
+
+tf = ->
+  t = new require('stream').Transform()
+  t._transform = (ch,enc,cb)->
+    console.log "aaa"
+    t.push ch
+    # cb null, "cbcb"
+  
+  return t
+
+rl = require("readline").createInterface(rs, ws)
+
+# rl.on "line", (l)->
+#   console.log "======="
+#   console.log l
+#   console.log "======="
+
+# tf().pipe process.stdout
+
+
+
+
+
+# rs.pipe(tf()).pipe(process.stdout)
+
+# codeStripper = (is)->
+###
+
+
+###
+# 文字列を抜き出す
+st1 = "asdf@asdfasdf@ddsf"
+st2 = "asdfsdaf@asdfs@asdf@sdf@asdfsd"
+###
+
+
+###
 # getHashは平均n文字で重複し始めるver2
 # 一件ずつpush
 # 重複したら終了
 # をくりかえし
 # 1文字～n文字
-###
 [1..7].forEach (i)->
   console.log i,"start"
   [1..60].forEach (m)->
@@ -63,8 +749,10 @@ wget "https://twitter.com/search?f=tweets&q=" + "@asdlkjdfefe OR " + encodeURI q
 
 
 
-# 1から一億のデータを処理する
 
+
+###
+# 1から一億のデータを処理する
 # 適当なデータを出力するモデルもどき
 modelModoki = (end)->
   cnt = 0
@@ -74,6 +762,11 @@ modelModoki = (end)->
     yield helper.getHash()
     cnt++
 
+modelModokiInfinity = ->
+  loop
+    yield helper.getHash()
+
+modelModokiInfinityNogen = -> helper.getHash()
 
 # hashGenelator = modelModoki 2
 # console.log hashGenelator.next()
@@ -95,15 +788,104 @@ countOfDeath = ->
 # cod()
 # cod()
 # cod()
+###
+
+
 
 ###
+# maxValue = 100
+# maxValue = 50139474
+# maxValue = 75209225
+
+createOutputStream = (gen)->
+  r = new require('stream').Readable()
+  r.setEncoding('UTF-8')
+  
+  r._read = ->
+    o = gen.next()
+    if o.done == false
+      r.push o.value
+    else
+      console.log "done"
+  
+  return r
+
+
+createOutputStreamNogen = ->
+  r = new require('stream').Readable()
+  r.setEncoding('UTF-8')
+  
+  r._read = ->
+    r.push modelModokiInfinityNogen()
+  
+  return r
+
+
+i = 0
+w = new require('stream').Writable()
+
+w.write = (ch)->
+  # 処理
+  i++
+  a = ch + helper.getHash() + helper.getHash()
+  
+  # console.log "p:",i
+  if i % 10000000 == 0
+    console.log "p:",i
+  
+
+# createOutputStream(modelModoki maxValue).pipe w
+# createOutputStream(modelModokiInfinity()).pipe w
+
+# createOutputStreamNogen().pipe w
+
+
+
+i = 0
+recursiveNogen = ()->
+  o = modelModokiInfinityNogen()
+  i++ 
+  # 処理
+  a = o + helper.getHash() + helper.getHash()
+  
+  if i % 10000000 == 0
+    console.log "p:",i
+  
+  process.nextTick ->
+    recursiveNogen()
+
+
+recursiveNogen()
 ###
+
+
+
+###
+eventDriven = (gen)->
+
+  o = gen.next()
+  i++ 
+
+
+eventDriven modelModoki maxValue 
+###
+
+
+
+
+
+###
+# maxValue = 50139474
+maxValue = 75209225
+
 i = 0
 recursive = (gen)->
+  o = null
   o = gen.next()
   i++ 
   if o.done == false
     # 処理
+    a = null
     a = o.value + helper.getHash() + helper.getHash()
     
     if i % 10000000 == 0
@@ -115,8 +897,9 @@ recursive = (gen)->
     console.log "done"
 
 
-# recursive modelModoki(50139474)
-recursive modelModoki(75209225)
+recursive modelModoki (maxValue + 100000)
+# recursive modelModokiInfinity() 
+###
 
 
 
@@ -166,38 +949,6 @@ loop
   cnt = cnt + 1
 ###
 
-
-
-###
-# マルチコアハッシュ生成器
-# 文字数を送る
-# 任意のタイミングで終了通知を送る
-cluster = require "cluster"
-if cluster.isMaster
-  w = cluster.fork()
-  
-  arr=[]
-  
-  cluster.on 'message', (w,msg)->
-    # console.log w.process.pid, "meg:", msg
-    arr.push msg
-    
-    # n個以上になったら終了
-    if arr.length > 5
-      w.process.kill()
-  
-  cluster.on 'exit',(worker, code, signal)-> console.log worker.process.pid + ' exit:' + worker.id
-  
-  setInterval ->
-    console.log arr
-  , 1500
-  
-  
-else
-  setInterval ->
-    process.send helper.getHash()
-  , 1500
-###
 
 
 ###
