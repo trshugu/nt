@@ -11,7 +11,362 @@ helper = require "./helper"
 
 
 
+###
+text = "1234567890123456789012345678901212345678901234567890123456789012"
 
+Promise.resolve()
+.then ->
+  helper.lock text, "pass"
+.then (cry)->
+  console.log "圧縮あり", cry
+  helper.unlock cry, "pass"
+.then (pt)->
+  console.log pt
+.catch (e)->
+  console.log "e",e
+###
+
+
+###
+# 圧縮・解凍promisify
+zlib =  require "zlib"
+
+deflate = (pt)-> new Promise (f,r)->
+  zlib.deflate pt, (e,d)->
+    if e?
+      r e
+    else
+      f d.toString("hex")
+
+inflate = (comp)-> new Promise (f,r)->
+  zlib.inflate new Buffer(comp, "hex"), (e,d)->
+    if e?
+      r e
+    else
+      f d.toString()
+###
+
+
+###
+deflate "あのくたらさんみゃくだんぼだい"
+.then (c)->
+  console.log new Buffer("あのくたらさんみゃくだんぼだい").toString("binary")
+  console.log c.toString("binary")
+.catch (e)-> console.log e
+###
+
+###
+Promise.resolve()
+.then ->
+  deflate "あのくたらさんみゃくだんぼだい"
+.then (c)->
+  console.log c
+  inflate c
+.then (p)->
+  console.log p
+.catch (e)->
+  console.log "e",e
+###
+
+###
+crypto = require("crypto")
+
+creageIV = (pass)->
+  hash = crypto.createHash 'md5'
+  hash.update pass
+  hash.digest().toString("hex").substr(16,16)
+
+creageKeyHash = (pass)->
+  hash = crypto.createHash 'md5'
+  hash.update pass
+  hash.digest().toString("hex")
+
+
+lock = (val, pass)-> new Promise (f,r)->
+  deflate val
+  .then (comp)->
+    cipher = crypto.createCipheriv 'aes-256-cbc', creageKeyHash(pass), creageIV(pass)
+    crypted = cipher.update comp, 'utf-8', 'hex'
+    crypted += cipher.final 'hex'
+    f crypted
+  .catch (e)-> r e
+
+unlock = (cry, pass)-> new Promise (f,r)->
+  decipher = crypto.createDecipheriv 'aes-256-cbc', creageKeyHash(pass), creageIV(pass)
+  decode = decipher.update cry, 'hex', 'utf-8'
+  decode += decipher.final "utf-8"
+  inflate decode
+  .then (pt)->
+    f pt
+  .catch (e)-> r e
+
+
+nocomplock = (val, pass)-> new Promise (f,r)->
+  cipher = crypto.createCipheriv 'aes-256-cbc', creageKeyHash(pass), creageIV(pass)
+  crypted = cipher.update val, 'utf-8', 'hex'
+  crypted += cipher.final 'hex'
+  f crypted
+
+nocompunlock = (cry, pass)-> new Promise (f,r)->
+  decipher = crypto.createDecipheriv 'aes-256-cbc', creageKeyHash(pass), creageIV(pass)
+  decode = decipher.update cry, 'hex', 'utf-8'
+  decode += decipher.final "utf-8"
+  f decode
+
+
+# 半角32文字で同等
+text = "12345678901234567890123456789012"
+
+# 半角64文字で圧縮の効果が表れる
+text = "1234567890123456789012345678901212345678901234567890123456789012"
+
+Promise.resolve()
+.then ->
+  nocomplock text, "pass"
+.then (cry)->
+  console.log "圧縮なし", cry
+  nocompunlock cry, "pass"
+.then (pt)->
+  # console.log pt
+.catch (e)->
+  console.log "e",e
+
+
+
+Promise.resolve()
+.then ->
+  lock text, "pass"
+.then (cry)->
+  console.log "圧縮あり", cry
+  unlock cry, "pass"
+.then (pt)->
+  # console.log pt
+.catch (e)->
+  console.log "e",e
+###
+
+
+###
+zlib =  require "zlib"
+
+# 圧縮する術
+zlib.deflate "teanokusatarannmaukudanbodaixt", (e,d)->
+  if e?
+    console.log e
+  else
+    # console.log d.toString()
+    # 解凍する術
+    zlib.inflate d, (e,data)->
+      if e?
+        console.log e
+      else
+        console.log data.toString()
+###
+
+
+
+
+###
+# cbcとctrはどちらがよいか
+# Use Cipheriv for counter mode of aes-256-ctrとでた
+# aes-256-cbcは64文字 固定長の様子
+# aes-256-ctrは42文字 可変だけど推測されそう
+# パス32文字
+crypto = require("crypto")
+
+# https://kido0617.github.io/js/2016-08-17-aes/
+# cbcの鍵は256bit→32文字
+# IVは128bit→16文字
+
+creageIV = (pass)->
+  hash = crypto.createHash 'md5'
+  hash.update pass
+  hash.digest().toString("hex").substr(16,16)
+
+# console.log creageIV "aa"
+
+creageKeyHash = (pass)->
+  hash = crypto.createHash 'md5'
+  hash.update pass
+  hash.digest().toString("hex")
+
+lock = (val, pass)->
+  cipher = crypto.createCipheriv 'aes-256-cbc', creageKeyHash(pass), creageIV(pass)
+  crypted = cipher.update val, 'utf-8', 'hex'
+  crypted += cipher.final 'hex'
+
+unlock = (cry, pass)->
+  decipher = crypto.createDecipheriv 'aes-256-cbc', creageKeyHash(pass), creageIV(pass)
+  decode = decipher.update cry, 'hex', 'utf-8'
+  decode += decipher.final "utf-8"
+
+
+
+cry = lock new Buffer("てきすとてきすと"), "pass"
+console.log cry
+console.log unlock cry, "pass"
+###
+
+
+###
+# ダメな気がするのでふかぼり
+# iv
+hash = crypto.createHash 'md5'
+hash.update 'randomToken'
+ive = hash.digest()
+# console.log "ive is", ive.toString("hex") # 526b0e737e7ad6e3344da44e56559ce5 (32文字)
+
+text = '共通鍵暗号方式'
+
+# 526b0e737e7ad6e3344da44e56559ce5
+# IVは16桁をbufferにすればいいっぽい 5xWAzpRh6TgybfGd
+# console.log new Buffer('5xWAzpRh6TgybfGd', 'utf8').toString("hex")
+# 32桁 b52c96bea30646abf8170f333bbd42b0
+# ive is 526b0e737e7ad6e3344da44e56559ce5
+
+# key = "526b0e737e7ad6e3344da44e56559ce5"
+# key = "00000000000000000000000000000000"
+# key = "0000000000000000000000000000000"
+# key = ive.toString("hex")
+# keyは32文字だったらなんでもよい。
+# bufferにしてもよい
+
+# 5xWAzpRh6TgybfGd 16文字
+# ive = new Buffer("5xWAzpRh6TgybfGd")
+# ive = new Buffer("0000000000000000")
+# ive = "0000000000000000"
+ive = "zx000000000000aa"
+
+
+# cipher = crypto.createCipheriv 'aes-256-ctr', new Buffer(key), new Buffer(ive)
+# cipher = crypto.createCipheriv 'aes-256-cbc', new Buffer(key), new Buffer(ive)
+# cipher = crypto.createCipheriv 'aes-256-cbc', key, ive
+cipher = crypto.createCipheriv 'aes-256-ctr', key, ive
+crypted = cipher.update text, 'utf-8', 'hex'
+crypted += cipher.final 'hex'
+
+console.log crypted
+###
+
+###
+decipher = crypto.createDecipheriv 'aes-256-ctr', "b52c96bea30646abf8170f333bbd42b0", ive
+# decipher.update crypted, 'hex', 'utf-8'
+decode = decipher.update crypted, 'hex', 'utf-8'
+decode += decipher.final "utf-8"
+
+console.log decode
+###
+
+
+
+
+
+
+
+
+###
+# cc = (c,t)->  Math.ceil(((c**t - (c-1)**t) / c**t) * 100000) / 1000
+cc = (c,t)->  ((c**t - (c-1)**t) / c**t)
+
+[1..10].forEach (i)->
+  [1..100].forEach (j)->
+    if j % 10 == 0
+      console.log i + "文字" + j + "回試行：", cc 16**i,j
+###
+
+
+###
+# 実用的な形にすると・・・
+lock = (val, pass)->
+  hash = crypto.createHash 'md5'
+  hash.update pass
+  ive = hash.digest()
+  
+  cipher = crypto.createCipheriv 'aes-256-cbc', "b52c96bea30646abf8170f333bbd42b0", ive
+  crypted = cipher.update val, 'utf-8', 'hex'
+  crypted += cipher.final 'hex'
+  crypted
+
+unlock = (pub, pass)->
+  hash = crypto.createHash 'md5'
+  hash.update pass
+  ive = hash.digest()
+  
+  decipher = crypto.createDecipheriv 'aes-256-cbc', "b52c96bea30646abf8170f333bbd42b0", ive
+  decode = decipher.update pub, 'hex', 'utf-8'
+  decode += decipher.final "utf-8"
+  decode
+
+
+pub = lock "nantoka", "passa"
+console.log pub, unlock pub, "passa"
+
+pub = lock "nantoka", "pass"
+console.log pub, unlock pub, "pass"
+
+
+pub = lock "nantokakantoka", "pass"
+console.log pub, unlock pub, "pass"
+
+pub = lock "nantokakantokanantokakantokanantokakantokanantokakantokanantokakantokanantokakantokanantokakantokanantokakantoka", "pass"
+console.log pub, unlock pub, "pass"
+###
+
+
+###
+# iv
+hash = crypto.createHash 'md5'
+hash.update 'randomToken'
+ive = hash.digest()
+console.log "ive is", ive.toString("hex")
+
+text = '共通鍵暗号方式'
+
+cipher = crypto.createCipheriv 'aes-256-ctr', "b52c96bea30646abf8170f333bbd42b0", ive
+crypted = cipher.update text, 'utf-8', 'hex'
+crypted += cipher.final 'hex'
+
+console.log crypted
+
+
+decipher = crypto.createDecipheriv 'aes-256-ctr', "b52c96bea30646abf8170f333bbd42b0", ive
+# decipher.update crypted, 'hex', 'utf-8'
+decode = decipher.update crypted, 'hex', 'utf-8'
+decode += decipher.final "utf-8"
+
+console.log decode
+###
+
+
+
+
+
+###
+# 微妙なやつらしい
+algorithm = 'aes-256-ctr'
+passphrase = "paas"
+
+encrypt = (text)->
+  cipher = crypto.createCipher algorithm, passphrase
+  crypted = cipher.update text, 'utf8', 'base64'
+  console.log crypted
+  crypted += cipher.final 'base64'
+  console.log crypted
+  crypted
+
+
+decrypt = (text)->
+  decipher = crypto.createDecipher algorithm, passphrase
+  dec = decipher.update text,'base64','utf8'
+  console.log dec
+  dec += decipher.final 'utf8'
+  console.log dec
+  dec
+
+t = "てすとてすとてすとてすとてすとてすとてすとてすとてすとてすとてすとてすとてすとてすと"
+console.log encrypt t
+console.log decrypt encrypt t
+###
 
 
 

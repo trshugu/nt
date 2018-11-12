@@ -1,6 +1,9 @@
 helper = @
 uuid = require "uuid"
 fs = require "fs"
+zlib =  require "zlib"
+crypto = require "crypto"
+
 
 module.exports.getHash = -> 
   cry = require("crypto").createHash 'SHA256'
@@ -66,4 +69,50 @@ module.exports.appendCsv = (filename, val)-> new Promise (f,r)->
       r e
     else
       f()
+
+
+# 圧縮、解凍
+deflate = (pt)-> new Promise (f,r)->
+  zlib.deflate pt, (e,d)->
+    if e?
+      r e
+    else
+      f d.toString("hex")
+
+inflate = (comp)-> new Promise (f,r)->
+  zlib.inflate new Buffer(comp, "hex"), (e,d)->
+    if e?
+      r e
+    else
+      f d.toString()
+
+
+# 暗号化
+creageIV = (pass)->
+  hash = crypto.createHash 'md5'
+  hash.update pass
+  hash.digest().toString("hex").substr(16,16)
+
+creageKeyHash = (pass)->
+  hash = crypto.createHash 'md5'
+  hash.update pass
+  hash.digest().toString("hex")
+
+module.exports.lock = (val, pass)-> new Promise (f,r)->
+  deflate val
+  .then (comp)->
+    cipher = crypto.createCipheriv 'aes-256-cbc', creageKeyHash(pass), creageIV(pass)
+    crypted = cipher.update comp, 'utf-8', 'hex'
+    crypted += cipher.final 'hex'
+    f crypted
+  .catch (e)-> r e
+
+module.exports.unlock = (cry, pass)-> new Promise (f,r)->
+  decipher = crypto.createDecipheriv 'aes-256-cbc', creageKeyHash(pass), creageIV(pass)
+  decode = decipher.update cry, 'hex', 'utf-8'
+  decode += decipher.final "utf-8"
+  inflate decode
+  .then (pt)->
+    f pt
+  .catch (e)-> r e
 
