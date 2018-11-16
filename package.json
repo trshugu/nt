@@ -4,6 +4,7 @@
   "description": "nt\r ==",
   "main": "tmp.coffee",
   "dependencies": {
+    "big-integer": "^1.6.36",
     "chai": "^4.1.2",
     "cheerio": "^1.0.0-rc.2",
     "co": "^4.6.0",

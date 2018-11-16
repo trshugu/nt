@@ -8,7 +8,183 @@ helper = require "./helper"
 
 
 
+###
+# 数字も無理だったんでいちもぢづつやる ng
+m = "12345678"
+a = m.split("").map (i)->i.charCodeAt()
+# console.log a
+p = 7
+q = 19
+n = p * q
 
+gcd = (x, y)->
+  while(y) 
+    t = y
+    y = x % y
+    x = t
+  
+  x
+
+lcm = (x, y)-> Math.abs((x * y) / gcd(x, y))
+
+l = lcm p-1, q-1
+
+pub = [2..l].find (i)-> gcd(i, l) == 1
+console.log pub
+pri = [2..l].find (i)-> (pub * i)  % l == 1
+console.log pri
+
+# 暗号化(5乗)はできたけど複合ができない
+c = a.map (i)-> i ** pub % n
+deco = c.map (i)-> i ** pri % n
+
+console.log a
+console.log c
+console.log deco.map((i)-> String.fromCharCode i).join("")
+
+# console.log a.map((i)-> String.fromCharCode i).join("")
+###
+
+
+
+
+###
+# 文字は無理なんで数字で ng
+m = "234567"
+
+p = 7
+q = 19
+n = p * q
+
+gcd = (x, y)->
+  while(y) 
+    t = y
+    y = x % y
+    x = t
+  
+  x
+
+lcm = (x, y)-> Math.abs((x * y) / gcd(x, y))
+
+l = lcm p-1, q-1
+
+pub = [2..l].find (i)-> gcd(i, l) == 1
+console.log pub
+pri = [2..l].find (i)-> (pub * i)  % l == 1
+console.log pri
+
+c = m ** pub % n
+deco = c ** pri % n
+
+console.log m
+console.log c
+console.log deco
+###
+
+
+
+
+
+
+
+
+###
+m = "nanrakano hirabunあ　"
+a = m.split("").map (i)->i.charCodeAt()
+# console.log a
+p = 7
+q = 19
+n = p * q
+
+gcd = (x, y)->
+  while(y) 
+    t = y
+    y = x % y
+    x = t
+  
+  x
+
+lcm = (x, y)-> Math.abs((x * y) / gcd(x, y))
+
+l = lcm p-1, q-1
+
+pub = [2..l].find (i)-> gcd(i, l) == 1
+console.log pub
+pri = [2..l].find (i)-> (pub * i)  % l == 1
+console.log pri
+
+# 暗号化(5乗)はできたけど複合ができない
+c = a.map (i)-> i ** pub % n
+deco = c.map (i)-> i ** pri % n
+
+console.log a
+console.log c
+console.log deco.map((i)-> String.fromCharCode i).join("")
+
+# console.log a.map((i)-> String.fromCharCode i).join("")
+###
+
+
+###
+m.split("").forEach (i)->
+  console.log i.charAt()
+  console.log i.charCodeAt()
+  # コードポイント値全体の取得
+  console.log i.codePointAt()
+###
+
+
+
+###
+zeta = (a, p, mod, q=1)->
+  q = (a*q) % mod
+  console.log a + " ** " + p + "≡" + " " + q  + " mod " + mod
+  
+  if p < 126
+    zeta a, p+1, mod, q
+
+
+zeta 3, 1, 19
+###
+
+###
+# 3**100%19
+c = 1
+mm = (i)->
+  mod =  3 * i % 19
+  console.log "3**" + c + "≡" + " " + mod + " mod 19"
+  c++
+  if c <= 100
+    mm mod
+
+mm 1
+###
+
+
+###
+# sha1sum
+# 衝突がみつかったのにsha1を使い続けるのは微妙では
+crypto = require "crypto"
+
+hashtest = (v,ha)-> 
+  cry = require("crypto").createHash ha
+  # cry.update uuid.v4(), "utf8"
+  cry.update v, "utf8"
+  cry.digest 'hex'
+
+
+
+crypto.getHashes().forEach (ha)->
+  hash = hashtest("v", ha)
+  console.log ha + " : " +  hash + " (" + hash.length +  ")"
+###
+
+
+###
+console.log hashtest "a", "SHA"
+console.log hashtest "a", "SHA1"
+console.log hashtest "a", "sha1WithRSAEncryption"
+###
 
 
 ###
