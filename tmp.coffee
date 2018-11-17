@@ -5,6 +5,172 @@ helper = require "./helper"
 
 
 
+###
+###
+# big-integerでRSA
+bi = require "big-integer"
+
+
+m = "ひらぶん。たいばばやしにトッキッキ"
+
+a = m.split("").map (i)->i.charCodeAt()
+# console.log a
+p = 3559
+q = 3571
+n = p * q
+
+l = bi.lcm(p-1, q-1).value
+console.log l
+
+
+pub = [2..l].find (i)-> bi.gcd(i, l).value == 1
+console.log pub
+pri = [2..l].find (i)-> (pub * i)  % l == 1
+console.log pri
+
+c = a.map (i)-> bi(i.toString()).pow( bi(pub.toString()) ).mod( n.toString() ).value
+deco = c.map (i)-> bi(i.toString()).pow( bi(pri.toString()) ).mod( n.toString() ).value
+
+console.log a
+console.log c
+console.log deco
+console.log deco.map((i)-> String.fromCharCode i).join("")
+
+
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = (res.multiply(a)).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# console.log modular_exp bi(13), bi(11), bi(141)
+
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# [0...5].forEach -> console.log Math.floor(Math.random() * 2)
+
+# console.log gen_rand 128
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).eq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  r.forEach (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      flg = true
+      
+      if (pl.find (p)-> modular_exp(a, p, n).eq(1)) != undefined
+        flg = false
+      
+      if flg
+        return false
+      
+  return true
+  
+
+# console.log mr_primary_test bi 11
+# console.log mr_primary_test bi 12
+# console.log mr_primary_test bi 13
+# console.log mr_primary_test bi 9007199254740991
+# console.log mr_primary_test bi 9007199254740993
+# console.log mr_primary_test bi 141
+# console.log mr_primary_test bi 142
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+# console.log gen_prime 18
+
+
+byt = bi 128
+p = gen_prime(byt)
+q = gen_prime(byt)
+e = gen_prime(byt)
+
+# 鍵生成
+euclid = (e, l)->
+  if e.eq(0)
+    l
+  else
+    euclid l.mod(e), e
+
+xeuclid = (a, b)->
+  if b.eq(0)
+    u = 1
+    v = 0
+  else
+    q = a.divide b
+    r = a.mod b
+    res = xeuclid(b, r)
+    u = res[1]
+    v = res[0].minus(q.multiply(res[1]))
+  
+  [bi(u), bi(v)]
+
+
+###
+l = bi.lcm p.minus(1), q.minus(1)
+d = xeuclid(e, l)[0]
+# d = e.mod l
+
+
+console.log l
+console.log d
+# console.log euclid bi(6), bi(18)
+# console.log bi.gcd bi(6), bi(18)
+
+n = p.multiply(q)
+m=bi("12309")
+
+c = modular_exp(m, e, n)
+# console.log "c",c
+pt = modular_exp(c, d, n)
+console.log "m",m
+console.log "pt",pt
+###
+
+
+
+###
+# 9007199254740991
+bi = require "big-integer"
+
+# console.log bi(10**10) * bi(10**10)
+
+###
 
 
 
