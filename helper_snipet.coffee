@@ -71,14 +71,14 @@ module.exports.appendCsv = (filename, val)-> new Promise (f,r)->
       f()
 
 # 圧縮、解凍
-deflate = (pt)-> new Promise (f,r)->
+module.exports.deflate = (pt)-> new Promise (f,r)->
   zlib.deflate pt, (e,d)->
     if e?
       r e
     else
       f d.toString("hex")
 
-inflate = (comp)-> new Promise (f,r)->
+module.exports.inflate = (comp)-> new Promise (f,r)->
   zlib.inflate new Buffer(comp, "hex"), (e,d)->
     if e?
       r e

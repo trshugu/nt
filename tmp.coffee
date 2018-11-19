@@ -5,7 +5,500 @@ helper = require "./helper"
 
 
 
+
+
+
+
 ###
+# 配列のオブジェクトを文字列にして伸張
+arr = [1,2,4,5]
+str = JSON.stringify arr
+helper.deflate str
+.then (v)->
+  console.log v
+  helper.inflate v
+.then (v)->
+  console.log v
+  obj = JSON.parse v
+  console.log "o", obj[3]
+###
+
+
+###
+# RSA暗号v1.2 成型
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+# 拡張ユークリッド互除法
+xeuclid = (aa, bb)->
+  if bb.eq(0)
+    uu = 1
+    vv = 0
+  else
+    qq = aa.divide bb
+    rr = aa.mod bb
+    res = xeuclid(bb, rr)
+    uu = res[1]
+    vv = res[0].minus(qq.multiply(res[1]))
+  
+  [bi(uu), bi(vv)]
+
+# 鍵生成
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+
+byt = bi 16
+p = gen_prime(byt)
+q = gen_prime(byt)
+e = gen_prime(byt)
+
+n = p.multiply(q)
+d = gen_d e, p.minus(1).multiply(q.minus(1))
+
+m = "nanrakano hirabunあ　漢字"
+a = m.split("").map (i)->bi i.charCodeAt()
+
+c = a.map (i)-> modular_exp(i, e, n)
+
+# 暗号文配列を圧縮
+str = JSON.stringify c
+helper.deflate str
+.then (v)->
+  console.log v
+  helper.inflate v
+.then (v)->
+  arr = JSON.parse(v)
+  console.log "arr",arr
+  pt = arr.map (i)-> modular_exp(bi(i), d, n)
+  console.log pt.map((i)-> String.fromCharCode i).join("")
+
+# pt = c.map (i)-> console.log i.toString(16);modular_exp(i, d, n)
+# console.log pt.map((i)-> String.fromCharCode i).join("")
+
+helper.deflate e.toString()
+.then (v)->
+  console.log "適当な正整数e",e.toString()
+  console.log "適当な正整数e",v
+
+helper.deflate d.toString()
+.then (v)->
+  console.log "秘密鍵",d.toString()
+  console.log "秘密鍵",v
+
+helper.deflate n.toString()
+.then (v)->
+  console.log "公開鍵",n.toString()
+  console.log "公開鍵",v
+###
+
+
+
+
+###
+# RSA暗号v1.1
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+# 拡張ユークリッド互除法
+xeuclid = (aa, bb)->
+  if bb.eq(0)
+    uu = 1
+    vv = 0
+  else
+    qq = aa.divide bb
+    rr = aa.mod bb
+    res = xeuclid(bb, rr)
+    uu = res[1]
+    vv = res[0].minus(qq.multiply(res[1]))
+  
+  [bi(uu), bi(vv)]
+
+# 鍵生成
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+
+byt = bi 16
+p = gen_prime(byt)
+q = gen_prime(byt)
+e = gen_prime(byt)
+
+n = p.multiply(q)
+d = gen_d e, p.minus(1).multiply(q.minus(1))
+
+
+# m=bi("1010101")
+
+m = "nanrakano hirabunあ　漢字"
+a = m.split("").map (i)->bi i.charCodeAt()
+# console.log a
+
+c = a.map (i)-> modular_exp(i, e, n)
+
+cstr = c.map (i)-> i.toString()
+console.log cstr.toString()
+
+pt = c.map (i)-> modular_exp(i, d, n)
+
+
+console.log pt.map((i)-> String.fromCharCode i).join("")
+
+# c = modular_exp(m, e, n)
+# pt = modular_exp(c, d, n)
+
+# 必要なものはe,d,n
+# console.log "m",m
+# console.log "c",c
+# console.log "pt",pt
+
+
+###
+
+
+###
+# RSA暗号v0.1.3
+bi = require "big-integer"
+
+byt = bi 10
+p = gen_prime(byt)
+q = gen_prime(byt)
+n = p * q
+
+l = bi.lcm( p.minus(1), q.minus(1) )
+
+pub = bi 0
+pubcnt = bi 2
+while pubcnt.leq l
+  if bi.gcd(pubcnt, l).eq(1)
+    pub = pubcnt
+    break
+  
+  pubcnt = pubcnt.plus(1)
+
+pri = bi 0
+pricnt = bi 2
+while pricnt.leq l
+  if pub.multiply(pricnt).mod(l).eq(1)
+    pri = pricnt
+    break
+  
+  pricnt = pricnt.plus(1)
+
+m = "nanrakano hirabunあ　漢字"
+a = m.split("").map (i)-> bi i.charCodeAt()
+
+c = a.map (i)-> i.pow(pub).mod(n)
+deco = c.map (i)-> i.pow(pri).mod(n)
+
+console.log m
+# console.log p
+# console.log c
+console.log deco.map((i)-> String.fromCharCode i).join("")
+###
+
+
+
+
+###
+# RSA暗号v0.1.2 成型
+bi = require "big-integer"
+
+m = "nanrakano hirabunあ　"
+a = m.split("").map (i)-> bi i.charCodeAt()
+# console.log a
+# p = bi 7
+# q = bi 19
+
+p = gen_prime(bi 8)
+q = gen_prime(bi 8)
+
+n = p * q
+
+# gcd = (x, y)->
+#   while(y) 
+#     t = y
+#     y = x % y
+#     x = t
+#   
+#   x
+
+# lcm = (x, y)-> Math.abs((x * y) / gcd(x, y))
+# console.log lcm 6, 18 
+# console.log bi.lcm( bi(6), bi(18) ) 
+
+l = bi.lcm( p.minus(1), q.minus(1) )
+console.log "l",l
+pub = bi 0
+pubcnt = bi 2
+while pubcnt.leq l
+  # console.log pubcnt
+  if bi.gcd(pubcnt, l).eq(1)
+    pub = pubcnt
+    break
+  
+  pubcnt = pubcnt.plus(1)
+
+console.log "pub", pub
+
+pri = bi 0
+pricnt = bi 2
+while pricnt.leq l
+  # console.log pricnt
+  if pub.multiply(pricnt).mod(l).eq(1)
+    pri = pricnt
+    break
+  
+  pricnt = pricnt.plus(1)
+
+console.log "pri",pri
+
+# console.log a
+c = a.map (i)-> i.pow(pub).mod(n)
+console.log c
+
+deco = c.map (i)-> i.pow(pri).mod(n)
+console.log deco
+console.log deco.map((i)-> String.fromCharCode i).join("")
+console.log a.map((i)-> String.fromCharCode i).join("")
+###
+
+
+
+###
+# RSA暗号v1.0
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+# 拡張ユークリッド互除法
+xeuclid = (aa, bb)->
+  if bb.eq(0)
+    uu = 1
+    vv = 0
+  else
+    qq = aa.divide bb
+    rr = aa.mod bb
+    res = xeuclid(bb, rr)
+    uu = res[1]
+    vv = res[0].minus(qq.multiply(res[1]))
+  
+  [bi(uu), bi(vv)]
+
+# 鍵生成
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+
+byt = bi 256
+p = gen_prime(byt)
+q = gen_prime(byt)
+e = gen_prime(byt)
+
+n = p.multiply(q)
+d = gen_d e, p.minus(1).multiply(q.minus(1))
+
+
+m=bi("1010101")
+c = modular_exp(m, e, n)
+pt = modular_exp(c, d, n)
+
+# 必要なものはe,d,n
+console.log "m",m
+console.log "c",c
+console.log "pt",pt
+###
+
+
+
 ###
 # big-integerでRSA
 bi = require "big-integer"
@@ -35,16 +528,22 @@ console.log a
 console.log c
 console.log deco
 console.log deco.map((i)-> String.fromCharCode i).join("")
+###
 
 
+
+
+###
 bi = require "big-integer"
 
 # 高速指数演算
 modular_exp = (a, b, n)->
+  # console.log "=================="
+  # console.log a,b,n
   res = bi.one
   while b.neq(0)
     if b.and(1).neq(0)
-      res = (res.multiply(a)).mod(n)
+      res = res.multiply(a).mod(n)
     
     a = a.multiply(a).mod(n)
     b = b.shiftRight(1)
@@ -75,33 +574,55 @@ mr_primary_test = (n, k=100)->
   
   d = n.minus(1)
   s = bi.zero
-  while d.mod(2).eq(0)
+  while d.mod(2).neq(0)
     d = d.divide(2)
+    # console.log "d",d
     s = s.plus(1)
   
   r = [0...k].map -> bi.randBetween 1, n.minus(1)
-  r.forEach (a)->
+  res = r.some (a)->
+    # console.log a
+    # console.log modular_exp(a, d, n)
     if modular_exp(a, d, n).neq(1)
+      # console.log "==="
+      # console.log s
       pl = [0...s].map (rr)-> 
         bi(2).pow(rr).multiply(d)
+      
       flg = true
       
-      if (pl.find (p)-> modular_exp(a, p, n).eq(1)) != undefined
-        flg = false
+      # console.log "pl"
+      # console.log pl
+      pl.forEach (p)->
+        console.log "plnaibu"
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
       
       if flg
-        return false
-      
-  return true
+        # 本来ならここに入って終了
+        # console.log "kokoha?"
+        return true
+    
+    
+  return res == false
   
 
-# console.log mr_primary_test bi 11
-# console.log mr_primary_test bi 12
-# console.log mr_primary_test bi 13
-# console.log mr_primary_test bi 9007199254740991
-# console.log mr_primary_test bi 9007199254740993
-# console.log mr_primary_test bi 141
-# console.log mr_primary_test bi 142
+console.log mr_primary_test bi 1 # f
+console.log mr_primary_test bi 2 # t
+console.log mr_primary_test bi 3 # t
+console.log mr_primary_test bi 4 # f
+
+console.log mr_primary_test bi 9007199254740991 # f
+
+console.log mr_primary_test bi 9007199254740993 # f
+
+console.log mr_primary_test bi 12 # f
+console.log mr_primary_test bi 13 # t
+console.log mr_primary_test bi 141 # f
+console.log mr_primary_test bi 142 # f
+
+
 
 # 素数生成
 gen_prime = (bit)->
@@ -115,52 +636,116 @@ gen_prime = (bit)->
 # console.log gen_prime 18
 
 
-byt = bi 128
-p = gen_prime(byt)
-q = gen_prime(byt)
-e = gen_prime(byt)
+
+
+
+byt = bi 256
+# p = gen_prime(byt)
+# q = gen_prime(byt)
+# e = gen_prime(byt)
+
+p = bi "195531435739008959673282737963575264469"
+q = bi "242779475795881938335203689155820874691"
+e = bi "188952817630177726230187917619251142649"
 
 # 鍵生成
-euclid = (e, l)->
-  if e.eq(0)
-    l
+euclid = (ee, ll)->
+  if ee.eq(0)
+    ll
   else
-    euclid l.mod(e), e
+    euclid ll.mod(ee), ee
 
-xeuclid = (a, b)->
-  if b.eq(0)
-    u = 1
-    v = 0
+xeuclid = (aa, bb)->
+  if bb.eq(0)
+    uu = 1
+    vv = 0
   else
-    q = a.divide b
-    r = a.mod b
-    res = xeuclid(b, r)
-    u = res[1]
-    v = res[0].minus(q.multiply(res[1]))
+    qq = aa.divide bb
+    rr = aa.mod bb
+    res = xeuclid(bb, rr)
+    uu = res[1]
+    vv = res[0].minus(qq.multiply(res[1]))
   
-  [bi(u), bi(v)]
+  [bi(uu), bi(vv)]
 
 
-###
-l = bi.lcm p.minus(1), q.minus(1)
-d = xeuclid(e, l)[0]
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+# l = bi.lcm p.minus(1), q.minus(1)
+# console.log "l",l
+# console.log "x", bi.gcd e, l
+# console.log "euclid", xeuclid(e, l)
+
+l = p.minus(1).multiply(q.minus(1))
+d = gen_d e, l
+
 # d = e.mod l
+# d = bi.gcd e, p.minus(1).multiply(q.minus(1))
 
 
-console.log l
-console.log d
+# console.log xeuclid(bi(22), bi(45))
+
+# xx = xeuclid(e, l)[0]
+# console.log "x", xx
+# console.log "l", l
+console.log "d", d
 # console.log euclid bi(6), bi(18)
 # console.log bi.gcd bi(6), bi(18)
 
+
+# console.log xx == xx.mod(l)
+# console.log "========"
+# console.log p
+# console.log q
+# console.log e
+# console.log "========"
+
 n = p.multiply(q)
-m=bi("12309")
+
+m=bi("1010101")
 
 c = modular_exp(m, e, n)
 # console.log "c",c
+# console.log "d",d
+# console.log "n",n
+
 pt = modular_exp(c, d, n)
-console.log "m",m
+
+# console.log "m",m
 console.log "pt",pt
 ###
+
+
+
+###
+aa = ->
+  flg = [0..3].some (p)->
+    console.log p
+    if p == 2
+      console.log "kiteru", p
+      flg = false
+      return
+    
+    console.log "dokokaeru"
+  
+  if flg
+    console.log "11"
+    return false
+    console.log "222"
+  
+  console.log "3333"
+  return true
+
+
+console.log aa()
+###
+
+
 
 
 
