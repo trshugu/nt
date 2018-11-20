@@ -7,6 +7,280 @@ helper = require "./helper"
 
 
 
+###
+# 検算
+xeuclid_si = (a, b)->
+  if b == 0
+    u = 1
+    v = 0
+  else
+    q = Math.floor(a / b)
+    r = a % b
+    console.log "qr", q, r
+    res = xeuclid_si(b, r)
+    u = res[1]
+    v = res[0] - (q * res[1])
+    console.log "uv", u, v
+  
+  [u,v]
+
+
+# console.log xeuclid_si 65537, 108
+# console.log xeuclid_si 5, 108
+
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+modular_exp = (a, b, n)->
+  res = 1
+  while b != 0
+    if (b & 1) != 0
+      res = (res * a) % n
+    
+    a = (a * a) % n
+    b = b >> 1
+    console.log "res,ab",res,a,b
+  
+  res
+
+# console.log modular_exp 123, 65537, 133
+# console.log modular_exp 93, 17, 133
+
+# console.log modular_exp 123, 5, 133
+console.log modular_exp 16, 65, 133
+###
+
+
+
+# RSA暗号v1.3 正整数eは65537で固定
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+# 拡張ユークリッド互除法
+xeuclid = (aa, bb)->
+  if bb.eq(0)
+    uu = 1
+    vv = 0
+  else
+    qq = aa.divide bb
+    rr = aa.mod bb
+    res = xeuclid(bb, rr)
+    uu = res[1]
+    vv = res[0].minus(qq.multiply(res[1]))
+  
+  [bi(uu), bi(vv)]
+
+# 鍵生成
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+
+
+gen_rsa = (byte_length)-> new Promise (f,r)->
+  byt = bi byte_length
+  p = gen_prime(byt)
+  q = gen_prime(byt)
+  e = bi 65537
+  
+  n = p.multiply(q)
+  d = gen_d e, p.minus(1).multiply(q.minus(1))
+  
+  res = {}
+  Promise.resolve()
+  .then ->
+    helper.deflate n.toString()
+  .then (v)->
+    res.pub = v
+    helper.deflate d.toString()
+  .then (v)->
+    res.key = v
+    f res
+  .catch (e)-> console.log "e", e
+
+encode_rsa = (pub, value)-> new Promise (f,r)->
+  e = bi 65537
+  
+  m = value
+  a = m.split("").map (i)->bi i.charCodeAt()
+  
+  Promise.resolve()
+  .then ->
+    helper.inflate pub
+  .then (pub)->
+    c = a.map (i)-> modular_exp(i, e, pub)
+    str = JSON.stringify c
+    helper.deflate str
+  .then (v)->
+    f v
+  .catch (e)-> console.log "e", e
+
+decode_rsa = (pub, key, crypto)-> new Promise (f,r)->
+  req = {}
+  Promise.resolve()
+  .then ->
+    helper.inflate pub
+  .then (v)->
+    req.pub = bi v
+    helper.inflate key
+  .then (v)->
+    req.key = bi v
+    helper.inflate crypto
+  .then (v)->
+    arr = JSON.parse(v)
+    # console.log "arr",arr
+    pt = arr.map (i)-> modular_exp(bi(i), bi(req.key), bi(req.pub))
+    f pt.map((i)-> String.fromCharCode i).join("")
+  .catch (e)-> console.log "e", e
+
+
+
+
+###
+pub = null
+key = null
+Promise.resolve()
+.then ->
+  gen_rsa 16
+.then (v)->
+  console.log v
+  pub = v.pub
+  key = v.key
+  encode_rsa v.pub, "てすと"
+.then (v)->
+  console.log v
+  decode_rsa pub, key, v
+.then (v)->
+  console.log v
+###
+
+
+
+
+###
+# これじゃない感
+gen_rsa = (byte_length, value)-> new Promise (f,r)->
+  byt = bi byte_length
+  p = gen_prime(byt)
+  q = gen_prime(byt)
+  e = bi 65537
+  
+  n = p.multiply(q)
+  d = gen_d e, p.minus(1).multiply(q.minus(1))
+  
+  m = value
+  a = m.split("").map (i)->bi i.charCodeAt()
+  
+  c = a.map (i)-> modular_exp(i, e, n)
+  str = JSON.stringify c
+  
+  # 暗号文配列を圧縮
+  res = {}
+  Promise.resolve()
+  .then ->
+    helper.deflate n.toString()
+  .then (v)->
+    res.pub = v
+    helper.deflate d.toString()
+  .then (v)->
+    res.key = v
+    helper.deflate str
+  .then (v)->
+    res.crypted = v
+    f res
+  .catch (e)-> console.log "e", e
+
+decode_rsa = (pub, key, crypto)-> new Promise (f,r)->
+  req = {}
+  Promise.resolve()
+  .then ->
+    helper.inflate pub
+  .then (v)->
+    req.pub = bi v
+    helper.inflate key
+  .then (v)->
+    req.key = bi v
+    helper.inflate crypto
+  .then (v)->
+    arr = JSON.parse(v)
+    # console.log "arr",arr
+    pt = arr.map (i)-> modular_exp(bi(i), bi(req.key), bi(req.pub))
+    f pt.map((i)-> String.fromCharCode i).join("")
+  .catch (e)-> console.log "e", e
+
+gen_rsa 16, "てすと"
+.then (v)->
+  console.log v
+  decode_rsa v.pub, v.key, v.crypted
+  .then (v)->
+    console.log v
+###
 
 
 ###
