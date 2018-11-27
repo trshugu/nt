@@ -14,6 +14,31 @@ helper = require "./helper"
 
 
 
+###
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> Math.floor Math.random() * 2
+  # console.log bits
+  ret = 1
+  bits.forEach (b)->
+    # console.log "b",b
+    ret = ret * 2 + b
+    # console.log "ret", ret
+  
+  ret * 2 + 1
+
+# 16ビット 2バイト
+# 32ビット 4バイト
+p = gen_rand(32)
+console.log p, p.toString(16), p.toString(2)
+
+# fa 9e b2 fd→8*4 32ビット
+# 1001101111011011011111001110100111101111000110101110000000000000→64ビット
+# 9b db 7c e9 ef 1a e0 00→8*8→64
+# f0 06 02 63 1c d8 26 2f→8*8→64
+# 素数は32ビットであり、公開鍵が64ビットということ
+###
+
+
 
 ###
 # RSAbreaker
@@ -270,15 +295,14 @@ gen_d = (e, l)->
 
 
 # keygen
-gen_rsa = (byte_length)-> new Promise (f,r)->
-  byt = bi byte_length
-  p = gen_prime(byt)
-  q = gen_prime(byt)
+gen_rsa = (bit_length)-> new Promise (f,r)->
+  bit = bi bit_length
+  p = gen_prime(bit)
+  q = gen_prime(bit)
   
   e = bi 65537
   
   n = p.multiply(q)
-  console.log "n",n.toString()
   d = gen_d e, p.minus(1).multiply(q.minus(1))
   
   res = {}
@@ -293,6 +317,7 @@ gen_rsa = (byte_length)-> new Promise (f,r)->
     f res
   .catch (e)-> console.log "e", e
 
+# 64ビットの公開鍵→32ビットのp,qを作る
 gen_rsa 32
 .then (v)-> console.log v
 
@@ -333,7 +358,6 @@ decode_rsa = (pub, key, crypto)-> new Promise (f,r)->
     f pt.map((i)-> String.fromCharCode i).join("")
   .catch (e)-> console.log "e", e
 ###
-
 
 
 
