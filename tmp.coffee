@@ -5,6 +5,1317 @@ helper = require "./helper"
 
 
 
+# 1～6のカード
+
+
+
+
+
+
+
+
+
+###
+# RSAbreaker
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# 拡張ユークリッド互除法
+xeuclid = (aa, bb)->
+  if bb.eq(0)
+    uu = 1
+    vv = 0
+  else
+    qq = aa.divide bb
+    rr = aa.mod bb
+    res = xeuclid(bb, rr)
+    uu = res[1]
+    vv = res[0].minus(qq.multiply(res[1]))
+  
+  [bi(uu), bi(vv)]
+
+# 鍵生成
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+# 平方根を求める
+sqrt = (x)->
+  a = x
+  [0..100].forEach ->
+    x = x.minus(x.multiply(x).minus(a).divide(bi(2).multiply(x)))
+  x.minus(1)
+
+# SQUFOF v1.1
+squfof = (N)->
+  multiplier = [1, 3, 5, 7, 11, 3*5, 3*7, 3*11, 5*7, 5*11, 7*11, 3*5*7, 3*5*11, 3*7*11, 5*7*11, 3*5*7*11].map (i)-> bi i
+  
+  s = sqrt(N)
+  if s.multiply(s).eq(N)
+    return s
+  
+  while multiplier.length > 0
+    k = multiplier.shift()
+    D = k.multiply N
+    Po = Pprev = P = sqrt D
+    Qprev = bi.one
+    Q = D.minus(Po.multiply(Po))
+    L = bi(2).multiply(sqrt(bi(2).multiply(s)))
+    B = bi(3).multiply(L)
+    
+    i = bi(2)
+    while i.lt(B)
+      b = (Po.plus(P)).divide(Q)
+      P = b.multiply(Q).minus(P)
+      q = Q
+      Q = Qprev.plus(b.multiply(Pprev.minus(P)))
+      r = sqrt Q
+      
+      if ((i.and(bi.one)).leq(bi.one) && r.multiply(r).eq(Q))
+        break
+      
+      Qprev = q
+      Pprev = P
+      
+      i = i.plus(bi.one)
+    
+    if (i.geq(B))
+      continue
+    
+    b = (Po.minus(P)).divide(r)
+    Pprev = P = b.multiply(r).plus(P)
+    Qprev = r
+    Q = (D.minus(Pprev.multiply(Pprev))).divide(Qprev)
+    i = bi.zero
+    
+    loop
+      b = (Po.plus(P)).divide(Q)
+      Pprev = P
+      P = b.multiply(Q).minus(P)
+      q = Q
+      Q = Qprev.plus(b.multiply(Pprev.minus(P)))
+      Qprev = q
+      i = i.plus(1)
+      
+      break unless (P.neq(Pprev))
+    
+    r = bi.gcd(N, Qprev)
+    if (r.neq(1) && r.neq(N))
+      return r
+  
+  return bi.zero
+
+# 16進数文字を10進数に変換
+hex2decsub = (req, res, ind)->
+  s = req.pop()
+  if s?
+    i = bi(parseInt(s, 16))
+    res = res.plus( i.multiply( bi(1).multiply(bi(16).pow(ind)) ) )
+    hex2decsub req, res, ind.plus(1)
+  else
+    res.toString()
+
+hex2dec = (str)->
+  hex2decsub str.split(""), bi.zero, bi.zero
+
+# 数字文字列を返す
+str2bi = (str)->
+  if str.match(/^\d*$/)
+    # 全部数字
+    return bi str
+  else if str.match(/^[\d:a-fA-F]*$/)
+    # 16進数っぽい
+    return bi hex2dec str.split(":").join("")
+  else
+    null
+
+# 秘密鍵生成v2.0 asnを生成
+rsacrack = (pub)->
+  q = squfof pub
+  p = pub.divide(q)
+
+  e = bi 65537
+
+  n = p.multiply(q)
+  d = gen_d e, p.minus(1).multiply(q.minus(1))
+
+  console.log "asn1=SEQUENCE:rsa_key"
+  console.log ""
+  console.log "[rsa_key]"
+  console.log "version=INTEGER:0"
+  console.log "modulus=INTEGER:" + n.toString()
+  console.log "pubExp=INTEGER:" + e.toString()
+  console.log "privExp=INTEGER:" + d.toString()
+  console.log "p=INTEGER:" + p.toString()
+  console.log "q=INTEGER:" + q.toString()
+  console.log "e1=INTEGER:" + d.mod(p.minus(1)).toString()
+  console.log "e2=INTEGER:" + d.mod(q.minus(1)).toString()
+  console.log "coeff=INTEGER:" + modular_exp(q, p.minus(2), p).toString()
+
+rsacrack str2bi "01:50:4c:45:03:e8:0e:e3:6d"
+rsacrack str2bi "01:9a:c6:86:47:6c:02:34:31"
+###
+
+
+
+
+
+
+
+
+
+
+
+
+###
+
+# RSA暗号v2.0
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+# 拡張ユークリッド互除法
+xeuclid = (aa, bb)->
+  if bb.eq(0)
+    uu = 1
+    vv = 0
+  else
+    qq = aa.divide bb
+    rr = aa.mod bb
+    res = xeuclid(bb, rr)
+    uu = res[1]
+    vv = res[0].minus(qq.multiply(res[1]))
+  
+  [bi(uu), bi(vv)]
+
+# 鍵生成
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+
+# keygen
+gen_rsa = (byte_length)-> new Promise (f,r)->
+  byt = bi byte_length
+  p = gen_prime(byt)
+  q = gen_prime(byt)
+  
+  e = bi 65537
+  
+  n = p.multiply(q)
+  console.log "n",n.toString()
+  d = gen_d e, p.minus(1).multiply(q.minus(1))
+  
+  res = {}
+  Promise.resolve()
+  .then ->
+    helper.deflate n.toString()
+  .then (v)->
+    res.pub = v
+    helper.deflate d.toString()
+  .then (v)->
+    res.key = v
+    f res
+  .catch (e)-> console.log "e", e
+
+gen_rsa 32
+.then (v)-> console.log v
+
+# rsa暗号化
+encode_rsa = (pub, value)-> new Promise (f,r)->
+  e = bi 65537
+  
+  m = value
+  a = m.split("").map (i)->bi i.charCodeAt()
+  
+  Promise.resolve()
+  .then ->
+    helper.inflate pub
+  .then (pub)->
+    c = a.map (i)-> modular_exp(i, e, pub)
+    str = JSON.stringify c
+    helper.deflate str
+  .then (v)->
+    f v
+  .catch (e)-> console.log "e", e
+
+# rsa複合
+decode_rsa = (pub, key, crypto)-> new Promise (f,r)->
+  req = {}
+  Promise.resolve()
+  .then ->
+    helper.inflate pub
+  .then (v)->
+    req.pub = bi v
+    helper.inflate key
+  .then (v)->
+    req.key = bi v
+    helper.inflate crypto
+  .then (v)->
+    arr = JSON.parse(v)
+    # console.log "arr",arr
+    pt = arr.map (i)-> modular_exp(bi(i), bi(req.key), bi(req.pub))
+    f pt.map((i)-> String.fromCharCode i).join("")
+  .catch (e)-> console.log "e", e
+###
+
+
+
+
+
+
+
+###
+# 平方根を求める
+sqrt = (x)->
+  a = x
+  [0..100].forEach ->
+    x = x.minus(x.multiply(x).minus(a).divide(bi(2).multiply(x)))
+  x.minus(1)
+
+# フェルマー法
+is_square = (n)->
+  flg = [0, 1, 4, 9, 16, 25, 33, 36].some (i)-> n.mod(48).eq(i)
+  
+  if flg==false
+    return false 
+  else
+    x = sqrt(n)
+    return x.multiply(x).eq(n)
+
+fermat = (n)->
+  a = sqrt(n)
+  b2 = (a.multiply(a)).minus(n)
+  
+  while is_square(b2) == false
+    a = a.plus(1)
+    b2 = a.multiply(a).minus(n)
+  
+  a.minus( sqrt(b2) )
+  # p = fermat n
+  # console.log n.toString(), "→", p.toString(), ",", n.divide(p).toString()
+
+# 16進数文字を10進数に変換
+hex2decsub = (req, res, ind)->
+  s = req.pop()
+  if s?
+    i = bi(parseInt(s, 16))
+    res = res.plus( i.multiply( bi(1).multiply(bi(16).pow(ind)) ) )
+    hex2decsub req, res, ind.plus(1)
+  else
+    res.toString()
+
+hex2dec = (str)->
+  hex2decsub str.split(""), bi.zero, bi.zero
+
+# 数字文字列を返す
+str2bi = (str)->
+  if str.match(/^\d*$/)
+    # 全部数字
+    return bi str
+  else if str.match(/^[\d:a-fA-F]*$/)
+    # 16進数っぽい
+    return bi hex2dec str.split(":").join("")
+  else
+    null
+
+
+
+# SQUFOF v1.0
+squfof_method = (N)->
+  multiplier = [1, 3, 5, 7, 11, 3*5, 3*7, 3*11, 5*7, 5*11, 7*11, 3*5*7, 3*5*11, 3*7*11, 5*7*11, 3*5*7*11].map (i)-> bi i
+  
+  s = sqrt(N)
+  if s.multiply(s).eq(N)
+    return s
+  
+  while multiplier.length > 0
+    k = multiplier.shift()
+    D = k.multiply N
+    Po = Pprev = P = sqrt D
+    Qprev = bi.one
+    Q = D.minus(Po.multiply(Po))
+    L = bi(2).multiply(sqrt(bi(2).multiply(s)))
+    B = bi(3).multiply(L)
+    
+    i = bi(2)
+    while i.lt(B)
+      b = (Po.plus(P)).divide(Q)
+      P = b.multiply(Q).minus(P)
+      q = Q
+      Q = Qprev.plus(b.multiply(Pprev.minus(P)))
+      r = sqrt Q
+      
+      if ((i.and(bi.one)).leq(bi.one) && r.multiply(r).eq(Q))
+        break
+      
+      Qprev = q
+      Pprev = P
+      
+      i = i.plus(bi.one)
+    
+    if (i.geq(B))
+      continue
+    
+    b = (Po.minus(P)).divide(r)
+    Pprev = P = b.multiply(r).plus(P)
+    Qprev = r
+    Q = (D.minus(Pprev.multiply(Pprev))).divide(Qprev)
+    i = bi.zero
+    
+    loop
+      b = (Po.plus(P)).divide(Q)
+      Pprev = P
+      P = b.multiply(Q).minus(P)
+      q = Q
+      Q = Qprev.plus(b.multiply(Pprev.minus(P)))
+      Qprev = q
+      i = i.plus(1)
+      
+      break unless (P.neq(Pprev))
+    
+    r = bi.gcd(N, Qprev)
+    if (r.neq(1) && r.neq(N))
+      return r
+  
+  return bi.zero
+
+squfof = (N)->
+  res = {}
+  N = bi N
+  p = squfof_method N
+  q = N.divide(p)
+  
+  res.n = N.toString()
+  res.p = p.toString()
+  res.q = q.toString()
+  
+  res
+###
+
+
+
+
+
+###
+# 秘密鍵生成v1.1 フェルマーからsqufofへ
+rsacrack = (pub)->
+  console.log "attack ", pub.toString()
+  
+  q = squfof_method pub
+  p = pub.divide(q)
+
+  e = bi 65537
+
+  n = p.multiply(q)
+  d = gen_d e, p.minus(1).multiply(q.minus(1))
+
+  console.log "modulus:", n.toString()
+  console.log "publicExponent:", e.toString()
+  console.log "privateExponent:", d.toString()
+
+  console.log "prime1:", p.toString()
+  console.log "prime2:", q.toString()
+
+  console.log "exponent1", d.mod(p.minus(1)).toString()
+  console.log "exponent2", d.mod(q.minus(1)).toString()
+  console.log "coefficient", modular_exp(q, p.minus(2), p).toString()
+
+
+
+rsacrack str2bi "01:50:4c:45:03:e8:0e:e3:6d"
+rsacrack str2bi "01:9a:c6:86:47:6c:02:34:31"
+###
+
+
+
+###
+# pubstr="17772938775798494671"
+# pubstr="12868808658646729003"
+# pubstr="17295514043671914031"
+# pubstr="15994946381146356007"
+# pubstr="1486935533"
+# pubstr= hex2dec "0332c178b4cb87f881"
+
+# console.log hex2dec "01:50:4c:45:03:e8:0e:e3:6d".split(":").join("")
+# pubstr = hex2dec "01:9a:c6:86:47:6c:02:34:31".split(":").join("")
+
+# rsacrack pubstr
+###
+
+
+###
+# 秘密鍵生成v1.0
+rsacrack = (pubstr)->
+  console.log "attack ", pubstr
+  pub = bi pubstr
+
+  q = bi fermat pub
+  p = bi pub.divide(q)
+
+  e = bi 65537
+
+  n = p.multiply(q)
+  d = gen_d e, p.minus(1).multiply(q.minus(1))
+
+  console.log "modulus:", n.toString()
+  console.log "publicExponent:", e.toString()
+  console.log "privateExponent:", d.toString()
+
+  console.log "prime1:", p.toString()
+  console.log "prime2:", q.toString()
+
+  console.log "exponent1", d.mod(p.minus(1)).toString()
+  console.log "exponent2", d.mod(q.minus(1)).toString()
+  console.log "coefficient", modular_exp(q, p.minus(2), p).toString()
+###
+
+
+
+###
+# pubstr="17772938775798494671"
+# pubstr="12868808658646729003"
+# pubstr="17295514043671914031"
+# pubstr="15994946381146356007"
+# pubstr="1486935533"
+# pubstr= hex2dec "0332c178b4cb87f881"
+
+# console.log hex2dec "01:50:4c:45:03:e8:0e:e3:6d".split(":").join("")
+# pubstr = hex2dec "01:9a:c6:86:47:6c:02:34:31".split(":").join("")
+
+# rsacrack pubstr
+
+# console.log squfof hex2dec "00:c3:c4:33:0f:7b:1c:d0:4f:65:db:6e:34:81:94:3e:36:a8:35:b5:67:6c:1e:b5:68:e2:c5:50:e4:ce:02:90:2a:f0:98:6a:df:bc:6c:9a:6e:a8:c3:7f:d0:b9:21:29:a8:3a:46:ab:2e:f9:aa:f4:32:de:7a:48:06:42:05:4a:3d:80:46:15:14:b9:4f:3e:c3:c4:5e:21:a2:a7:a8:cc:38:ec:c1:56:58:cd:03:9f:9b:1b:cf:54:4f:1d:14:9f:aa:ed:97:93:64:19:b5:db:28:db:94:6c:1b:e3:b1:2e:1c:12:e2:0a:b5:5e:c5:1d:3e:4f:3f:fa:5f:5f:64:94:45".split(":").join("")
+# console.log hex2dec "00:c3:c4:33:0f:7b:1c:d0:4f:65:db:6e:34:81:94:3e:36:a8:35:b5:67:6c:1e:b5:68:e2:c5:50:e4:ce:02:90:2a:f0:98:6a:df:bc:6c:9a:6e:a8:c3:7f:d0:b9:21:29:a8:3a:46:ab:2e:f9:aa:f4:32:de:7a:48:06:42:05:4a:3d:80:46:15:14:b9:4f:3e:c3:c4:5e:21:a2:a7:a8:cc:38:ec:c1:56:58:cd:03:9f:9b:1b:cf:54:4f:1d:14:9f:aa:ed:97:93:64:19:b5:db:28:db:94:6c:1b:e3:b1:2e:1c:12:e2:0a:b5:5e:c5:1d:3e:4f:3f:fa:5f:5f:64:94:45".split(":").join("")
+###
+
+
+
+
+###
+# console.log squfof_method bi 133
+
+# console.log sqrt bi 133
+# console.log sqrt bi 144
+# console.log squfof bi 133
+# console.log squfof bi 11111
+# modustr="17772938775798494671"
+# console.log squfof modustr
+###
+
+###
+console.time "a"
+console.log squfof "17772938775798494671"
+console.timeEnd "a"
+
+console.time "a"
+console.log squfof "12868808658646729003"
+console.timeEnd "a"
+
+console.time "a"
+console.log squfof "17295514043671914031"
+console.timeEnd "a"
+
+console.time "a"
+console.log squfof "15994946381146356007"
+console.timeEnd "a"
+
+console.time "a"
+console.log squfof "1486935533"
+console.timeEnd "a"
+
+console.time "a"
+console.log squfof hex2dec "0332c178b4cb87f881"
+console.timeEnd "a"
+
+console.time "a"
+console.log squfof "15994946381146356007"
+console.timeEnd "a"
+
+console.time "a"
+console.log squfof hex2dec "01:50:4c:45:03:e8:0e:e3:6d".split(":").join("")
+console.timeEnd "a"
+
+console.time "a"
+console.log squfof "1578095031515398957"
+console.timeEnd "a"
+
+console.time "a"
+console.log squfof hex2dec "01:9a:c6:86:47:6c:02:34:31".split(":").join("")
+console.timeEnd "a"
+###
+
+
+
+
+###
+i = bi(2)
+B = bi(10)
+while i.lt(B)
+  console.log i
+  i = i.plus 1
+###
+
+
+
+
+###
+console.log str2bi "1234567"
+console.log str2bi "23:12:f2:23"
+console.log str2bi "error"
+###
+
+###
+# SQUFOF v0.1
+# 平方根を求める(小さい数)
+sqrts = (x)->
+  a = x
+  x = x - ((x*x-a)/2) * x
+  x - 1
+
+squfof = (N)->
+  multiplier = [1, 3, 5, 7, 11, 3*5, 3*7, 3*11, 5*7, 5*11, 7*11, 3*5*7, 3*5*11, 3*7*11, 5*7*11, 3*5*7*11]
+  # D, Po, P, Pprev, Q, Qprev, q, b, r, s
+  # L, B, i
+  
+  # 平方根をとる
+  s = Math.ceil Math.sqrt N
+  console.log s, N
+  if s * s == N
+    console.log "saisyo"
+    return s
+  
+  # マルチプライヤー分繰り返す
+  # multiplier.forEach (k)->
+  while multiplier.length > 0
+    k = multiplier.shift()
+    console.log "k is",k
+    D = k*N
+    Po = Pprev = P = Math.ceil Math.sqrt D
+    Qprev = 1
+    Q = D - Po * Po
+    L = 2 * Math.ceil Math.sqrt(2 * s)
+    B = 3 * L
+    
+    console.log "i = 2"
+    i = 2
+    while i < B
+      console.log "i is ", i
+      b = (Po + P)/Q
+      P = b * Q - P
+      q = Q
+      Q = Qprev + b * (Pprev - P)
+      r = Math.ceil Math.sqrt Q
+      console.log "Q,r", Q,r
+      # iの下一桁が1でなく、rがQの平方だった場合抜ける
+      if (!(i & 1) && r * r == Q)
+        break
+      
+      console.log "break ato"
+      
+      Qprev = q
+      Pprev = P
+      
+      i = i + 1
+    
+    console.log "continue mae"
+    # ここがうまくいくかあやしい
+    # iがB以上だったら次のマルチプライヤ―へ行くということ
+    if (i >= B)
+      continue
+    
+    console.log "continue ato"
+    b = (Po - P)/r
+    Pprev = P = b * r + P
+    Qprev = r
+    Q = (D - Pprev * Pprev) / Qprev
+    i = 0
+    
+    console.log "loop mae"
+    loop
+      console.log "loop nai"
+      b = (Po + P) / Q
+      Pprev = P
+      P = b * Q - P
+      q = Q
+      Q = Qprev + b * (Pprev - P)
+      Qprev = q
+      i++
+      
+      break unless (P != Pprev)
+    
+    r = bi.gcd(N, Qprev).value
+    console.log "kiteru?", r
+    if (r != 1 && r != N)
+      return r
+  
+  return r
+
+
+
+console.log squfof 144
+console.log squfof 11111
+# console.log Math.sqrt 144
+###
+
+
+
+###
+hai = [1,2,4,5,6].map (i)-> bi i
+
+while hai.length > 0
+  a = hai.shift()
+  console.log a
+  if a.eq(4)
+    continue
+  console.log a,"にかいめ"
+###
+
+
+
+###
+console.log hex2dec "8000000000000000"
+console.log hex2dec "10000000000000000"
+console.log hex2dec "1504c4503e80ee36d"
+console.log hex2dec "20000000000000000"
+###
+
+
+###
+# 秘密鍵生成
+pubstr="17772938775798494671"
+pubstr="1486935533"
+pubstr= hex2dec "0332c178b4cb87f881"
+
+console.log "attack ", pubstr
+pub = bi pubstr
+
+q = bi fermat pub
+p = bi pub.divide(q)
+
+e = bi 65537
+
+n = p.multiply(q)
+d = gen_d e, p.minus(1).multiply(q.minus(1))
+
+console.log "modulus:", n.toString()
+console.log "publicExponent:", e.toString()
+console.log "privateExponent:", d.toString()
+
+console.log "prime1:", p.toString()
+console.log "prime2:", q.toString()
+
+console.log "exponent1", d.mod(p.minus(1)).toString()
+console.log "exponent2", d.mod(q.minus(1)).toString()
+console.log "coefficient", modular_exp(q, p.minus(2), p).toString()
+
+
+# exponent1: 200729035 (0xbf6e1cb)
+# e1 = privExp mod (p - 1)
+
+# exponent2: 2121898481 (0x7e7999f1)
+# e2 = privExp mod (q - 1)
+
+# coefficient: 693493053 (0x2955dd3d)
+# coeff = q^-1 mod p
+
+# sympy.factorint(1578095031515398957)
+###
+
+
+
+
+###
+# 365が衝突する可能性
+[1..100].forEach (ninzu)->
+  kaku = 0
+  loo = 2000
+
+  [0...loo].forEach ->
+    conflg = false
+    p = []
+    [0..ninzu].forEach ->
+      n = Math.floor(Math.random()*365)
+      flg = p.some((i)-> n == i)
+      if flg
+        # console.log "conf", n
+        conflg = true
+      else
+        p.push n
+        # console.log p
+    
+    if conflg
+      kaku++
+  
+  console.log ninzu, "人のとき", Math.ceil(kaku/loo*100), "%重複する"
+###
+
+
+###
+# 素因数分解 まだダメ
+primefactorization = (n)->
+  p = bi(2)
+  
+  # まず2で割れるだけ割る
+  output = ""
+  while n == n.divide(p).multiply(p) and n.gt(p)
+    output += p.toString() + ' * '
+    n = n.divide(p)
+  
+  # 次に3以上の奇数で割り続ける
+  p = p.plus(1)
+  while n.geq(p.multiply(p))
+    if n.neq(n.divide(p).multiply(p))
+      p = p.plus(2)
+    else
+      output += p.toString() + ' * '
+      n = n.divide(p)
+    
+  
+  output += n.toString()
+
+console.log primefactorization bi "133"
+console.log primefactorization bi "17772938775798494671"
+###
+
+
+###
+n = bi "133"
+# n = 1578095031515398957
+
+i = bi 2
+while i.leq(n)
+  # console.log i
+  while n.mod(i).eq 0
+    console.log i.toString()
+    n = n.divide i
+  
+  i = i.plus 1
+###
+
+
+
+
+
+###
+# 素因数分解 bi版 いまいち
+bi = require "big-integer"
+
+# 平方根を求める
+sqrt = (x)->
+  a = x
+  [0..100].forEach ->
+    x = x.minus(x.multiply(x).minus(a).divide(bi(2).multiply(x)))
+  x.minus(1)
+
+
+primeFactorizationbi = (n)->
+  s = sqrt n
+  r = bi.zero
+  result = []
+  
+  # i = bi("4143585130")
+  i = bi("2")
+  while i.leq(s)
+    console.log i
+    if (n.mod(i)).eq(0)
+      console.log "cong!!!", i
+      result.push i.toString()
+      result.push n.divide(i).toString()
+      break
+    
+    # インクリメントではなく素数を増やしていく
+    while true
+      i = i.plus(1)
+      console.log i
+      if i.isPrime()
+      # if mr_primary_test(i)
+        console.log i,"isprime"
+        break
+      else
+        console.log i,"isntprime"
+        # if mr_primary_test(s)
+        continue
+    
+    # i = i.plus(1)
+    
+  
+  result
+
+# console.log sqrt bi "17772938775798494671"
+# console.log primeFactorizationbi bi 133
+# console.log primeFactorizationbi bi "17772938775798494671"
+
+n = bi "17772938775798494671"
+# console.log gen_prime(1024).bitLength()
+###
+
+
+
+
+
+###
+# フェルマー法
+# console.log sqrt bi 36
+# console.log sqrt bi 133
+# console.log sqrt bi 14884
+
+is_square = (n)->
+  flg = [0, 1, 4, 9, 16, 25, 33, 36].some (i)-> n.mod(48).eq(i)
+  
+  if flg==false
+    return false 
+  else
+    x = sqrt(n)
+    return x.multiply(x).eq(n)
+
+# console.log is_square bi 36
+# console.log is_square bi 133
+# console.log is_square bi 14884
+
+
+
+
+fermat = (n)->
+  a = sqrt(n)
+  b2 = (a.multiply(a)).minus(n)
+  
+  while is_square(b2) == false
+    a = a.plus(1)
+    b2 = a.multiply(a).minus(n)
+  
+  a.minus( sqrt(b2) )
+
+getPrime = (n)->
+  p = fermat n
+  console.log n.toString(), "→", p.toString(), ",", n.divide(p).toString()
+
+getPrime bi "133"
+getPrime bi "17772938775798494671"
+###
+
+
+
+
+###
+str = "21f" # 512+16+15=543
+arr = str.split("")
+
+res = bi.zero
+console.log res
+res = res.plus( bi(parseInt(arr.pop(), 16)).multiply( bi(1).multiply(  bi(16).pow(0)  ) ) )
+console.log res
+res = res.plus( bi(parseInt(arr.pop(), 16)).multiply( bi(1).multiply(  bi(16).pow(1)  ) ) )
+console.log res
+res = res.plus( bi(parseInt(arr.pop(), 16)).multiply( bi(1).multiply(  bi(16).pow(2)  ) ) )
+console.log res
+###
+
+
+
+
+
+###
+# console.log "", hex2dec "21f23987234fdaefafdfe"
+
+console.log "17772938775798494671", hex2dec "f6a629a6ca3c35cf"
+console.log "65537", hex2dec "10001"
+console.log "7332960987984909313", hex2dec "65c3e92ab8a35401"
+console.log "4289265983", hex2dec "ffa9013f"
+console.log "4143585137", hex2dec "f6fa1771"
+console.log "200729035", hex2dec "bf6e1cb"
+console.log "2121898481", hex2dec "7e7999f1"
+console.log "693493053", hex2dec "2955dd3d"
+###
+
+
+
+
+###
+# hex2dec
+str = "21f" # 512+16+15=543
+arr = str.split("")
+
+res = bi.zero
+console.log res
+res = res.plus( bi(parseInt(arr.pop(), 16)).multiply( bi(1).multiply(  bi(16).pow(0)  ) ) )
+console.log res
+res = res.plus( bi(parseInt(arr.pop(), 16)).multiply( bi(1).multiply(  bi(16).pow(1)  ) ) )
+console.log res
+res = res.plus( bi(parseInt(arr.pop(), 16)).multiply( bi(1).multiply(  bi(16).pow(2)  ) ) )
+console.log res
+###
+
+
+###
+# hex2dec
+str = "1f" # 16+15=31
+arr = str.split("")
+
+res = bi.zero
+console.log res
+res = res.plus( bi(parseInt(arr.pop(), 16)).multiply(bi(1)) )
+console.log res
+res = res.plus( bi(parseInt(arr.pop(), 16)).multiply( bi(1).multiply(16) ) )
+console.log res
+###
+
+
+
+
+###
+# 自分が素数かどうか
+lprime = []
+
+# [2...120].forEach (i)->
+
+# n = bi(120)
+n = bi("65535")
+
+i = bi 2
+while i.leq(n)
+  flg = lprime.some (j)-> i % j == 0
+  if flg == false
+    lprime.push i.toString()
+    console.log i.toString(), lprime.length
+  
+  i = i.plus 1
+
+console.log lprime
+###
+
+
+
+
+###
+# 8bit (23)
+# i = bi 128
+# n = bi 255
+
+# 16bit (3030)
+# i = bi 32768
+# n = bi 65535
+
+# 32 bits is 2147483648 ～ 4294967295 range
+# このへんからしんどい
+i = bi "2147483648"
+n = bi "4294967295"
+# 64 bits is 9223372036854775808 ～ 18446744073709551615 range
+
+
+lprime = []
+while i.leq(n)
+  # 途中からなのでエラトステネスの篩は使えない
+  # flg = lprime.some (j)-> i % j == 0
+  # if flg == false
+  if i.isProbablePrime()
+    lprime.push i.toString()
+    console.log i.toString(), lprime.length
+  
+  i = i.plus 1
+
+console.log lprime, lprime.length
+###
+
+
+
+###
+[1...10].forEach (r)->
+  # console.log r,"ビットのとき",2**r,"個"
+  console.log 2**r, "bits is", 2** ( (2**r)-1 )
+  # console.log r, "bits is", parseInt "1" + "0".repeat(r-1), 2, "count"
+###
+
+
+###
+i = bi 1
+while i.leq("10")
+  bit = bi(2).pow(i).toString()
+  count = bi(2).pow( (bi(2).pow(i).minus(1)) ).toString()
+  console.log bit, "bits is", count
+  i = i.plus 1
+
+# 64 bits is 9223372036854775808
+###
+
+###
+i = bi 1
+while i.leq("10")
+  bit = bi(2).pow(i).toString()
+  start = bi(2).pow( (bi(2).pow(i).minus(1)) ).toString()
+  end = bi(2).pow( (bi(2).pow(i)) ).minus(1).toString()
+  console.log bit, "bits is", start, "～", end, "range"
+  i = i.plus 1
+
+# 8 bits is 128 ～ 255 range
+# 16 bits is 32768 ～ 65535 range
+# 32 bits is 2147483648 ～ 4294967295 range
+# 64 bits is 9223372036854775808 ～ 18446744073709551615 range
+
+###
+
+
+###
+i = bi 1
+while i.leq("10")
+  console.log i
+  i = i.plus 1
+###
+
+###
+r = bi 2
+[1...10].forEach ->
+  console.log r, "bits is", parseInt "1" + "0".repeat(r-1), 2, "count"
+  r = r.multiply(2)
+###
+
+###
+cntter = (b)->
+  bits = b
+  range = parseInt "1" + "0".repeat(16-1), 2
+  range - 1
+  
+
+bits = 16
+ab = cntter bits
+console.log bits, "bits is", ab, "count"
+###
+
+
+
+###
+while true
+  p = sqrt(gen_prime(64))
+  console.log p
+  if n.mod(p) == 0
+    console.log p
+    break
+# console.log sqrt(gen_prime(64))
+###
+
+
+
+
+###
+# Eratosthenes
+eratosthenes = (n)->
+  s = Math.floor Math.sqrt n
+  arr = [2..n].filter (i)-> 
+    i % 2 != 0
+  .filter (i)->
+    i % 3 != 0
+  .filter (i)->
+    i % 5 != 0
+  .filter (i)->
+    i % 7 != 0
+  .filter (i)->
+    i % 9 != 0
+  .filter (i)->
+    i % 11 != 0
+
+console.log eratosthenes 120
+###
+
+
+
+###
+a = 133
+x = 133
+x = x - (x * x - a) / (2 * x)
+console.log x
+x = x - (x * x - a) / (2 * x)
+console.log x
+x = x - (x * x - a) / (2 * x)
+console.log x
+###
+
+###
+sqrt = (x)->
+  a = x
+  [0..1000].forEach ->
+    x = x - (x * x - a) / (2 * x)
+  x
+###
+
+
+###
+# 平方根を求める
+sqrt = (x)->
+  a = x
+  [0..100].forEach ->
+    x = x.minus(x.multiply(x).minus(a).divide(bi(2).multiply(x)))
+  x
+
+console.log sqrt bi 133
+console.log sqrt bi 12394873
+###
+
+###
+n = 133
+r = sqrt n, n
+console.log r
+
+r = sqrt n,r
+console.log r
+r = sqrt n,r
+console.log r
+r = sqrt n,r
+console.log r
+r = sqrt n,r
+console.log r
+r = sqrt n,r
+console.log r
+###
+
+###
+n = bi "133"
+# n = bi "17772938775798494671"
+
+i = bi(2)
+while i.leq(11)
+  if n.mod(i).eq(0)
+    console.log "zzzz", i.toString()
+  console.log i.toString()
+  
+  i = i.plus(1)
+###
+
+
+###
+console.log "検算"
+i = bi(2)
+while i.leq(5)
+  console.log i.toString()
+  i = i.plus(1)
+###
+
+
+###
+# 素因数分解
+primeFactorization = (n)->
+  s = Math.floor(Math.sqrt(n))
+  r = 0
+  result = []
+  
+  [2..s].forEach (i)->
+    if (n % i) == 0
+      r = 0
+      while ((n % i) == 0)
+        r++
+        n = n / i
+      
+      result.push
+        num: i
+        r: r
+  
+  if (n > s) 
+    result.push
+      num: n
+      r: 1
+  
+  result
+
+# console.log primeFactorization 17772938775798494671
+# console.log primeFactorization 1486935533
+###
+
+
+
+
+###
+str = """
+MCQwDQYJKoZIhvcNAQEBBQADEwAwEAIJANsBMrNYoNXtAgMBAAE=
+"""
+
+
+console.log Buffer.from(str, "base64")
+console.log Buffer.from(str, "base64").toString("utf8")
+console.log Buffer.from(str, "base64").toString("hex")
+###
+
+
+
+###
+# base64変換 Bufferはfromが推奨
+str = Buffer.from("もじれつ").toString 'base64'
+console.log str
+console.log Buffer.from(str, "base64").toString()
+###
 
 
 ###
@@ -55,7 +1366,7 @@ console.log modular_exp 16, 65, 133
 ###
 
 
-
+###
 # RSA暗号v1.3 正整数eは65537で固定
 bi = require "big-integer"
 
@@ -147,6 +1458,7 @@ gen_rsa = (byte_length)-> new Promise (f,r)->
   byt = bi byte_length
   p = gen_prime(byt)
   q = gen_prime(byt)
+  
   e = bi 65537
   
   n = p.multiply(q)
@@ -198,7 +1510,7 @@ decode_rsa = (pub, key, crypto)-> new Promise (f,r)->
     pt = arr.map (i)-> modular_exp(bi(i), bi(req.key), bi(req.pub))
     f pt.map((i)-> String.fromCharCode i).join("")
   .catch (e)-> console.log "e", e
-
+###
 
 
 
