@@ -12,6 +12,94 @@ helper = require "./helper"
 
 
 
+###
+# sw
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# 拡張ユークリッド互除法
+xeuclid = (aa, bb)->
+  if bb.eq(0)
+    uu = 1
+    vv = 0
+  else
+    qq = aa.divide bb
+    rr = aa.mod bb
+    res = xeuclid(bb, rr)
+    uu = res[1]
+    vv = res[0].minus(qq.multiply(res[1]))
+  
+  [bi(uu), bi(vv)]
+
+# 鍵生成
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+
+n = bi "114381625757888867669235779976146612010218296721242362562561842935706935245733897830597123563958705058989075147599290026879543541"
+p = bi "3490529510847650949147849619903898133417764638493387843990820577"
+q = bi "32769132993266709549961988190834461413177642967992942539798288533"
+e = bi "9007"
+d = gen_d e, p.minus(1).multiply(q.minus(1))
+
+c = bi "96869613754622061477140922254355882905759991124574319874695120930816298225145708356931476622883989628013391990551829945157815154"
+
+m = modular_exp(c, d, n).toString()
+
+m2a = (str)->
+  convert_swa = (i)->
+    switch i
+      when "00" then return " "
+      when "01" then return "A"
+      when "02" then return "B"
+      when "03" then return "C"
+      when "04" then return "D"
+      when "05" then return "E"
+      when "06" then return "F"
+      when "07" then return "G"
+      when "08" then return "H"
+      when "09" then return "I"
+      when "10" then return "J"
+      when "11" then return "K"
+      when "12" then return "L"
+      when "13" then return "M"
+      when "14" then return "N"
+      when "15" then return "O"
+      when "16" then return "P"
+      when "17" then return "Q"
+      when "18" then return "R"
+      when "19" then return "S"
+      when "20" then return "T"
+      when "21" then return "U"
+      when "22" then return "V"
+      when "23" then return "W"
+      when "24" then return "X"
+      when "25" then return "Y"
+      when "26" then return "Z"
+  
+  str.match(/.{1,2}/g).map((i)-> convert_swa i).join("")
+
+
+console.log m
+console.log m2a(m)
+###
+
+
 
 
 ###
