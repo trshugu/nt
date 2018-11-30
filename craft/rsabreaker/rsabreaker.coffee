@@ -148,7 +148,37 @@ rsacrack = (pub)->
   console.log "e2=INTEGER:" + d.mod(q.minus(1)).toString()
   console.log "coeff=INTEGER:" + modular_exp(q, p.minus(2), p).toString()
 
-if process.argv[2]?
+# ˆø”‚ª“ñ‚Â‚Ìê‡‚Í‘fˆö”•ª‰ð‚µ‚È‚¢
+rsacrack_pq = (p, q)->
+  q = q
+  p = p
+
+  e = bi 65537
+
+  n = p.multiply(q)
+  d = gen_d e, p.minus(1).multiply(q.minus(1))
+
+  console.log "asn1=SEQUENCE:rsa_key"
+  console.log ""
+  console.log "[rsa_key]"
+  console.log "version=INTEGER:0"
+  console.log "modulus=INTEGER:" + n.toString()
+  console.log "pubExp=INTEGER:" + e.toString()
+  console.log "privExp=INTEGER:" + d.toString()
+  console.log "p=INTEGER:" + p.toString()
+  console.log "q=INTEGER:" + q.toString()
+  console.log "e1=INTEGER:" + d.mod(p.minus(1)).toString()
+  console.log "e2=INTEGER:" + d.mod(q.minus(1)).toString()
+  console.log "coeff=INTEGER:" + modular_exp(q, p.minus(2), p).toString()
+
+
+
+if process.argv[3]?
+  p = process.argv[2]
+  q = process.argv[3]
+  rsacrack_pq str2bi(p), str2bi(q)
+
+else if process.argv[2]?
   str = process.argv[2]
   rsacrack str2bi str
 
