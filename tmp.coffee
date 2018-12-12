@@ -11,6 +11,53 @@ helper = require "./helper"
 
 
 
+euclid = (a,b)->
+  return b if a%b == 0
+  euclid b, a%b
+
+# console.log euclid 18800, 37884
+# console.log euclid 37884, 37884 - 18800
+# console.log euclid 37884, 18800
+# console.log euclid 89,144
+
+
+###
+m = 1071
+n = 1029
+console.log euclid m, n
+###
+
+
+# m * x + n * y
+xeuc = (a, b)->
+  if b == 0
+    x = 1
+    y = 0
+  else
+    q = Math.floor a/b
+    m = a%b
+    res = xeuc b, m
+    x = res[1]
+    y = res[0] - (q * res[1])
+  
+  [x,y]
+  
+# console.log xeuc 111, 30
+
+p = 7
+q =19
+phi = (p-1)*(q-1)
+
+
+
+x = xeuc 5, 
+console.log x
+if x[0] < 0
+  console.log x[0] + 18
+else
+  console.log x[0] % 18
+
+
 
 ###
 # sw
