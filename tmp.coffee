@@ -49,13 +49,187 @@ q =19
 phi = (p-1)*(q-1)
 
 
-
+###
 x = xeuc 5, 
 console.log x
 if x[0] < 0
   console.log x[0] + 18
 else
   console.log x[0] % 18
+###
+
+
+
+
+
+###
+# ミラーラビン
+is_prime = (q,k=1)->
+  q = Math.abs q 
+  
+  return true  if q == 2
+  return false if q < 2 or (q&1) == 0
+  
+  d = (q-1) >> 1
+  while (d&1) == 0
+    d >>= 1
+  
+  [0...q].forEach (i)->
+    a = Math.floor(Math.random() * (q-1)) + 1
+    t = d
+    y = (a**t)%q
+    while t != q-1 and y != 1 and y != q-1
+      y = (y**2)%q
+      t <<= 1
+    
+    return false if y != q-1 and (t&1) == 0
+  
+  return true
+###
+
+
+
+###
+# フェルマー
+is_prime = (q)->
+  q = Math.abs q
+  return true if q == 2
+  return false if q < 2 or (q&1) == 0
+  return ((3 ** (q-1)) % q) == 1
+###
+
+
+###
+# フェルマー2
+is_prime = (q)->
+  q = Math.abs q
+  return true if q == 2
+  return false if q < 2 or (q&1) == 0
+  flg = true
+  i = 2
+  while i < 100
+    i++
+    x = q
+    y = i
+    while y == 1
+      x = y
+      y = x % y
+    
+    if x != 1
+      continue
+    
+    if (( (Math.floor(Math.random() * 1000) + 3)  ** (q-1)) % q) == 1
+      flg = false
+      break
+  
+  return flg
+###
+
+
+###
+###
+is_prime = (q,k=50)->
+  q = Math.abs q
+  
+  # 計算するまでもなく判定できるものははじく
+  return true if q == 2
+  return false if q < 2 or (q&1) == 0
+  
+  # n-1=2^s*dとし（但しaは整数、dは奇数)、dを求める
+  d = (q-1)>>1
+  while (d&1) == 0
+    d >>= 1
+  
+  # 判定をk回繰り返す
+  [0...k].forEach (i)->
+    a = Math.floor(Math.random() * (q-1)) + 1
+    t = d
+    y = (a**t)%q
+    # [0,s-1]の範囲すべてをチェック
+    while t != q-1 and y != 1 and y != q-1
+      y = (y**2)%q
+      t <<= 1
+    
+    return false if y != q-1 and (t&1) == 0
+    
+  return true
+
+
+
+###
+###
+console.log "1", is_prime 1
+console.log "2", is_prime 2
+console.log "3", is_prime 3
+console.log "4", is_prime 4
+console.log "5", is_prime 5
+console.log "11", is_prime 11
+console.log "12", is_prime 12
+console.log "13", is_prime 13
+console.log "127", is_prime 127
+console.log "132", is_prime 132
+console.log "133", is_prime 133
+console.log "134", is_prime 134
+
+# 疑素数
+console.log "341", is_prime 341
+console.log "561", is_prime 561
+console.log "645", is_prime 645
+console.log "1105", is_prime 1105
+console.log "1387", is_prime 1387
+console.log "1729", is_prime 1729
+console.log "1905", is_prime 1905
+console.log "2047", is_prime 2047
+console.log "2465", is_prime 2465
+console.log "2701", is_prime 2701
+console.log "2821", is_prime 2821
+console.log "3277", is_prime 3277
+console.log "4033", is_prime 4033
+console.log "4369", is_prime 4369
+console.log "4371", is_prime 4371
+console.log "4681", is_prime 4681
+console.log "5461", is_prime 5461
+console.log "6601", is_prime 6601
+console.log "7957", is_prime 7957
+console.log "8321", is_prime 8321
+console.log "8481", is_prime 8481
+console.log "8911", is_prime 8911
+
+
+
+
+###
+# ビット演算はカッコが必要そう
+d = 132
+console.log d&1
+console.log d&1 == 0
+console.log (d&1) == 0
+while (d&1) == 0
+  d >>= 1
+  console.log d
+###
+
+
+###
+sec = 'pwpw'
+pass = new Buffer sec
+loop
+  string = Buffer.allocUnsafe(1024).toString()
+  console.log string
+  if /pw/.test string
+    break
+  sec = 'pwpw'
+  pass = new Buffer sec
+
+
+# console.log string
+
+
+# console.log Buffer.allocUnsafe(1024).toString()
+# console.log Buffer.allocUnsafe(1024).toString()
+# console.log Buffer.allocUnsafe(1024).toString()
+# console.log Buffer.allocUnsafe(1024).toString()
+###
 
 
 
