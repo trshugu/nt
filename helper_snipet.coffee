@@ -4,6 +4,8 @@ fs = require "fs"
 zlib =  require "zlib"
 crypto = require "crypto"
 
+# bi:nが導入されるまでの間利用
+bi = require "big-integer"
 
 module.exports.getHash = -> 
   cry = require("crypto").createHash 'SHA256'
@@ -114,4 +116,19 @@ module.exports.unlock = (cry, pass)-> new Promise (f,r)->
   .then (pt)->
     f pt
   .catch (e)-> r e
+
+
+# 16進数文字を10進数に変換
+hex2decsub = (req, res, ind)->
+  s = req.pop()
+  if s?
+    i = bi(parseInt(s, 16))
+    res = res.plus( i.multiply( bi(1).multiply(bi(16).pow(ind)) ) )
+    hex2decsub req, res, ind.plus(1)
+  else
+    res.toString()
+
+module.exports.hex2dec = (str)->
+  hex2decsub str.split(""), bi.zero, bi.zero
+
 

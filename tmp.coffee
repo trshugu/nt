@@ -5,12 +5,55 @@ helper = require "./helper"
 
 
 
-# 1～6のカード
 
 
 
 
 
+
+
+
+###
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = 1
+  while b != 0
+    if (b & 1) != 0
+      res = (res * a) % n
+    
+    a = (a * a) % n
+    b = b >> 1
+  
+  res
+
+modular_exp = (a, b, n)->
+  result = 1
+  for i in [0..b] # big rangeできない
+    result *= a
+    result = result % n
+  
+  result
+
+# 再帰を使う
+modular_exp = (a, b, n)->
+  return 1 if b == 0
+  if (b % 2) == 0
+    return modular_exp( (a*a)%n, b/2, n)
+  else
+    return (a * modular_exp(a, b-1, n)) % n
+
+# 2
+console.log modular_exp 2, 11, 6
+
+console.log modular_exp 16, 11, 133
+
+###
+
+
+
+
+
+###
 euclid = (a,b)->
   return b if a%b == 0
   euclid b, a%b
@@ -19,6 +62,8 @@ euclid = (a,b)->
 # console.log euclid 37884, 37884 - 18800
 # console.log euclid 37884, 18800
 # console.log euclid 89,144
+###
+
 
 
 ###
@@ -27,7 +72,7 @@ n = 1029
 console.log euclid m, n
 ###
 
-
+###
 # m * x + n * y
 xeuc = (a, b)->
   if b == 0
@@ -47,7 +92,7 @@ xeuc = (a, b)->
 p = 7
 q =19
 phi = (p-1)*(q-1)
-
+###
 
 ###
 x = xeuc 5, 
@@ -55,8 +100,11 @@ console.log x
 if x[0] < 0
   console.log x[0] + 18
 else
+  # おそらくこちらはありえない
   console.log x[0] % 18
 ###
+
+
 
 
 
@@ -127,7 +175,8 @@ is_prime = (q)->
 
 
 ###
-###
+# ミラーラビン2
+# →ほとんどミスしない
 is_prime = (q,k=50)->
   q = Math.abs q
   
@@ -140,9 +189,10 @@ is_prime = (q,k=50)->
   while (d&1) == 0
     d >>= 1
   
+  flg = true
   # 判定をk回繰り返す
   [0...k].forEach (i)->
-    a = Math.floor(Math.random() * (q-1)) + 1
+    a = Math.floor(Math.random() * (q-1)) + 2
     t = d
     y = (a**t)%q
     # [0,s-1]の範囲すべてをチェック
@@ -150,13 +200,14 @@ is_prime = (q,k=50)->
       y = (y**2)%q
       t <<= 1
     
-    return false if y != q-1 and (t&1) == 0
+    flg = false if y != q-1 and (t&1) == 0
     
-  return true
-
-
-
+  
+  return flg
 ###
+
+
+
 ###
 console.log "1", is_prime 1
 console.log "2", is_prime 2
@@ -170,7 +221,9 @@ console.log "127", is_prime 127
 console.log "132", is_prime 132
 console.log "133", is_prime 133
 console.log "134", is_prime 134
+###
 
+###
 # 疑素数
 console.log "341", is_prime 341
 console.log "561", is_prime 561
@@ -194,6 +247,31 @@ console.log "7957", is_prime 7957
 console.log "8321", is_prime 8321
 console.log "8481", is_prime 8481
 console.log "8911", is_prime 8911
+###
+
+
+###
+[0...100000].forEach ->
+  if is_prime 8911
+    console.log "miss!"
+###
+
+
+
+
+###
+# ・crypto.randomBytes(16) とは
+# →256**nの数字しか指定できない
+cry = require "crypto"
+bi = require "big-integer"
+
+console.log parseInt cry.randomBytes(128).toString("hex"), 16
+console.log cry.randomBytes(128).toString("hex")
+console.log helper.hex2dec cry.randomBytes(128).toString("hex")
+
+[0...100].forEach ->
+  console.log parseInt cry.randomBytes(2).toString("hex"), 16
+###
 
 
 
