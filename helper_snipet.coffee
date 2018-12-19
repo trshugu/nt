@@ -128,7 +128,16 @@ hex2decsub = (req, res, ind)->
   else
     res.toString()
 
-module.exports.hex2dec = (str)->
-  hex2decsub str.split(""), bi.zero, bi.zero
+module.exports.hex2dec = (str)-> hex2decsub str.split(""), bi.zero, bi.zero
 
 
+# 10進数文字を16進数文字に変換
+dec2hexsub = (req, res)->
+  m = req.mod(16)
+  if req.eq m
+    return m.toString(16) + res
+  else
+    res = m.toString(16) + res
+    dec2hexsub req.divide(16), res
+
+module.exports.dec2hex = (str)-> dec2hexsub bi(str), ""

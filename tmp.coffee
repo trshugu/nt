@@ -8,7 +8,572 @@ helper = require "./helper"
 
 
 
+###
+# 2/3くらいで失敗するレスポンス3.1
+# ランダムではなく振り子時計のように
+Koa = require('koa')
+app = new Koa()
+route = require('koa-route')
 
+clockwork = false
+
+setInterval ->
+  clockwork = clockwork == false
+, 2000 + Math.floor(Math.random() * 2000)
+
+app.use route.get '/', (ctx)->
+  ctx.set 'Content-Type': 'text/plain'
+  
+  if clockwork
+    ctx.status = 404
+    ctx.body = "missin"
+  else
+    ctx.status = 200
+    ctx.body = "hell"
+
+app.listen 3000, -> console.log "listen"
+
+# 絶対にとってくるまで諦めない処理2
+# telomereの概念を導入
+getter = (uri, telomere=2)-> new Promise (f,r)->
+  r "dead" if telomere == 0
+  
+  require("http").get uri
+  , (res)->
+    res.on "data", (c)->
+      if res.statusCode == 200
+        f res.statusCode
+      else
+        setTimeout ->
+          getter uri, telomere - 1
+          .then (tr)->
+            f tr
+          .catch (e)-> r e
+        , 500
+      
+  .on "error", (e)-> r e
+
+
+setInterval ->
+  getter "http://localhost:3000"
+  .then (v)->
+    console.log v
+  .catch (e)->
+    console.log "e",e
+    process.exit()
+, 1000
+###
+
+
+
+
+###
+# 2/3くらいで失敗するレスポンス3
+# ランダムではなく振り子時計のように
+Koa = require('koa')
+app = new Koa()
+route = require('koa-route')
+
+clockwork = false
+
+setInterval ->
+  clockwork = clockwork == false
+, 2000 + Math.floor(Math.random() * 2000)
+
+app.use route.get '/', (ctx)->
+  ctx.set 'Content-Type': 'text/plain'
+  
+  if clockwork
+    ctx.status = 404
+    ctx.body = "missin"
+  else
+    ctx.status = 200
+    ctx.body = "hell"
+
+app.listen 3000, -> console.log "listen"
+
+# 絶対にとってくるまで諦めない処理
+getter = (uri)-> new Promise (f,r)->
+  require("http").get uri
+  , (res)->
+    res.on "data", (c)->
+      if res.statusCode == 200
+        f res.statusCode
+      else
+        setTimeout ->
+          getter uri
+          .then (tr)->
+            f tr
+        , 500
+      
+  .on "error", (e)-> r e
+
+
+setInterval ->
+  getter "http://localhost:3000"
+  .then (v)->
+    console.log v
+  .catch (e)-> console.log "e",e
+, 1000
+###
+
+
+
+
+
+
+###
+# 2/3くらいで失敗するレスポンス2
+Koa = require('koa')
+app = new Koa()
+route = require('koa-route')
+
+app.use route.get '/', (ctx)->
+  ctx.set 'Content-Type': 'text/plain'
+  r = Math.floor(Math.random() * 10)
+  switch r
+    when 1,2,3,4,5,6
+      ctx.status = 404
+      ctx.body = "missin"
+    else
+      ctx.status = 200
+      ctx.body = "hell"
+
+app.listen 3000, -> console.log "listen"
+
+get = -> new Promise (f,r)->
+  require("http").get "http://localhost:3000"
+  , (res)->
+    res.on "data", (c)->
+      # f [c.toString(), res.statusCode]
+      f res.statusCode
+      
+  .on "error", (e)-> r e
+
+
+setInterval ->
+  get()
+  .then (v)->
+    console.log v
+  .catch (e)-> console.log "e",e
+, 1000
+###
+
+
+
+###
+# 任意ビットの鍵をつくる
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+# 拡張ユークリッド互除法
+xeuclid = (aa, bb)->
+  if bb.eq(0)
+    uu = 1
+    vv = 0
+  else
+    qq = aa.divide bb
+    rr = aa.mod bb
+    res = xeuclid(bb, rr)
+    uu = res[1]
+    vv = res[0].minus(qq.multiply(res[1]))
+  
+  [bi(uu), bi(vv)]
+
+# 鍵生成
+gen_d = (e, l)->
+  x = xeuclid(e, l)[0]
+  if x.sign
+    x.plus l
+  else
+    x.mod l
+
+
+# keygen
+# gen_rsa = (bit_length)-> new Promise (f,r)->
+gen_rsa = (bit_length)->
+  bit = bi(bit_length).divide 2
+  p = gen_prime(bit)
+  q = gen_prime(bit)
+  
+  e = bi 65537
+  
+  n = p.multiply(q)
+  d = gen_d e, p.minus(1).multiply(q.minus(1))
+  
+  res = {}
+  
+  res.pub = n.toString()
+  res.pri = d.toString()
+  
+  res
+  
+###
+
+
+
+
+
+
+###
+message = bi 1492
+
+# 鍵を作成
+key = gen_rsa 64
+# 暗号化
+c = modular_exp message, bi(65537), bi(key.pub)
+# 複合
+m = modular_exp c, bi(key.pri), bi(key.pub)
+
+console.log m.toString()
+# console.log "cip", helper.dec2hex c.toString()
+# console.log "pub", helper.dec2hex key.pub
+# console.log "pri", helper.dec2hex key.pri
+
+
+console.log helper.dec2hex(key.pub)
+console.log Buffer.from(helper.dec2hex(key.pub)).toString("base64")
+console.log Buffer.from(helper.dec2hex(key.pub)).toString("base64").length
+###
+
+
+
+
+###
+# 64だと16文字
+# 1024だと256桁になる
+helper.deflate helper.dec2hex key.pub
+.then (v)->
+  console.log v
+  console.log v.length
+  console.log Buffer.from(v).toString("base64").length
+
+# 圧縮すると
+# 16文字が48文字
+# 256文字が316文字
+# baseb4だと
+# 16文字が64
+###
+
+###
+# dec2hexがいりそう
+dec2hexsub = (req, res)->
+  m = req.mod(16)
+  if req.eq m
+    return m.toString(16) + res
+  else
+    res = m.toString(16) + res
+    dec2hexsub req.divide(16), res
+
+dec2hex = (str)-> dec2hexsub bi(str), ""
+
+console.log helper.dec2hex helper.hex2dec("9e89d78f789")
+
+###
+
+
+
+
+###
+# ビットは指定していいけど、中身は半分にしないとダメ
+rc = (di)->
+  min64 = bi helper.hex2dec("1000000000000000") # 64
+  max64 = bi helper.hex2dec "ffffffffffffffff" # 64
+  return (min64.lt(di)) && (di.lt(max64))
+
+# 秘密鍵が大きいとは限らない
+checker = (n)->
+  key = gen_rsa(n)
+  console.log key
+  unless rc(bi(key.pub))
+    console.log "miss", n
+    console.log helper.hex2dec("1000000000000000")
+    console.log key.pub
+    console.log helper.hex2dec "ffffffffffffffff"
+    process.exit()
+
+[0...1000].forEach ->
+  checker 64
+###
+
+
+
+
+###
+# ビットは指定していいけど、中身は半分にしないとダメ
+key = gen_rsa(63)
+console.log key
+
+
+min64 = bi helper.hex2dec("1000000000000000") # 64
+max64 = bi helper.hex2dec "ffffffffffffffff" # 64
+
+console.log min64
+console.log max64
+console.log bi(key.pub)
+console.log min64.lt bi(key.pub)
+console.log bi(key.pub).lt max64
+
+if min64.lt(bi(key.pub)) && bi(key.pub).lt(max64)
+  console.log "pubOK"
+else
+  console.log "pubNG"
+
+if min64.lt(bi(key.pri)) && bi(key.pri).lt(max64)
+  console.log "priOK"
+else
+  console.log "priNG"
+###
+
+
+
+###
+# hex2decはムダではなかった
+console.log parseInt 10000000, 2 # 8
+
+console.log parseInt 1000000000000000, 2 # 16
+console.log parseInt 1111111111111111, 2 # 16
+console.log helper.hex2dec "ffff" # 16
+console.log parseInt "ffff", 16 # 16
+
+console.log parseInt "10000000000000000000000000000000", 2 # 32
+console.log parseInt "11111111111111111111111111111111", 2 # 32
+console.log helper.hex2dec "ffffffff" # 32
+console.log parseInt "ffffffff", 16 # 32
+
+console.log parseInt "1000000000000000000000000000000000000000000000000000000000000000", 2 # 64
+console.log parseInt "1111111111111111111111111111111111111111111111111111111111111111", 2 # 64
+console.log helper.hex2dec "ffffffffffffffff" # 64
+console.log parseInt "ffffffffffffffff", 16 # 64
+
+
+console.log "64"
+console.log helper.hex2dec "1000000000000000" # 64
+console.log gen_prime(64).toString()
+console.log helper.hex2dec "ffffffffffffffff" # 64
+
+console.log "32"
+console.log helper.hex2dec "10000000"
+console.log gen_prime(32).toString()
+console.log helper.hex2dec "ffffffff"
+
+console.log "16"
+console.log helper.hex2dec "1000"
+console.log gen_prime(16).toString()
+console.log helper.hex2dec "ffff"
+
+console.log "8"
+console.log helper.hex2dec "10"
+console.log gen_prime(8).toString()
+console.log helper.hex2dec "ff"
+
+
+console.log "4"
+console.log helper.hex2dec "1"
+console.log gen_prime(4).toString()
+console.log helper.hex2dec "f"
+
+###
+
+
+
+
+
+###
+# bcミニ3.1
+ch = (str)-> helper.createHash(JSON.stringify(str)).substr(0,16)
+
+blocks = []
+
+addblock = (ph, val)->
+  block = 
+    if blocks[0]
+      index: blocks[blocks.length-1].block.index + 1
+      timestamp: process.hrtime().join("")
+      transaction: val
+      prev_hash: ph
+    else
+      index: 1
+      prev_hash: 1
+  
+  hash = ch block
+  
+  blocks.push
+    hash: hash
+    block: block
+
+addblock 1, null
+addblock blocks[blocks.length-1].hash, helper.getHash().substr(0,8)
+addblock blocks[blocks.length-1].hash, helper.getHash().substr(0,8)
+addblock blocks[blocks.length-1].hash, helper.getHash().substr(0,8)
+addblock blocks[blocks.length-1].hash, helper.getHash().substr(0,8)
+addblock blocks[blocks.length-1].hash, helper.getHash().substr(0,8)
+addblock blocks[blocks.length-1].hash, helper.getHash().substr(0,8)
+console.log blocks
+
+
+isHash = (i)-> i.hash == ch i.block
+
+# 特定のハッシュを持つノードが正しいか検証
+isTruthChain = (h)->
+  check = blocks.find (i)-> i.hash == h
+  
+  if isHash check
+    if check.block.prev_hash == 1
+      return true
+    else
+      isTruthChain check.block.prev_hash
+  
+  else
+    return false
+
+console.log isTruthChain blocks[blocks.length-1].hash
+console.log blocks.filter((i)->i.block.transaction?).map (i)-> i.block.transaction
+###
+
+
+###
+# bcミニ3
+# やっぱhashはhashとして扱わないとしんどい
+ch = (str)-> helper.createHash(JSON.stringify(str)).substr(0,16)
+
+blocks = []
+
+addblock = (ph)->
+  block = 
+    if blocks[0]
+      index: blocks[blocks.length-1][ph].index + 1
+      prev_hash: ph
+    else
+      index: 1
+      prev_hash: 1
+  
+  hash = ch block
+  obj = {}
+  obj[hash] = block
+  
+  blocks.push obj
+
+addblock 1
+addblock Object.keys(blocks[blocks.length-1]).pop()
+addblock Object.keys(blocks[blocks.length-1]).pop()
+addblock Object.keys(blocks[blocks.length-1]).pop()
+addblock Object.keys(blocks[blocks.length-1]).pop()
+addblock Object.keys(blocks[blocks.length-1]).pop()
+addblock Object.keys(blocks[blocks.length-1]).pop()
+addblock Object.keys(blocks[blocks.length-1]).pop()
+console.log blocks
+###
+
+
+
+###
+# bcミニ2
+blocks = []
+
+block = 
+  index:1
+  prev_hash:1
+
+ch = (str)-> helper.createHash(JSON.stringify(str)).substr(0,16)
+
+hash = ch block
+
+blocks.push
+  hash: hash
+  block: block
+
+nex =
+  index: blocks[blocks.length-1].block.index + 1
+  prev_hash: blocks[blocks.length-1].hash
+
+hs = ch nex
+
+blocks.push
+  hash: hs
+  block: nex
+
+console.log blocks
+###
+
+
+
+
+###
+# bcミニ
+# index,transaction,prev_hash,nonce
+blocks = []
+block = 
+  index: 1
+  timestamp: process.hrtime().join("")
+  transaction: 
+    sender: "send"
+    recipient: "recipt"
+    amount: 1
+  prev_hash: 1
+
+console.log helper.createHash(block.toString()).substr(0,16)
+console.log helper.getHash().substr(0,16)
+###
 
 
 
