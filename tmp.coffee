@@ -8,6 +8,350 @@ helper = require "./helper"
 
 
 
+
+###
+bi = require "big-integer"
+
+int2base58btbi = (i, res="")->
+  a = i.divide bi("58")
+  m = i.mod bi("58")
+  res = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".substr(m,1) + res
+  # console.log i.toString(),"-->",a.toString()
+  # console.log res,m.toString()
+  # console.log m.toString()
+  return res if a.eq(bi.zero)
+  
+  int2base58btbi a, res
+
+# console.log int2base58btbi bi 12345
+# console.log int2base58btbi bi 12346
+# console.log int2base58btbi bi("12345678923234987233")
+# console.log int2base58btbi bi("12345678923234987234")
+console.log int2base58btbi bi "12345678923498723497823498742398723" # 4rmwHMZR1XDWi5Sv9rLa
+console.log int2base58btbi bi "12345678923498723497823498742398724"  # 4rmwHMZR1XDWi5Sv9rLb
+
+# base582int
+console.log "4rmwHMZR1XDWi5Sv9rLa".split("").map( (i)-> bi("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".indexOf(i)) ).reduce( (a,b)-> a.multiply(58).plus(b) ).toString()
+console.log "4rmwHMZR1XDWi5Sv9rLb".split("").map( (i)-> bi("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".indexOf(i)) ).reduce( (a,b)-> a.multiply(58).plus(b) ).toString()
+###
+
+
+
+###
+int2base58bt = (i, res="")->
+  a = Math.floor(i/58)
+  m = i % 58
+  res = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".substr(m,1) + res
+  
+  return res if a == 0
+  
+  int2base58bt a, res
+
+
+
+
+console.log int2base58bt 1234567890 # 2t6V2H
+console.log "2t6V2H".split("").map( (i)-> "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".indexOf(i) ).reduce( (a,b)-> a * 58 + b )
+
+console.log int2base58bt 123456789 # BukQL
+console.log "BukQL".split("").map( (i)-> "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".indexOf(i) ).reduce( (a,b)-> a * 58 + b )
+###
+
+
+###
+# convert_base64なしで
+arr = [65, 66, 67, 68, 69, 70, 71]
+console.log Buffer.from(arr)
+console.log Buffer.from("ABCDEFG")
+# console.log Buffer.from(arr).toString("hex").split("").map( (i)-> ("000" + parseInt(i, 16).toString(2)).slice(-4) ).join("").match(/.{1,6}/g).map( (i)->   parseInt((i + "00000").slice(0,6),2)   ).join("").split().map((i)-> i + "=".repeat(i.length % 4))[0]
+# console.log Buffer.from(arr).toString("hex").split("").map( (i)-> ("000" + parseInt(i, 16).toString(2)).slice(-4) ).join("").match(/.{1,6}/g).map( (i)-> "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/+".substr(parseInt((i + "00000").slice(0,6),2),1) ).join("").split().map((i)-> i + "=".repeat(i.length % 4))[0]
+# console.log Buffer.from(arr).toString("base64")
+console.log Buffer.from("QUJDREVGRw==", "base64")
+console.log Buffer.from("QUJDREVGRw==", "base64").map (i)-> i
+console.log Buffer.from("QUJDREVGRw==", "base64").toString()
+# console.log Buffer.from("44GCae+8kDBv", "base64").toString()
+
+console.log Buffer.from(arr).toString("hex").split("").map( (i)-> ("000" + parseInt(i, 16).toString(2)).slice(-4) )
+
+console.log Buffer.from("QUJDREVGRw==".split("=").join("").split("").map( (i)-> ("00000" + ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/+".indexOf(i)).toString(2)).slice(-6) ).join("").match(/.{1,4}/g).map(  (i)-> parseInt(i,2) ).join("").match(/.{1,2}/g).map( (i)-> parseInt(i, 16) )).toString()
+
+# .map( (i)-> parseInt(i, 2).toString(16) ).join("").match(/.{1,2}/g)
+###
+
+
+###
+convert_base58 = (i)->
+  switch i
+    when "0" then return "1"
+    when "1" then return "2"
+    when "2" then return "3"
+    when "3" then return "4"
+    when "4" then return "5"
+    when "5" then return "6"
+    when "6" then return "7"
+    when "7" then return "8"
+    when "8" then return "9"
+    when "9" then return "A"
+    when "10" then return "B"
+    when "11" then return "C"
+    when "12" then return "D"
+    when "13" then return "E"
+    when "14" then return "F"
+    when "15" then return "G"
+    when "16" then return "H"
+    when "17" then return "J"
+    when "18" then return "K"
+    when "19" then return "L"
+    when "20" then return "M"
+    when "21" then return "N"
+    when "22" then return "P"
+    when "23" then return "Q"
+    when "24" then return "R"
+    when "25" then return "S"
+    when "26" then return "T"
+    when "27" then return "U"
+    when "28" then return "V"
+    when "29" then return "W"
+    when "30" then return "X"
+    when "31" then return "Y"
+    when "32" then return "Z"
+    when "33" then return "a"
+    when "34" then return "b"
+    when "35" then return "c"
+    when "36" then return "d"
+    when "37" then return "e"
+    when "38" then return "f"
+    when "39" then return "g"
+    when "40" then return "h"
+    when "41" then return "i"
+    when "42" then return "j"
+    when "43" then return "k"
+    when "44" then return "m"
+    when "45" then return "n"
+    when "46" then return "o"
+    when "47" then return "p"
+    when "48" then return "q"
+    when "49" then return "r"
+    when "50" then return "s"
+    when "51" then return "t"
+    when "52" then return "u"
+    when "53" then return "v"
+    when "54" then return "w"
+    when "55" then return "x"
+    when "56" then return "y"
+    when "57" then return "z"
+###
+
+
+
+###
+convert_base64 = (i)->
+  switch i
+    when "000000" then return "A"
+    when "000001" then return "B"
+    when "000010" then return "C"
+    when "000011" then return "D"
+    when "000100" then return "E"
+    when "000101" then return "F"
+    when "000110" then return "G"
+    when "000111" then return "H"
+    when "001000" then return "I"
+    when "001001" then return "J"
+    when "001010" then return "K"
+    when "001011" then return "L"
+    when "001100" then return "M"
+    when "001101" then return "N"
+    when "001110" then return "O"
+    when "001111" then return "P"
+    when "010000" then return "Q"
+    when "010001" then return "R"
+    when "010010" then return "S"
+    when "010011" then return "T"
+    when "010100" then return "U"
+    when "010101" then return "V"
+    when "010110" then return "W"
+    when "010111" then return "X"
+    when "011000" then return "Y"
+    when "011001" then return "Z"
+    when "011010" then return "a"
+    when "011011" then return "b"
+    when "011100" then return "c"
+    when "011101" then return "d"
+    when "011110" then return "e"
+    when "011111" then return "f"
+    when "100000" then return "g"
+    when "100001" then return "h"
+    when "100010" then return "i"
+    when "100011" then return "j"
+    when "100100" then return "k"
+    when "100101" then return "l"
+    when "100110" then return "m"
+    when "100111" then return "n"
+    when "101000" then return "o"
+    when "101001" then return "p"
+    when "101010" then return "q"
+    when "101011" then return "r"
+    when "101100" then return "s"
+    when "101101" then return "t"
+    when "101110" then return "u"
+    when "101111" then return "v"
+    when "110000" then return "w"
+    when "110001" then return "x"
+    when "110010" then return "y"
+    when "110011" then return "z"
+    when "110100" then return "0"
+    when "110101" then return "1"
+    when "110110" then return "2"
+    when "110111" then return "3"
+    when "111000" then return "4"
+    when "111001" then return "5"
+    when "111010" then return "6"
+    when "111011" then return "7"
+    when "111100" then return "8"
+    when "111101" then return "9"
+    when "111110" then return "+"
+    when "111111" then return "/"
+
+
+console.log Buffer.from("ABCDEFG").toString("hex").split("").map( (i)-> ("000" + parseInt(i, 16).toString(2)).slice(-4) ).join("").match(/.{1,6}/g).map( (i)-> convert_base64((i + "00000").slice(0,6)) ).join("").split().map((i)-> i + "=".repeat(i.length % 4))[0]
+###
+
+
+
+
+###
+arr = [65, 66, 67, 68, 69, 70, 71]
+console.log Buffer.from(arr)
+console.log Buffer.from(arr).toString("hex").split("").map( (i)-> ("000" + parseInt(i, 16).toString(2)).slice(-4) ).join("").match(/.{1,6}/g).map( (i)-> encodebase64((i + "00000").slice(0,6)) ).join("").split().map((i)-> i + "=".repeat(i.length % 4))[0]
+console.log parseInt(Buffer.from(arr).toString("hex"), 16)
+console.log parseInt(Buffer.from(arr).toString("hex"), 16).toString(2)
+console.log Buffer.from(arr).toString("base64")
+
+console.log "======"
+console.log Buffer.from("ABCDEFG")
+console.log Buffer.from("ABCDEFG").toString("hex")
+console.log parseInt(Buffer.from("ABCDEFG").toString("hex"), 16)
+console.log parseInt(Buffer.from("ABCDEFG").toString("hex"), 16).toString(2)
+console.log Buffer.from("ABCDEFG").toString("base64")
+###
+
+###
+arr = [10]
+console.log Buffer.from(arr)
+console.log Buffer.from(arr).toString("hex")
+console.log Buffer.from(arr).toString("base64")
+console.log Buffer.from(arr).toString()
+console.log Buffer.from(arr).toString().toString(2)
+console.log Buffer.from("010001")
+console.log Buffer.from("010001").toString("base64")
+
+console.log Buffer.from("ABCDEFG")
+console.log Buffer.from("ABCDEFG").toString("base64")
+
+###
+
+
+###
+bs58 = require "base58"
+console.log Buffer.from("あi０0o").toString("hex")
+console.log Buffer.from("あi０0o")
+
+console.log bs58.int_to_base58(6857269519)
+console.log bs58.base58_to_int('brXijP')
+console.log bs58.int_to_base58(0)
+console.log bs58.int_to_base58(1)
+console.log bs58.int_to_base58(2)
+console.log bs58.int_to_base58(33)
+console.log "====="
+console.log bs58.base58_to_int('1')
+console.log bs58.base58_to_int('9')
+console.log bs58.base58_to_int('a')
+console.log bs58.base58_to_int('b')
+console.log bs58.base58_to_int('z')
+###
+
+###
+bs58 = require "base58"
+console.log Buffer.from("あi０0o").toString("hex")
+console.log Buffer.from("あi０0o")
+
+bs58 = require "base58"
+console.log bs58.int_to_base58(268419915)
+
+convert_base58bt = (i)-> "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".substr(i,1)
+convert_base58fl = (i)-> "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ".substr(i,1)
+###
+
+
+###
+int2base58bt = (i, res="")->
+  a = Math.floor(i/58)
+  m = i % 58
+  res = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".substr(m,1) + res
+  
+  return res if a == 0
+  
+  int2base58bt a, res
+
+int2base58fl = (i, res="")->
+  a = Math.floor(i/58)
+  m = i % 58
+  res = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ".substr(m,1) + res
+  
+  return res if a == 0
+  
+  int2base58fl a, res
+
+
+bs58 = require "base58"
+console.log bs58.int_to_base58 123456789
+
+console.log int2base58bt 123456789
+console.log int2base58fl 123456789
+###
+
+###
+int2base58bt = (i, res="")->
+  a = Math.floor(i/58)
+  m = i % 58
+  res = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".substr(m,1) + res
+  
+  return res if a == 0
+  
+  int2base58bt a, res
+
+int2base58fl = (i, res="")->
+  a = Math.floor(i/58)
+  m = i % 58
+  res = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ".substr(m,1) + res
+  
+  return res if a == 0
+  
+  int2base58fl a, res
+
+console.log int2base58bt 268419915
+console.log int2base58fl 268419915
+
+
+bs58 = require "base58"
+console.log bs58.int_to_base58(268419915)
+###
+
+###
+console.log "====="
+arr = [65, 66, 67, 68, 69, 70, 71]
+# console.log Buffer.from("ABCDEFG")
+# console.log Buffer.from("ABCDEFG").toString("hex")
+console.log parseInt(Buffer.from("ABCDEFG").toString("hex"), 16) 
+console.log Buffer.from("A").toString("hex") % 58
+console.log parseInt(Buffer.from("A").toString("hex"), 16) % 58
+# console.log parseInt(Buffer.from("ABCDEFG").toString("hex"), 16).toString(2)
+# console.log Buffer.from("ABCDEFG").toString("base64")
+console.log bs58.base58_to_int('A')
+###
+
+
+
 ###
 # 2/3くらいで失敗するレスポンス3.1
 # ランダムではなく振り子時計のように
