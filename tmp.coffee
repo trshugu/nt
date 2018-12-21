@@ -1,4 +1,5 @@
 console.time "tmp"
+puts = console.log
 helper = require "./helper"
 ###
 ###
@@ -8,6 +9,18 @@ helper = require "./helper"
 
 
 
+
+
+###
+putsj = (v)->
+  o = {}
+  o.value = v
+  o.timestamp = new Date().getTime()
+  o.digest = helper.createHash(JSON.stringify(o))
+  console.log o
+
+putsj "noisruiow"
+###
 
 ###
 bi = require "big-integer"
@@ -27,14 +40,13 @@ int2base58btbi = (i, res="")->
 # console.log int2base58btbi bi 12346
 # console.log int2base58btbi bi("12345678923234987233")
 # console.log int2base58btbi bi("12345678923234987234")
-console.log int2base58btbi bi "12345678923498723497823498742398723" # 4rmwHMZR1XDWi5Sv9rLa
-console.log int2base58btbi bi "12345678923498723497823498742398724"  # 4rmwHMZR1XDWi5Sv9rLb
+# console.log int2base58btbi bi "12345678923498723497823498742398723" # 4rmwHMZR1XDWi5Sv9rLa
+# console.log int2base58btbi bi "12345678923498723497823498742398724"  # 4rmwHMZR1XDWi5Sv9rLb
 
 # base582int
-console.log "4rmwHMZR1XDWi5Sv9rLa".split("").map( (i)-> bi("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".indexOf(i)) ).reduce( (a,b)-> a.multiply(58).plus(b) ).toString()
-console.log "4rmwHMZR1XDWi5Sv9rLb".split("").map( (i)-> bi("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".indexOf(i)) ).reduce( (a,b)-> a.multiply(58).plus(b) ).toString()
+# console.log "4rmwHMZR1XDWi5Sv9rLa".split("").map( (i)-> bi("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".indexOf(i)) ).reduce( (a,b)-> a.multiply(58).plus(b) ).toString()
+# console.log "4rmwHMZR1XDWi5Sv9rLb".split("").map( (i)-> bi("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".indexOf(i)) ).reduce( (a,b)-> a.multiply(58).plus(b) ).toString()
 ###
-
 
 
 ###
