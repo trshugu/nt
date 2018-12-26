@@ -11,6 +11,137 @@ helper = require "./helper"
 
 
 
+
+
+
+###
+# 末尾再帰
+NS_PER_SEC = 1e9
+cm = (i)-> i.toString().split("").reverse().join("").match(/.{1,3}/g).join(",").split("").reverse().join("")
+
+
+bi = require "big-integer"
+runner = (n)->
+  res = {}
+  cnt = 0
+  
+  fib = (i)->
+    cnt++
+    return 0 if i == 0
+    return 1 if i == 1
+    fib(i-1) + fib(i-2)
+  
+  fibtl = (i, a=1, b=0)->
+    cnt++
+    return 0 if i == 0
+    return a if i == 1
+    return fibtl(i-1, a+b, a)
+  
+  fibtlbi = (i, a=bi(1), b=bi(0))->
+    cnt++
+    return bi.zero if i.eq(bi.zero)
+    return a if i.eq(bi.one)
+    return fibtlbi(i.minus(1), a.plus(b), a)
+
+
+  nano = process.hrtime()
+  res.fib = fibtlbi bi(n)
+  diff = process.hrtime(nano)
+  
+  res.c = cnt
+  res.t = cm (diff[0] * NS_PER_SEC + diff[1])
+  
+  res
+
+# [1..8000].forEach (m)->
+#   console.log m, runner m
+###
+
+
+
+
+###
+sigma = (i)->
+  return 1 if i == 1
+  
+  sigma(i-1) + i
+
+
+sigmatl2 = (i, r = 1)->
+  return r if i == 1
+  
+  sigmatl2(i-1, r+i)
+
+sigmatl = (i, r = 1)->
+  return r if i == 1
+  a = sigmatl(i-1, r+i)
+  return a
+  
+
+sigmatlbi = (i, r = bi.one)->
+  return r if i.eq(bi.one)
+  
+  sigmatlbi(i.minus(bi.one), r.plus(i))
+
+runner = (n)->
+  res = {}
+  
+  # nano = process.hrtime()
+  # res.sig = sigma n
+  # diff = process.hrtime(nano)
+  # res.sigt = cm (diff[0] * NS_PER_SEC + diff[1])
+  
+  nano = process.hrtime()
+  res.tl = sigmatl n
+  diff = process.hrtime(nano)
+  res.tlt = cm (diff[0] * NS_PER_SEC + diff[1])
+  
+  res
+
+
+
+console.log 12508, sigma 12508
+console.log 8338, sigmatl 8338
+console.log 8933, sigmatl2 8933
+console.log 8336, sigmatlbi bi 8336
+
+# [1..10000].forEach (m)->
+#   console.log m, sigmatlbi bi(m)
+
+factorial = (n)->
+  return 1 if n == 0
+  return n * factorial(n - 1)
+
+factorial2 = (n)->
+  factorialTailCall = (n, accum)->
+    return accum if n == 0
+    return factorialTailCall(n - 1, n * accum)
+  
+  result = factorialTailCall(n, 1)
+  
+  return result
+
+console.log factorial 11370
+console.log factorial2 10420
+
+
+recursion = (num, limit)->
+  return num if num == limit
+  num++
+  return recursion(num, limit)
+
+console.log recursion(0, 2100)
+###
+
+###
+rec = (i)->
+  i-1
+
+
+console.log rec 10
+###
+
+
 ###
 putsj = (v)->
   o = {}
