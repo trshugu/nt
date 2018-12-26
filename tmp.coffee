@@ -11,6 +11,8 @@ helper = require "./helper"
 
 
 
+
+###
 bi = require "big-integer"
 
 fact = (n)-> [n..1].reduce (a,b)-> a*b
@@ -29,9 +31,9 @@ lbda = (i, p)->
     console.log cnt + ",", res
     
     cnt++
-
-
 ###
+
+
 ###
 cnt = 1
 lbdafif = (i, p)->
@@ -43,6 +45,7 @@ lbdafif = (i, p)->
       break
     
     cnt++
+###
 
 
 
@@ -101,17 +104,17 @@ if process.argv[2]?
 
 
 ###
+###
 # もじとおり
 # 2文字、1バイト8ビット
 c = 16 # 1～64文字
 console.log c * 4 + "ビット"
 console.log bi(16).pow(bi(c)).toString()
 console.log bdabi bi(16).pow(bi(c)).toString(), "100"
-###
 
 [1..32].forEach (c)->
   n = bi(16).pow(bi(c))
-  console.log c + "文字：", n.toString(),":", n.divide(bi(16).pow(c)).toString()
+  console.log c + "文字：", n.toString()
 
 
 ###
