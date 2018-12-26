@@ -11,6 +11,72 @@ helper = require "./helper"
 
 
 
+###
+# 誕生日攻撃の安全圏
+bi = require "big-integer"
+cm = (i)-> i.toString().split("").reverse().join("").match(/.{1,3}/g).join(",").split("").reverse().join("")
+
+[1..64].forEach (c)->
+  n = bi(2).pow( bi(c).multiply(bi(4)) )
+  bb = bi(2).pow(bi(c).multiply(bi(4)).divide(2))
+  # console.log "2**" + c*4 + ":" + c + "文字：", cm n.toString()
+  # console.log c + "文字：", cm(n.toString()) 
+  # console.log cm(bb.toString())
+  # console.log c + "文字で50%こえる回数：",  cm(bb.toString())
+  console.log c + "文字の容量：", cm(n.multiply(c).toString()) + "バイト"
+###
+
+
+
+###
+# birthday bound(2^n/2)
+bi = require "big-integer"
+cm = (i)-> i.toString().split("").reverse().join("").match(/.{1,3}/g).join(",").split("").reverse().join("")
+
+factbi = (n)-> [bi(n)..bi.one].reduce (a,b)-> a.multiply(b)
+bdabi = (i, cnt)-> parseInt(bi(100000).minus(factbi(bi(i).minus(1)).divide( factbi( bi(i).minus((bi.one)).minus(bi(cnt))) ).multiply(bi(100000)).divide( (bi(i).pow(bi(cnt))) )).toString()) / 1000
+
+# console.log cm bi(2).pow(bi(64)).toString()
+# console.log cm bi(2).pow(  bi(64).divide(bi(2))  ).toString()
+# console.log cm bi(2).pow(  bi(256).divide(bi(2))  ).toString()
+# console.log bdabi bi(2).pow(bi(64)), "23"
+
+[1..16].forEach (i)->
+  i = i * 4
+  all = bi(2).pow(i).toString()
+  bb = bi(2).pow(  bi(i).divide(bi(2)) ).toString()
+  # sikou = bdabi all, bb
+  # console.log all + " / " + bb
+
+
+[1..11].forEach (j)->
+  i = j * 4
+  all = parseInt bi(2).pow(i).toString()
+  bb = parseInt bi(2).pow(  bi(i).divide(bi(2)) ).toString()
+  
+  # 4かいやる→ bb/j回やる
+  flg = "" 
+  [1..8].forEach (n)->
+  # m = Math.floor(bb/j)
+  # [1..m].forEach (n)->
+    arr = {}
+    [1..bb].forEach (k)->
+      arr[helper.getHash().substr(0,j)] = null
+    
+    flg = "失敗" if Object.keys(arr).length != bb
+    
+    # console.log j + "文字:" + "全" + all + "件:" + bb + "個生成:" + n + "回目" + (Object.keys(arr).length.toString()) + "個" + flg
+    # console.log (Object.keys(arr).length.toString()) + ":" + bb
+    # console.log Object.keys(arr).length +":"+ i
+  
+  if flg != ""
+    # console.log m + "回試行" + j + "文字:" + "全" + all + "件:" + bb + "個生成" + flg
+    console.log j + "文字:" + "全" + all + "件:" + bb + "個生成" + flg
+
+# console.log [1..50].map (i)-> return i.toString() + ":" + bdabi(256, i)
+###
+
+
 
 ###
 bi = require "big-integer"
@@ -104,17 +170,21 @@ if process.argv[2]?
 
 
 ###
-###
+bi = require "big-integer"
 # もじとおり
 # 2文字、1バイト8ビット
-c = 16 # 1～64文字
-console.log c * 4 + "ビット"
-console.log bi(16).pow(bi(c)).toString()
-console.log bdabi bi(16).pow(bi(c)).toString(), "100"
+# c = 16 # 1～64文字
+# console.log c * 4 + "ビット"
+# console.log bi(16).pow(bi(c)).toString()
+# console.log bdabi bi(16).pow(bi(c)).toString(), "100"
 
-[1..32].forEach (c)->
+cm = (i)-> i.toString().split("").reverse().join("").match(/.{1,3}/g).join(",").split("").reverse().join("")
+
+[1..64].forEach (c)->
   n = bi(16).pow(bi(c))
-  console.log c + "文字：", n.toString()
+  console.log "2**" + c*4 + ":" + c + "文字：", cm n.toString()
+###
+
 
 
 ###
@@ -159,6 +229,7 @@ lsamebirthday = (i) ->
 ###
 # 末尾再帰
 NS_PER_SEC = 1e9
+# カンマで区切る
 cm = (i)-> i.toString().split("").reverse().join("").match(/.{1,3}/g).join(",").split("").reverse().join("")
 
 
