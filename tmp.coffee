@@ -11,6 +11,145 @@ helper = require "./helper"
 
 
 
+bi = require "big-integer"
+
+fact = (n)-> [n..1].reduce (a,b)-> a*b
+bda = (i, cnt)-> 1-(  ( fact(i-1) / fact(i-1-cnt) ) / i**cnt  )
+
+factbi = (n)-> [bi(n)..bi.one].reduce (a,b)-> a.multiply(b)
+bdabi = (i, cnt)-> parseInt(bi(100000).minus(factbi(bi(i).minus(1)).divide( factbi( bi(i).minus((bi.one)).minus(bi(cnt))) ).multiply(bi(100000)).divide( (bi(i).pow(bi(cnt))) )).toString()) / 1000
+
+
+lbda = (i, p)->
+  cnt = 1
+  res = 0
+  # while cnt <= i - 2
+  while res <= p
+    res = bdabi i, cnt
+    console.log cnt + ",", res
+    
+    cnt++
+
+
+###
+###
+cnt = 1
+lbdafif = (i, p)->
+  res = 0
+  while cnt <= i - 2
+    res = bdabi i, cnt
+    if res > p
+      console.log i + "," + cnt + ",", res
+      break
+    
+    cnt++
+
+
+
+###
+bun = bi.zero
+lbdafifwari = (i, p)->
+  cnt = bi(i).divide(bi(bun)) if bun.neq(bi.zero)
+  res = 0
+  while cnt <= i - 2
+    res = bdabi i, cnt
+    if res > p
+      bun = bi(i).divide(bi(cnt))
+      console.log i + "," + cnt + "," + bun + "分の1"
+      break
+    
+    cnt++
+###
+
+
+
+
+# [1..32].forEach (n)->
+#   lbdafifwari bi(2).pow(bi(n)), 50
+
+
+# [1..(2**15)].forEach (n)->
+#   lbdafifwari n, 50
+
+
+# console.log bda 10, 2
+# console.log bdabi 10, 2
+# lbda 11
+# console.log bdabi bi(2).pow(bi(10)), "23"
+# lbda 365
+# console.log bdabi 365, 23
+# lbda 1000, 50
+# n = bi(2).pow(bi(16))
+# console.log bdabi n, 400
+# console.log n.toString()
+
+# [1..100].forEach (n)->
+#   console.log bi(2).pow(bi(n)).toString()
+
+# [1..(2**15)].forEach (n)->
+#   lbdafif n, 50
+
+
+
+###
+if process.argv[2]?
+  vit = process.argv[2]
+  n = vit.toString()
+  lbda n, 90
+###
+
+
+
+###
+# もじとおり
+# 2文字、1バイト8ビット
+c = 16 # 1～64文字
+console.log c * 4 + "ビット"
+console.log bi(16).pow(bi(c)).toString()
+console.log bdabi bi(16).pow(bi(c)).toString(), "100"
+###
+
+[1..32].forEach (c)->
+  n = bi(16).pow(bi(c))
+  console.log c + "文字：", n.toString(),":", n.divide(bi(16).pow(c)).toString()
+
+
+###
+[1..32].forEach (c)->
+  n = bi(16).pow(bi(c))
+  console.log c + "文字：", n.toString()
+  lbdafif n, 10
+###
+
+###
+[1..32].forEach (c)->
+  n = bi(16).pow(bi(c))
+  console.log c + "文字：", n.toString(), bdabi(n,n.divide(bi(100)))
+###
+
+
+
+###
+samebirthday = (i, cnt) ->  Math.floor(  (1 - ( ((i-1)**cnt) / (i**cnt) ))*1000)  /10
+samebirthdaybi = (i, cnt) -> bi(100).minus(bi(i).minus(bi.one).pow(bi(cnt)).multiply(bi(100)).divide(bi(i).pow(cnt))).toString()
+samebirthdaybi2 = (i, cnt) -> parseInt(bi(100000).minus(bi(i).minus(bi.one).pow(bi(cnt)).multiply(bi(100000)).divide(bi(i).pow(cnt))).toString())/1000
+
+lsamebirthday = (i) ->
+  cnt = 1
+  res = 0
+  # while cnt <= i
+  while res <= 90
+    res = samebirthdaybi2 i, cnt
+    console.log cnt + ":", res
+    
+    cnt++
+
+# lsamebirthday 10
+# lsamebirthday 365
+# console.log "10:", samebirthday 10, 10
+# console.log "120:", samebirthdaybi 365, 120
+###
+
 
 
 
