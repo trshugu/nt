@@ -9,6 +9,228 @@ helper = require "./helper"
 
 
 
+###
+# キーソート(おおよそ要件が厳しい)
+sortByKey = (arr, key)->
+  return arr.sort (a, b)->
+    x = a[key]
+    y = b[key]
+    if (x > y)
+      return 1;
+    else if (x < y)
+      return -1
+    else
+      return 0
+
+obj = [
+    k:2,v:"aaa"
+  ,
+    k:9,v:"aaddda"
+  ,
+    k:2,v:"afaa"
+  ,
+    k:3,v:"aasdfa"
+  ,
+    k:15,v:"addaa"
+]
+
+puts sortByKey obj, "k"
+puts sortByKey obj, "v"
+###
+
+###
+# ソートファンクション(コンペアファンクション)の仕組み
+suuji = [1,45,5,366,3,4,3,3,3,5]
+
+puts "==="
+puts suuji
+
+puts "1" if 1
+puts "-1" if -1
+puts "0" if 0
+puts "a<b" if "a" < "b"
+puts "a>b" if "a" > "b"
+
+
+suuji.sort (a,b)->
+  # false if a < b
+  # true if a > b
+  # 0 if a > b
+  # -1 if a < b # 負数と0はなにも返却されないと同義
+  # undefined
+  # null
+  # return -1 if a - b
+  # return null if a > b
+  # return 0 if a == b
+puts suuji
+
+
+# 降順(大きいものが最初にくる)
+puts "==="
+
+# 1 45 -> 1 == bが先頭へ
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b, a < b
+  a < b
+puts "1",suuji
+# なにも返らないとfalse
+
+# 全部負数なのでなにも変わらない
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)-> true unless a > b
+puts "2",suuji
+
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)->
+  return 1 if a < b
+  return -1 if a > b
+  return 0 if a == b
+puts "3",suuji
+
+# 引き算 正:変更の余地あり  負: aの方が大きい(どこをとっても否定)
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)-> b - a
+puts "4",suuji
+
+# Infinityがあると部分的にソートされる
+suuji = [1,45,5,366,3,4,3,Infinity,3,3,5]
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b, a < b
+  a < b
+puts "5",suuji
+
+suuji = [Infinity,1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)-> a < b
+puts "6",suuji
+
+suuji = [1,45,5,366,3,4,3,3,3,5,Infinity]
+suuji.sort (a,b)-> a < b
+puts "7",suuji
+
+# NaN
+suuji = [1,45,5,366,3,4,3,NaN,3,3,5]
+suuji.sort (a,b)-> a < b
+puts "8",suuji
+
+# Infinityと微妙に違う。なぜinfinityは正常にソートできないのか
+suuji = [NaN,1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)-> a < b
+puts "9",suuji
+
+# 最後にあるとundeifnedになる。ソートは正常
+suuji = [1,45,5,366,3,4,3,3,3,5,NaN]
+suuji.sort (a,b)-> a < b
+puts "10",suuji
+
+# 引き算だとうまくいく
+suuji = [1,45,5,366,3,4,3,Infinity,3,3,5]
+suuji.sort (a,b)-> b - a
+puts "11",suuji
+
+# booleanで返したらダメ？
+suuji = [1,45,5,366,3,4,3,Infinity,3,3,5]
+suuji.sort (a,b)->
+  if (b - a) > 0
+    return 1 
+  else
+    return -1
+puts "12",suuji
+
+# aが大きければなにもしない
+suuji = [1,45,5,366,3,4,3,Infinity,3,3,5]
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b, b > a
+  return 1 if b > a
+  return -1 if b < a
+puts "13",suuji
+
+# あくまで数字を返さないといけない
+suuji = [1,45,5,366,3,4,3,Infinity,3,3,5]
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b
+  return 1 if (b - a) > 0
+  return -1 if (b - a) < 0
+puts "14",suuji
+
+# 負数を返さないとうまいかない
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b, a < b
+  return 1 if a < b
+  return -1 if a > b
+puts "15",suuji
+
+suuji = [1,45,5,366,3,4,3,Infinity,3,3,5]
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b, a < b
+  return 1 if a < b
+  return -1 if a > b
+puts "16",suuji
+
+# boolを返してもうまくいかない
+# おそらく途中から文字列比較か逆転
+suuji = [1,45,5,366,3,4,3,Infinity,3,3,5]
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b, a < b
+  return true if a < b
+  return false if a > b
+puts "17",suuji
+
+# おそらくこれのせい
+suuji = [1,45,5,366,3,4,3,Infinity,3,3,5]
+suuji.sort()
+puts "18",suuji
+
+suuji = [1,45,5,366,3,4,3,Infinity,3,3,5]
+suuji.sort (a,b)->a-b
+puts "19",suuji
+
+
+# 昇順
+puts "==="
+
+# 1 45 -> false == aが先頭へ
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b, a > b
+  a > b
+puts "1",suuji
+
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)-> return 1 if a > b
+puts "2",suuji
+
+
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)->
+  return 1 if a > b
+  return -1 if a < b
+  return 0 if a == b
+puts "3",suuji
+
+# 引き算
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b, a - b
+  a - b
+puts "4",suuji
+
+# こうすると大なり小なりの意味がでてくる
+suuji = [1,45,5,366,3,4,3,3,3,5]
+suuji = suuji.map (i)-> i.toString()
+suuji.sort (a,b)->
+  # puts "a:",a, ",b:",b, a > b
+  a > b
+puts "5",suuji.map (i)-> parseInt i
+
+
+
+# sortは破壊的
+puts suuji
+puts suuji.sort()
+puts suuji
+###
 
 
 ###
