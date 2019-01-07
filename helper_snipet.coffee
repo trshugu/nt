@@ -10,6 +10,7 @@ bi = require "big-integer"
 module.exports.getHash = -> 
   cry = require("crypto").createHash 'SHA256'
   cry.update uuid.v4(), "utf8"
+  cry.update uuid.v4(), "utf8"
   cry.digest 'hex'
 
 module.exports.createHash = (src)-> 

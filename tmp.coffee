@@ -7,6 +7,54 @@ helper = require "./helper"
 
 
 
+###
+# hmac2
+crypto = require 'crypto'
+enchmac = (val, pass)-> new Promise (f,r)->
+  hmac = crypto.createHmac 'sha256', pass
+  
+  arrch = []
+  hmac.on 'data', (d)-> arrch.push d
+  hmac.on 'end', -> f Buffer.concat(arrch).toString("hex")
+  hmac.on 'error', (e)-> r e
+  
+  hmac.write val
+  hmac.end()
+
+enchmac "iroiroo", "paspass"
+.then (v)->
+  puts v
+.catch (e)-> puts e
+###
+
+
+
+
+
+###
+# hmac
+crypto = require 'crypto'
+enchmac = (val, pass)-> new Promise (f,r)->
+  hmac = crypto.createHmac 'sha256', pass
+  
+  arrch = []
+  hmac.on 'data', (d)-> arrch.push d
+  hmac.on 'end', -> f Buffer.concat(arrch)
+  hmac.on 'error', (e)-> r e
+  
+  hmac.write val
+  hmac.end()
+
+enchmac "iroiro", "paspass"
+.then (v)->
+  puts v
+  a = v.toString("hex")
+  puts a
+  puts Buffer.from a, "hex"
+.catch (e)-> puts e
+###
+
+
 
 
 ###
