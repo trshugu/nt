@@ -7,6 +7,99 @@ helper = require "./helper"
 
 
 
+###
+# 還暦コンバート
+convert_kanreki =(i)->
+  switch i % 60
+    when 0 then return "庚申"
+    when 1 then return "辛酉"
+    when 2 then return "壬戌"
+    when 3 then return "癸亥"
+    when 4 then return "甲子"
+    when 5 then return "乙丑"
+    when 6 then return "丙寅"
+    when 7 then return "丁卯"
+    when 8 then return "戊辰"
+    when 9 then return "己巳"
+    when 10 then return "庚午"
+    when 11 then return "辛未"
+    when 12 then return "壬申"
+    when 13 then return "癸酉"
+    when 14 then return "甲戌"
+    when 15 then return "乙亥"
+    when 16 then return "丙子"
+    when 17 then return "丁丑"
+    when 18 then return "戊寅"
+    when 19 then return "己卯"
+    when 20 then return "庚辰"
+    when 21 then return "辛巳"
+    when 22 then return "壬午"
+    when 23 then return "癸未"
+    when 24 then return "甲申"
+    when 25 then return "乙酉"
+    when 26 then return "丙戌"
+    when 27 then return "丁亥"
+    when 28 then return "戊子"
+    when 29 then return "己丑"
+    when 30 then return "庚寅"
+    when 31 then return "辛卯"
+    when 32 then return "壬辰"
+    when 33 then return "癸巳"
+    when 34 then return "甲午"
+    when 35 then return "乙未"
+    when 36 then return "丙申"
+    when 37 then return "丁酉"
+    when 38 then return "戊戌"
+    when 39 then return "己亥"
+    when 40 then return "庚子"
+    when 41 then return "辛丑"
+    when 42 then return "壬寅"
+    when 43 then return "癸卯"
+    when 44 then return "甲辰"
+    when 45 then return "乙巳"
+    when 46 then return "丙午"
+    when 47 then return "丁未"
+    when 48 then return "戊申"
+    when 49 then return "己酉"
+    when 50 then return "庚戌"
+    when 51 then return "辛亥"
+    when 52 then return "壬子"
+    when 53 then return "癸丑"
+    when 54 then return "甲寅"
+    when 55 then return "乙卯"
+    when 56 then return "丙辰"
+    when 57 then return "丁巳"
+    when 58 then return "戊午"
+    when 59 then return "己未"
+
+i = 1868
+i = process.argv[2] if process.argv[2]?
+console.log i + "年は" + convert_kanreki(i) + "戦争です"
+###
+
+
+
+###
+# 干支コンバート
+convert_eto =(i)->
+  switch i % 12
+    when 0 then return "申"
+    when 1 then return "酉"
+    when 2 then return "戌"
+    when 3 then return "亥"
+    when 4 then return "子"
+    when 5 then return "丑"
+    when 6 then return "寅"
+    when 7 then return "卯"
+    when 8 then return "辰"
+    when 9 then return "巳"
+    when 10 then return "午"
+    when 11 then return "未"
+
+i = 2019
+i = process.argv[2] if process.argv[2]?
+console.log i + "年は" + convert_eto(i) + "年です"
+###
 
 
 ###
