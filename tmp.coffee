@@ -7,6 +7,111 @@ helper = require "./helper"
 
 
 
+
+
+###
+request = require("request")
+cheerio = require("cheerio")
+
+wget = (url)-> new Promise (f,re)->
+  request url
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      res = {}
+      res.headers = r.headers
+      res.body = cheerio.load b
+      res.raw = b
+      f res
+
+slackGetter = (uri)-> new Promise (f,r)->
+  wget uri
+  .then (v)->
+    res = JSON.parse v.raw
+    if res.ok
+      slackcomment = res.messages.map (i)->
+        obj = {}
+        obj._id = helper.createHash(i.user + i.text + i.ts).substr(0,5)
+        obj.value = i.text.replace(/\n/g," ")
+        obj
+      f slackcomment
+    else
+      r "errer"
+  .catch (e)-> r e
+
+slackGetter ""
+.then (v)->
+  v.forEach (i)-> console.log i
+.catch (e)-> puts e
+###
+
+
+
+
+
+###
+# スピードメーター
+# 1秒間にいくつ作れるか
+NS_PER_SEC = 1e9
+# カンマで区切る
+cm = (i)-> i.toString().split("").reverse().join("").match(/.{1,3}/g).join(",").split("").reverse().join("")
+
+cnt = 0
+arr = []
+size = 0
+looper = ->
+  setTimeout ->
+    arr.push helper.getHash()
+    # cnt++
+    looper()
+  , 0
+
+setInterval ->
+  # puts cnt
+  # cnt = 0
+  size = arr.length - size
+  puts size, arr.length
+  size = arr.length
+,1000
+
+looper()
+###
+
+
+
+
+
+###
+bi = require "big-integer"
+sqrt = (x)->
+  a = x
+  [0..100].forEach ->
+    x = x.minus(x.multiply(x).minus(a).divide(bi(2).multiply(x)))
+  x.minus(1)
+
+# puts sqrt bi 20000000
+puts sqrt bi 366
+###
+
+
+###
+nano = process.hrtime()
+setTimeout ->
+  helper.getHash()
+  diff = process.hrtime(nano)
+  puts cm diff[0] * NS_PER_SEC + diff[1]
+,1000
+###
+
+
+
+
+
+
+
+
+
 ###
 # hmac2
 crypto = require 'crypto'

@@ -8,23 +8,23 @@ crypto = require "crypto"
 bi = require "big-integer"
 
 module.exports.getHash = -> 
-  cry = require("crypto").createHash 'SHA256'
+  cry = crypto.createHash 'SHA256'
   cry.update uuid.v4(), "utf8"
   cry.update uuid.v4(), "utf8"
   cry.digest 'hex'
 
 module.exports.createHash = (src)-> 
-  cry = require("crypto").createHash 'SHA256'
+  cry = crypto.createHash 'SHA256'
   cry.update src, "utf8"
   cry.digest 'hex'
 
 module.exports.getHash64 = -> 
-  cry = require("crypto").createHash 'SHA512'
+  cry = crypto.createHash 'SHA512'
   cry.update uuid.v4(), "utf8"
   cry.digest 'hex'
 
 module.exports.createHash64 = (src)-> 
-  cry = require("crypto").createHash 'SHA512'
+  cry = crypto.createHash 'SHA512'
   cry.update src, "utf8"
   cry.digest 'hex'
 
