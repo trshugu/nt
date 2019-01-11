@@ -11,6 +11,8 @@
     "co": "^4.6.0",
     "co-view": "^0.0.1",
     "co-views": "^2.1.0",
+    "ecdsa": "^0.7.0",
+    "elliptic": "^6.4.1",
     "koa": "^2.5.1",
     "koa-logger": "^3.2.0",
     "koa-route": "^3.2.0",
@@ -20,6 +22,7 @@
     "propel": "^3.3.1",
     "pug": "^2.0.0-rc.4",
     "request": "^2.87.0",
+    "secp256k1": "^3.6.1",
     "uuid": "^3.3.2"
   },
   "devDependencies": {},

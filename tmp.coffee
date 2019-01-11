@@ -7,6 +7,122 @@ helper = require "./helper"
 
 
 
+
+
+
+
+ec = new require('elliptic').ec('secp256k1')
+
+# 秘密鍵作成
+kp = ec.genKeyPair()
+pub = kp.getPublic()
+
+# console.log "kp", kp
+# console.log "pub", pub
+
+# 署名
+msg = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+sig = kp.sign msg
+
+# console.log sig
+
+pubkey = ec.keyFromPublic(pub, 'hex')
+console.log pubkey
+console.log pubkey.verify(msg, sig)
+
+# kpでもいける
+
+
+
+
+###
+secp256k1 = require('secp256k1')
+cry = require("crypto")
+
+
+# 32バイトじゃないとダメそう
+msg = cry.randomBytes(32)
+
+# 秘密鍵を何回か試行して作成する
+loop
+  pri = Buffer.from(cry.randomBytes(32))
+  break if secp256k1.privateKeyVerify(pri)
+
+console.log "pri", pri.toString("hex")
+
+# 秘密鍵から公開鍵を作成
+pub = secp256k1.publicKeyCreate(pri)
+console.log "pub", pub.toString("hex")
+
+# 秘密鍵で署名
+sigObj = secp256k1.sign msg, pri
+console.log "sigObj", sigObj.signature.toString("hex")
+
+# sigとpubを送信する
+console.log "==========="
+console.log "msg:",msg.toString("hex")
+console.log "sig:",sigObj.signature.toString("hex")
+console.log "pub:",pub.toString("hex")
+console.log "==========="
+
+console.log secp256k1.verify(msg, sigObj.signature, pub)
+###
+
+###
+# 楕円曲線
+# console.log require("crypto").getCurves()
+
+EC = require('elliptic').ec
+ec = new EC('secp256k1')
+
+key = ec.genKeyPair()
+
+# 署名
+msgHash = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+signature = key.sign msgHash
+derSign = signature.toDER()
+
+# console.log key.verify msgHash, derSign
+# console.log derSign
+# console.log derSign.map((i)-> helper.dec2hex(i))
+# console.log derSign.map((i)-> ("00"+ helper.dec2hex(i)).slice(-2) ).join("")
+# console.log signature
+# console.log "key:",key
+
+# 公開鍵
+pubPoint = key.getPublic()
+x = pubPoint.getX();
+y = pubPoint.getY()
+
+# console.log pubPoint
+# console.log x
+# console.log y
+
+puba = pubPoint.encode('hex')
+# console.log "encode:",pub
+pubb = x: x.toString('hex'), y: y.toString('hex')
+# console.log pub
+pubc = x: x.toBuffer(), y: y.toBuffer()
+# console.log pub
+pubd = x: x.toArrayLike(Buffer), y: y.toArrayLike(Buffer)
+# console.log pub
+
+
+
+keya = ec.keyFromPublic(puba, 'hex')
+keyb = ec.keyFromPublic(pubb, 'hex')
+keyc = ec.keyFromPublic(pubc, 'hex')
+keyd = ec.keyFromPublic(pubd, 'hex')
+
+console.log keya.verify(msgHash, signature)
+console.log keyb.verify(msgHash, signature)
+console.log keyc.verify(msgHash, signature)
+console.log keyd.verify(msgHash, signature)
+###
+
+
+
+
 ###
 # 還暦コンバート
 convert_kanreki =(i)->
