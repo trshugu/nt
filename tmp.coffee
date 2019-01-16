@@ -10,7 +10,7 @@ helper = require "./helper"
 
 
 
-
+###
 ec = new require('elliptic').ec('secp256k1')
 
 # 秘密鍵作成
@@ -31,7 +31,7 @@ console.log pubkey
 console.log pubkey.verify(msg, sig)
 
 # kpでもいける
-
+###
 
 
 
@@ -476,6 +476,7 @@ suuji.sort (a,b)-> a < b
 puts "8",suuji
 
 # Infinityと微妙に違う。なぜinfinityは正常にソートできないのか
+# NaNはfalse Infinityはtrue
 suuji = [NaN,1,45,5,366,3,4,3,3,3,5]
 suuji.sort (a,b)-> a < b
 puts "9",suuji
