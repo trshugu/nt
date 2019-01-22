@@ -10,6 +10,268 @@ helper = require "./helper"
 
 
 
+
+
+###
+# まとめてから半分に分けるのはNG
+ec = new require('elliptic').ec('secp256k1')
+
+# 鍵生成
+keygen = ->
+  res = {}
+  kp = ec.genKeyPair()
+  res.pri = kp.priv.toString("hex")
+  pk = kp.getPublic()
+  res.pub = pk.x.toString("hex") + pk.y.toString("hex")
+  res
+
+
+# 署名
+sign = (val, priv)->
+  s = ec.keyFromPrivate(priv).sign val
+  console.log "s:",s
+  s.r.toString("hex") + s.s.toString("hex")
+
+
+# 検証
+verify = (val, pub, sign)->
+  pk = ec.keyFromPublic
+    x: pub.substr 0, Math.floor(pub.length/2)
+    y: pub.substr Math.floor(pub.length/2)
+  console.log pk
+  console.log pk.pub.x.toString("hex").length
+  console.log pk.pub.y.toString("hex").length
+  
+  sig = 
+    r: sign.substr 0, Math.ceil(sign.length/2)
+    s: sign.substr Math.ceil(sign.length/2)
+  console.log sig
+  pk.verify val, sig
+
+
+val = "aeaaああいあいあおいうあ3ae"
+
+# key = keygen()
+# puts key
+
+# sig = sign val, key.pri
+# puts sig
+
+# puts verify val, key.pub, sig
+# puts verify val, key.pub, sign(val, key.pri)
+
+# keygenで鍵作成
+pri = '7912419654941b44c1e1ad66d6f0d06992548b1aae8794844479a08077400ab2'
+pub = '2e4f7daa5832b61d0f54d8ce326a26a35464359941a190b2a33a16af8ab8e32dd457f9df18f4522a33d141cde4b383a7de81f4507fc43a1d68ae6b1c6298de3d'
+
+key = keygen()
+pri = key.pri
+pub = key.pub
+console.log pub
+# クライアント側 平文とsigを送る
+sig = sign val, pri
+puts sig
+
+# サーバー側 pubとsigで平文を検証
+flg = verify val, pub, sig
+puts flg
+"out----------!!!!!!!!!!!!!!!!!!!!!!" if flg == false
+###
+
+
+
+###
+val = "平文"
+pri = ec.genKeyPair().priv.toString("hex")
+puts "pri", pri
+
+sig = sign val, pri
+puts "sig", sig
+
+pk = ec.keyFromPrivate(pri).getPublic()
+pub = pk.x.toString("hex") + pk.y.toString("hex")
+puts "pub", pub
+###
+
+
+
+
+###
+ec = new require('elliptic').ec('secp256k1')
+
+kp = ec.genKeyPair()
+msg = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+msg = 111
+msg = "111"
+sig = kp.sign msg # 秘密鍵で署名されている
+
+pub = kp.getPublic()
+gen = {}
+gen.x = pub.x.toString("hex")
+gen.y = pub.y.toString("hex")
+
+gensig = {}
+gensig.r = sig.r.toString("hex")
+gensig.s = sig.s.toString("hex")
+
+# pubkey = ec.keyFromPublic(pub, 'hex') # pubそのものは必要
+pubkey = ec.keyFromPublic gen, 'hex'
+console.log gen.verify msg, gensig # 公開鍵で署名確認
+
+# cry = pubkey.sign "aaa"
+###
+
+###
+ec = new require('elliptic').ec('secp256k1')
+
+# 秘密鍵作成
+kp = ec.genKeyPair()
+console.log "kp", kp # 全部
+pub = kp.getPublic() # この時点ではpubがない
+console.log "kp", kp # 全部
+
+# console.log "kp", kp # 全部
+# console.log "priv1", kp.priv
+# console.log "priv2", kp.priv.toString()
+console.log "priv3", kp.priv.toString("hex")
+console.log "===="
+# console.log "kppub", kp.pub
+console.log "kppubx", kp.pub.x.toString("hex")
+console.log "kppuby", kp.pub.y.toString("hex")
+
+# console.log "pub", pub # xyのみ
+console.log "pubx", pub.x.toString("hex")
+console.log "puby", pub.y.toString("hex")
+
+# 署名
+msg = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+sig = kp.sign msg
+
+# console.log sig
+console.log sig.r.toString("hex")
+console.log sig.s.toString("hex")
+# console.log sig.recoveryParam
+
+pubkey = ec.keyFromPublic(pub, 'hex')
+# console.log "pubkey", pubkey
+console.log "pubkeyx", pubkey.pub.x.toString("hex")
+console.log "pubkeyy", pubkey.pub.y.toString("hex")
+
+console.log "pubkey", pubkey
+console.log "pub", pub
+
+# console.log pubkey.verify(msg, sig)
+###
+
+
+
+
+###
+# ec2では使えなかった
+puts = console.log
+NS_PER_SEC = 1e9
+
+GPU = require "gpu.js"
+gpu = new GPU()
+
+gen_prime = (val)->
+  ret = 1
+  cnt = 0
+  while  cnt < val
+    ret = (ret * 2) + Math.floor(Math.random() * 2)
+    cnt++
+  return (ret * 2) + 1
+
+
+p = 2 ** 10
+# console.log p
+gen_prime_gpu = gpu.createKernel gen_prime, output: [p]
+
+
+nano = process.hrtime()
+c = [0...p].map -> gen_prime 8
+diff = process.hrtime(nano)
+puts diff[0] * NS_PER_SEC + diff[1]
+
+nano = process.hrtime()
+d = gen_prime_gpu 8 # こっちは配列で返ってくる
+diff = process.hrtime(nano)
+puts diff[0] * NS_PER_SEC + diff[1]
+
+
+# console.log c
+# console.log d.length
+###
+
+
+
+
+###
+# GPGPU
+g = require "gpu.js"
+gpu = new g()
+
+fun = gpu.createKernel ->
+  array2 = [0.08, 2]
+  array2  
+
+fun()
+###
+
+
+
+###
+GPU = require "gpu.js"
+gpu = new GPU()
+
+suu = gpu.createKernel (a)-> a + a
+
+matMul = gpu.createKernel (a)->
+  sum = 0
+  # console.log this.thread.x
+  console.log this
+  sum = Math.floor(Math.random() * this.thread.x)
+  
+  
+  return sum
+,
+  output: [512]
+
+
+a = []
+[0..512].forEach (i)->
+  a.push 1
+
+c = matMul(a)
+console.log c
+###
+
+
+###
+bi = require "big-integer"
+# 4738381338321616896通り
+puts bi("4738381338321616896").divide(4).toString()
+# →118,4595,3345,8040,4224
+
+puts bi("218340105584896").divide(4).toString()
+# → 54,5850,2639,6224
+
+# ワンタイムパスワード
+
+[1..6].forEach (i)->
+  console.log i + "文字で" + (bi(10).pow(bi(i)).toString()) + "通り"
+###
+
+
+
+
+###
+bi = require "big-integer"
+[1..16].forEach (i)->
+  console.log i + "文字で" + (bi(36).pow(bi(i)).toString()) + "通り"
+###
+
+
 ###
 ec = new require('elliptic').ec('secp256k1')
 
@@ -36,6 +298,7 @@ console.log pubkey.verify(msg, sig)
 
 
 ###
+# こっちのライブラリはイマイチそう
 secp256k1 = require('secp256k1')
 cry = require("crypto")
 
