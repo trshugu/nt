@@ -9,6 +9,42 @@ helper = require "./helper"
 
 
 
+###
+herrtora = -> new Promise (f,r)->
+  t = Math.floor(Math.random() * 10000)
+  setTimeout ->
+    console.log "t:",t
+    f "done: " + t
+  , t
+
+
+Promise.race [0...10].map -> herrtora()
+.then (v)->
+  console.log v
+###
+
+
+###
+sto = -> new Promise (f,r)->
+  t = Math.floor(Math.random() * 10000)
+  setTimeout ->
+    console.log "t",t
+    f "done" + t
+  , t
+
+
+# すべて実行し、一番早いfulfilledを採用する
+Promise.race [sto(),sto()]
+.then (v)->
+  console.log v
+
+# すべて実行し、戻り値は配列
+Promise.all [stm(),stm()]
+.then (v)->
+  console.log v
+###
+
+
 
 ###
 # bip39
