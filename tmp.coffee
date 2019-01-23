@@ -10,6 +10,19 @@ helper = require "./helper"
 
 
 
+###
+# bip39
+bm = require "bitcore-mnemonic"
+mpri = new bm 256, bm.Words.JAPANESE
+pri = mpri.toHDPrivateKey()
+console.log pri
+str = mpri.toString()
+console.log str
+
+mnemonic = new bm ""
+cpri = mnemonic.toHDPrivateKey()
+console.log cpri
+###
 
 
 ###
