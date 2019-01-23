@@ -9,6 +9,44 @@ helper = require "./helper"
 
 
 
+
+###
+# RSAのライブラリ
+tico = require "cryptico"
+
+# 署名
+key = tico.generateRSAKey "pass", 1024
+pub = tico.publicKeyString key
+res = tico.encrypt "hira", pub, key 
+cip = res.cipher
+puts tico.decrypt cip, key
+
+# 暗号化2
+key = tico.generateRSAKey "pass", 1024
+pub = tico.publicKeyString key
+enc = tico.encrypt "hirabun", pub
+cip = enc.cipher
+puts tico.decrypt cip, key
+
+
+# 暗号化
+key = tico.generateRSAKey "pass", 1024
+
+# puts key.p.toString()
+pub = tico.publicKeyString key
+# puts pub
+
+hira = "hirabun"
+
+enc = tico.encrypt hira, pub
+# puts enc
+cip = enc.cipher
+# puts cip
+puts tico.decrypt cip, key
+###
+
+
+
 ###
 herrtora = -> new Promise (f,r)->
   t = Math.floor(Math.random() * 10000)
