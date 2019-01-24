@@ -11,6 +11,420 @@ helper = require "./helper"
 
 
 ###
+# prime bi
+bi = require "big-integer"
+NS_PER_SEC = 1e9
+cm = (i)-> i.toString().split("").reverse().join("").match(/.{1,3}/g).join(",").split("").reverse().join("")
+
+# 若干gpuのほうが早い印象
+gen_rand_gpu = (b)->
+  ret = bi.one
+  cnt = 2
+  while  cnt < b
+    ret = ret.multiply(2).plus(bi(Math.floor(Math.random() * 2)))
+    cnt++
+  return ret.multiply(2).plus(bi.one)
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+bit = 53
+
+console.log gen_rand(bit).toString()
+console.log gen_rand_gpu(bit).toString()
+console.log parseInt("1"+"0".repeat(bit-1),2) + "～" + parseInt("1".repeat(bit),2)
+console.log bi(2).pow(bit-1).toString() + "～" + bi(2).pow(bit).minus(1).toString()
+console.log Number.MAX_SAFE_INTEGER
+###
+
+
+###
+
+nano_old = process.hrtime()
+console.log gen_rand(bit).toString()
+diff_old = process.hrtime(nano_old)
+console.log "old", cm diff_old[0] * NS_PER_SEC + diff_old[1]
+
+nano_gpu = process.hrtime()
+console.log gen_rand_gpu(bit).toString()
+diff_gpu = process.hrtime(nano_gpu)
+console.log "gpu", cm diff_gpu[0] * NS_PER_SEC + diff_gpu[1]
+
+nano_old = process.hrtime()
+console.log gen_rand(bit).toString()
+diff_old = process.hrtime(nano_old)
+console.log "old", cm diff_old[0] * NS_PER_SEC + diff_old[1]
+
+nano_gpu = process.hrtime()
+console.log gen_rand_gpu(bit).toString()
+diff_gpu = process.hrtime(nano_gpu)
+console.log "gpu", cm diff_gpu[0] * NS_PER_SEC + diff_gpu[1]
+
+nano_old = process.hrtime()
+console.log gen_rand(bit).toString()
+diff_old = process.hrtime(nano_old)
+console.log "old", cm diff_old[0] * NS_PER_SEC + diff_old[1]
+
+nano_gpu = process.hrtime()
+console.log gen_rand_gpu(bit).toString()
+diff_gpu = process.hrtime(nano_gpu)
+console.log "gpu", cm diff_gpu[0] * NS_PER_SEC + diff_gpu[1]
+nano_gpu = process.hrtime()
+console.log gen_rand_gpu(bit).toString()
+diff_gpu = process.hrtime(nano_gpu)
+console.log "gpu", cm diff_gpu[0] * NS_PER_SEC + diff_gpu[1]
+nano_gpu = process.hrtime()
+console.log gen_rand_gpu(bit).toString()
+diff_gpu = process.hrtime(nano_gpu)
+console.log "gpu", cm diff_gpu[0] * NS_PER_SEC + diff_gpu[1]
+nano_old = process.hrtime()
+console.log gen_rand(bit).toString()
+diff_old = process.hrtime(nano_old)
+console.log "old", cm diff_old[0] * NS_PER_SEC + diff_old[1]
+nano_old = process.hrtime()
+console.log gen_rand(bit).toString()
+diff_old = process.hrtime(nano_old)
+console.log "old", cm diff_old[0] * NS_PER_SEC + diff_old[1]
+nano_old = process.hrtime()
+console.log gen_rand(bit).toString()
+diff_old = process.hrtime(nano_old)
+console.log "old", cm diff_old[0] * NS_PER_SEC + diff_old[1]
+
+
+
+# console.log parseInt("1"+"0".repeat(bit-1),2) + "～" + parseInt("1".repeat(bit),2)
+console.log bi(2).pow(bit-1).toString() + "～" + bi(2).pow(bit).minus(1).toString()
+# console.log parseInt "1000",2
+# console.log parseInt "1111",2
+###
+
+
+
+###
+# prime
+gen_rand = (b)->
+  ret = 1
+  cnt = 0
+  while  cnt < b
+    ret = (ret * 2) + Math.floor(Math.random() * 2)
+    cnt++
+  return (ret * 2) + 1
+
+console.log gen_rand 1024
+###
+
+###
+# sshでは
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+# diffie-hellman-group14-sha1
+# p = bi helper.hex2dec "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE65381FFFFFFFFFFFFFFFF"
+p = bi helper.hex2dec "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF"
+g = bi 2
+
+seca = gen_prime 8
+secb = gen_prime 8
+
+console.log "p", p.toString()
+console.log "g", g.toString()
+console.log "seca", seca.toString()
+console.log "secb", secb.toString()
+
+a = modular_exp g, seca, p
+puts "a", a.toString()
+
+b = modular_exp g, secb, p
+puts "b", b.toString()
+
+
+ka = modular_exp b, seca, p
+puts "ka", ka.toString()
+
+kb = modular_exp a, secb, p
+puts "kb", kb.toString()
+
+k =  modular_exp g, seca.multiply(secb), p
+puts "k", k.toString()
+###
+
+
+
+
+###
+p = 127
+g = 12
+
+console.log "素数p:", p
+console.log "数字g:", g
+
+seca = 4
+secb = 5
+console.log "Xの秘密鍵:", seca
+console.log "Yの秘密鍵:", secb
+
+A = (g**seca)%p
+B = (g**secb)%p
+
+console.log "XがYに送信する数字A(g ** seca % p):", A
+console.log "YがXに送信する数字B(g ** secb % p):", B
+
+KA = (B**seca)%p
+KB = (A**secb)%p
+
+console.log "Xが送られてきた数字を元に共通鍵K作成:", KA
+console.log "Yが送られてきた数字を元に共通鍵K作成:", KB
+
+K = (g**(seca*secb)) % p
+console.log "Kの根拠はg**(a*b)%p:", K
+###
+
+
+
+
+###
+# ディフィーヘルマン手計算
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+# 秘密鍵を送信せずに共通鍵を作成する2
+# 高速指数演算をつかう
+p = gen_prime 16
+g = gen_prime 8
+
+seca = gen_prime 8
+secb = gen_prime 8
+
+console.log "p", p.toString()
+console.log "g", g.toString()
+console.log "seca", seca.toString()
+console.log "secb", secb.toString()
+
+a = modular_exp g, seca, p
+puts "a", a.toString()
+
+b = modular_exp g, secb, p
+puts "b", b.toString()
+
+
+ka = modular_exp b, seca, p
+puts "ka", ka.toString()
+
+kb = modular_exp a, secb, p
+puts "kb", kb.toString()
+
+k =  modular_exp g, seca.multiply(secb), p
+puts "k", k.toString()
+###
+
+
+
+
+###
+# 秘密鍵を送信せずに共通鍵を作成する
+# ・素数pと数値gを公開する
+p = gen_prime 32
+g = bi 2
+
+# ・XとYがaとbを決める
+seca = gen_prime 16
+secb = gen_prime 16
+
+# ・XはAを作成してYに送る
+# A = g ** a % p
+a = g.pow(seca).mod(p)
+puts "a", a.toString()
+# ・YもBを作成してXに送る
+# B = g ** b % p
+b = g.pow(secb).mod(p)
+puts "b", b.toString()
+
+
+# ・XはaとBでKAを作る
+# KA = B ** a % p
+ka = b.pow(seca).mod(p)
+puts "ka", ka.toString()
+# ・YもbとAでKBを作る
+# KB = A ** b % p
+kb = a.pow(secb).mod(p)
+puts "kb", kb.toString()
+# ・KAもKBもKとなる
+# K = g ** (a*b) % p
+# k = g.pow(a.multiply(b)).mod(p)
+# puts "k", k.toString()
+# 大きすぎて計算できない
+###
+
+
+
+###
+cry = require "crypto"
+
+# getDiffieHellman
+cli = cry.getDiffieHellman "modp1"
+sev = cry.getDiffieHellman "modp1"
+
+clikey = cli.generateKeys()
+sevkey = sev.generateKeys()
+
+console.log "clikey", clikey.toString("hex")
+console.log "sevkey", sevkey.toString("hex")
+
+clisec = cli.computeSecret sevkey, "binary", "hex"
+sevsec = sev.computeSecret clikey, "binary", "hex"
+
+console.log "clisec", clisec
+console.log "sevsec", sevsec
+
+
+# createDiffieHellman
+cli = cry.createDiffieHellman(128)
+clikey = cli.generateKeys()
+console.log "clikey", clikey.toString("hex")
+
+console.log "prime:", cli.getPrime().toString("hex")
+console.log "gen:", cli.getGenerator().toString("hex")
+
+sev = cry.createDiffieHellman cli.getPrime(), cli.getGenerator()
+sevkey = sev.generateKeys()
+console.log "sevkey", sevkey.toString("hex")
+
+clisec = cli.computeSecret sevkey
+sevsec = sev.computeSecret clikey
+console.log clisec.toString("hex")
+console.log sevsec.toString("hex")
+###
+
+
+
+
+
+
+###
 # RSAのライブラリ
 tico = require "cryptico"
 
