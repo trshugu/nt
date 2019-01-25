@@ -7,7 +7,60 @@ helper = require "./helper"
 
 
 
+###
+###
 
+k = 3
+n = 3
+
+res = [n..1].reduce (a,b)-> a+b
+
+puts res
+
+tm1 = (3 * 3) * 2
+fo = res * 3 + tm1
+puts fo
+
+tm2 = (3 * 4) * 2 + tm1
+fiv = fo * 3 + tm2
+puts fiv
+
+tm3 = (3 * 5) * 2 + tm2
+six = fiv * 3 + tm3 + 6 * 3
+puts six
+
+tm4 = (3 * 5) * 2 + tm3
+sev = six * 3 + tm4 + 6 * 7 * 2
+puts sev
+
+tm5 = (3 * 5) * 2 + tm4
+ei = sev * 3 + tm5 + 6 * 7 * 2
+puts ei
+
+
+###
+arr = ["a","b","c"]
+arr.map (i)->
+  arr.map (j)->
+    arr.map (k)->
+      arr.map (l)->
+        arr.map (a)->
+          puts i, j, k, l, a, arr.every (n)-> n == i || n == j || n == k || n == l || n == a
+###
+
+
+###
+arr = ["a","b","c"]
+arr.map (i)-> # 1
+  arr.map (j)-> # 2
+    arr.map (k)-> # 3
+      arr.map (l)-> # 4
+        # puts i, j, k, l, arr.every (n)-> n == i || n == j || n == k || n == l
+        arr.map (a)-> # 5
+          arr.map (b)-> # 6
+            arr.map (c)-> # 7
+              puts i, j, k, l, a, b, arr.every (n)-> n == i || n == j || n == k || n == l || n == a || n == b || n == c
+###
 
 
 ###
