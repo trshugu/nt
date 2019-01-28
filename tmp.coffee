@@ -4,12 +4,53 @@ helper = require "./helper"
 ###
 ###
 
+###
+through2 = require "through2"
+stm = through2( (c,e,n)->
+    this.push c
+    n()
+  )
+stm.pipe process.stdout
+
+stmerr = through2( (c,e,n)->
+    this.push c
+    n()
+  )
+stmerr.pipe process.stderr
+
+setInterval ->
+  stm.write "out:" + new Date().getTime() + "\n"
+  stmerr.write "err:" + new Date().getTime() + "\n"
+, 1000
+###
+
+
+###
+lop = ->
+  setInterval ->
+    console.error "errrr"
+    throw "throwww"
+  , 1000
+
+lop()
+
+process.on 'uncaughtException', (ex)->
+  console.error "ex",ex
+  lop()
+###
 
 
 
 ###
+setInterval ->
+  console.log "out:" + new Date().getTime() + "\n"
+  console.error "err:" + new Date().getTime() + "\n"
+, 1000
 ###
 
+
+
+###
 k = 3
 n = 3
 
@@ -36,6 +77,7 @@ puts sev
 tm5 = (3 * 5) * 2 + tm4
 ei = sev * 3 + tm5 + 6 * 7 * 2
 puts ei
+###
 
 
 ###
