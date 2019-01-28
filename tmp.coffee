@@ -4,6 +4,116 @@ helper = require "./helper"
 ###
 ###
 
+
+
+
+
+###
+redis = require "redis"
+cli = redis.createClient()
+
+setval = (key)->
+  cli.set key, "0000", (e,d)->
+    if e?
+      console.log e
+    else
+      console.log d
+      setval helper.getHash()
+
+setval helper.getHash()
+###
+
+
+
+
+###
+# 再redis
+NS_PER_SEC = 1e9
+cm = (i)-> i.toString().split("").reverse().join("").match(/.{1,3}/g).join(",").split("").reverse().join("")
+
+redis = require "redis"
+cli = redis.createClient()
+
+
+# endにきた
+cli.on "end", ->
+  diff = process.hrtime(nano)
+  console.log "end"
+  console.log cm diff[0] * NS_PER_SEC + diff[1]
+
+# cli.on "close", (a)-> console.log "close",a
+# cli.on "quit", (a)-> console.log "quit",a
+
+setval = (key)->
+  cli.set key, "0000", (e,d)->
+    if e?
+      console.log e
+    else
+      console.log d
+      diff = process.hrtime(nano)
+      console.log cm diff[0] * NS_PER_SEC + diff[1]
+      cli.quit()
+
+h = helper.getHash()
+
+nano = process.hrtime()
+setval h
+###
+
+
+
+###
+cli.set "tt", "valval", (e,d)->
+  if e?
+    console.log e
+  else
+    console.log d
+    
+    cli.quit()
+###
+
+
+###
+# stream vs through
+# process.stdin.pipe(require("through2") (a,b,c)->console.log(a);c()).pipe(process.stdout)
+
+t = new require('stream').Transform()
+t._transform = (a,b,c)->@push(a);c()
+process.stdin.pipe(t).pipe(process.stdout)
+###
+
+
+###
+t = new require('stream').Transform()
+t._transform = (a,b,c)->
+  @push(a)
+  c()
+
+process.stdin.pipe(t).pipe(process.stdout)
+###
+
+
+
+
+###
+# edge ng
+edge = require "edge"
+
+sample1 = edge.func ->
+  """
+    async (input) =>
+      "Hello " + input.ToString() + "!";
+  """
+
+sample1 'World', (e,r)->
+  throw e if e
+  console.log r
+###
+
+
+
+
+
 ###
 through2 = require "through2"
 stm = through2( (c,e,n)->
