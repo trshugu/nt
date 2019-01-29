@@ -8,6 +8,375 @@ helper = require "./helper"
 
 
 
+
+
+
+###
+# 楕円曲線暗号 bi版
+# それっぽいものはできたけどよくわからない
+
+# いつもの========
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+# ================
+
+
+invMod = (k, mod)-> modular_exp k, mod.minus(bi(2)), mod
+
+# ダブル計算
+ecDouble = (p, ca, cb, cp)->
+  res = {}
+  lam = (bi(3).multiply(p.x.pow(2).plus(cb)).multiply(invMod(bi(2).multiply(p.y), cp)) ).mod(cp)
+  
+  res.x = ( lam.pow(2).minus(2).multiply(p.x)).mod(cp)
+  res.y = (lam.multiply(p.x.minus(res.x)).minus(p.y)).mod(cp)
+  res
+
+# 加算
+ecAdd = (p, b, cp)->
+  res = {}
+  lam = ((b.y.minus(p.y)).multiply(invMod(b.x.minus(p.x), cp))).mod(cp)
+  
+  res.x = (((lam.pow(2))).minus(p.x).minus(b.x)).mod(cp)
+  res.y = (lam.multiply(p.x.minus(res.x)).minus(p.y)).mod(cp)
+  res
+
+# 16進数文字を2進数に変換
+hex2bin = (str)-> str.split("").map((i)->parseInt(i,16).toString(2)).join("")
+# puts hex2bin helper.getHash()
+
+
+# スカラーは16進文字列
+ecMulti = (scalar)->
+  throw 'invalid scalar/ purivate key' if scalar == 0
+  
+  scalar_bin = hex2bin scalar
+  # xとyの固定値(素数ではなさそう) 
+  cp = gen_prime 128
+  ca = bi gen_prime 16
+  cb = bi gen_prime 16
+  
+  base = {}
+  base.x = gen_prime 256
+  base.y = gen_prime 256
+  
+  res = {}
+  res.x = base.x
+  res.y = base.y
+  
+  # ビット数回繰り返す
+  [0...scalar_bin.length].forEach (i)->
+    ed = ecDouble(res, ca, cb, cp)
+    res.x = ed.x
+    res.y = ed.y
+    
+    if scalar_bin[i] == "1"
+      ea = ecAdd(res, base, cp)
+      res.x = ea.x
+      res.y = ea.y
+  
+
+  res.x = res.x.multiply(-1) if res.x.sign
+  res.x = helper.dec2hex res.x.toString()
+  
+  res.y = res.y.multiply(-1) if res.y.sign
+  res.y = helper.dec2hex res.y.toString()
+  res
+
+ec = new require('elliptic').ec('secp256k1')
+
+keygen = (hash)->
+  res = {}
+  
+  res.pri = if hash then  hash else helper.getHash()
+  pt = ecMulti res.pri
+  
+  res.x = pt.x
+  res.y = pt.y
+  res
+
+sign = (val, priv)->
+  res = {}
+  sig = ec.keyFromPrivate(priv).sign val
+  
+  res.r = sig.r.toString("hex")
+  res.s = sig.s.toString("hex")
+  res
+
+verify = (val, x, y, r, s)->
+  pk = ec.keyFromPublic
+    x: x
+    y: y
+  
+  sig = 
+    r: r
+    s: s
+  
+  pk.verify val, sig
+
+
+
+val = "aeaaああいあいあおいうあ3ae"
+
+key = keygen()
+puts key
+
+sig = sign val, key.pri
+puts sig
+
+flg = verify val, key.x, key.y, sig.r, sig.s
+puts flg
+"out----------!!!!!!!!!!!!!!!!!!!!!!" if flg == false
+###
+
+
+
+###
+# 楕円曲線暗号
+# E: y**2 = x**3 + ax + b (mod p)
+# p>=5, 4a**3 + 27b**2 != 0
+# y^2 = x^3 + b Mod p(素数ｓ)
+
+# 高速指数演算smallint版
+modular_exp = (a, b, n)->
+  res = 1
+  while b != 0
+    if (b & 1) != 0
+      res = (res * a) % n
+    
+    a = (a * a) % n
+    b = b >> 1
+  
+  res
+
+invMod = (k, mod)-> modular_exp k, mod-2, mod
+
+# ダブル計算
+ecDouble = (p, ca, cb, cp)->
+  res = {}
+  lam = (3 * (p.x ** 2 + cb) * invMod(2 * p.y, cp) ) % cp
+  
+  res.x = ( (lam ** 2) - 2 * p.x) % cp
+  res.y = (lam * (p.x - res.x) - p.y) % cp
+  res
+
+# 加算
+ecAdd = (p, b, cp)->
+  res = {}
+  lam = ((b.y - p.y) * invMod(b.x - p.x, cp)) % cp
+  
+  res.x = (((lam ** 2)) - p.x - b.x) % cp
+  res.y = (lam * (p.x- res.x) - p.y) % cp
+  res
+
+ # スカラーは16進文字列
+ecMulti = (scalar)->
+  throw 'invalid scalar/ purivate key' if scalar == 0
+  
+  scalar_bin = parseInt(scalar,16).toString(2)
+  # xとyの固定値(素数ではなさそう) 
+  cp = 133
+  ca = 0
+  cb = 7
+  
+  base = {}
+  base.x = 65
+  base.y = 30
+  
+  res = {}
+  res.x = base.x
+  res.y = base.y
+  
+  # ビット数回繰り返す
+  [0...scalar_bin.length].forEach (i)->
+    ed = ecDouble(res, ca, cb, cp)
+    res.x = ed.x
+    res.y = ed.y
+    
+    puts "scalar_bin:", scalar_bin
+    puts "i:", i
+    puts "sbi:", scalar_bin[i]
+    puts ed
+    
+    if scalar_bin[i] == "1"
+      ea = ecAdd(res, base, cp)
+      puts ea
+      res.x = ea.x
+      res.y = ea.y
+    
+  res
+
+ec = new require('elliptic').ec('secp256k1')
+
+keygen = (hash)->
+  res = {}
+  
+  res.pri = if hash then  hash else helper.getHash().substr(0,4)
+  pt = ecMulti res.pri
+  
+  res.x = pt.x
+  res.y = pt.y
+  res
+
+sign = (val, priv)->
+  res = {}
+  sig = ec.keyFromPrivate(priv).sign val
+  
+  res.r = sig.r.toString("hex")
+  res.s = sig.s.toString("hex")
+  res
+
+verify = (val, x, y, r, s)->
+  pk = ec.keyFromPublic
+    x: x
+    y: y
+  
+  sig = 
+    r: r
+    s: s
+  
+  pk.verify val, sig
+
+
+val = "aeaaああいあいあおいうあ3ae"
+
+key = keygen()
+
+sig = sign val, key.pri
+
+flg = verify val, key.x, key.y, sig.r, sig.s
+puts flg
+"out----------!!!!!!!!!!!!!!!!!!!!!!" if flg == false
+###
+
+
+
+###
+generateKey = (str)->
+  secret_hash = "ABC"
+  secret_key = "ABC"
+  pt = ecMulti secret_key
+  public_key = int("04" + "%064x" % pt[0] + "%064x" % pt[1], 16)
+  return [public_key, secret_key]
+###
+
+
+
+
+###
+# 使える形で書き直し
+ec = new require('elliptic').ec('secp256k1')
+
+# 鍵生成
+keygen = ->
+  res = {}
+  kp = ec.genKeyPair()
+  res.pri = kp.priv.toString("hex")
+  
+  pk = kp.getPublic()
+  res.x = pk.x.toString("hex")
+  res.y = pk.y.toString("hex")
+  res
+
+
+# 署名
+sign = (val, priv)->
+  res = {}
+  sig = ec.keyFromPrivate(priv).sign val
+  
+  res.r = sig.r.toString("hex")
+  res.s = sig.s.toString("hex")
+  res
+
+
+# 検証
+verify = (val, x, y, r, s)->
+  pk = ec.keyFromPublic
+    x: x
+    y: y
+  
+  sig = 
+    r: r
+    s: s
+  
+  pk.verify val, sig
+
+
+val = "aeaaああいあいあおいうあ3ae"
+
+key = keygen()
+
+# クライアント側 平文とsigを送る
+sig = sign val, key.pri
+
+# サーバー側 pubとsigで平文を検証
+flg = verify val, key.x, key.y, sig.r, sig.s
+puts flg
+"out----------!!!!!!!!!!!!!!!!!!!!!!" if flg == false
+###
+
+
+
+
 ###
 redis = require "redis"
 cli = redis.createClient()
