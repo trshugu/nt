@@ -8,6 +8,562 @@ helper = require "./helper"
 
 
 
+###
+###
+# secp256k
+# https://chuckbatson.wordpress.com/2014/11/26/secp256k1-test-vectors/
+
+# いつもの========
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+# ================
+
+
+# 定数的なもの p,a,b,G,n,h
+# 素数
+# # puts helper.dec2hex bi(2).pow(256).minus(bi(2).pow(32)).minus(977).toString()
+# cp = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+
+# E: y**2 = x**3 + ax + b (mod p)
+# 結局y**2 = x**3 + 7である→ y**2 - x**3 - 7 mod p == 0
+# ca = bi helper.hex2dec "0000000000000000000000000000000000000000000000000000000000000000"
+# cb = bi helper.hex2dec "0000000000000000000000000000000000000000000000000000000000000007"
+
+# Finally the order n of G and the cofactor are
+# cr = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+
+# x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+# y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+
+# 楕円判定
+# y.pow(2) = x.pow(3).plus(x).plus(7).mod(p)
+isoncurve = (x, y, p)-> (y.pow(2).minus(x.pow(3).plus(bi(7)))).mod(p).eq(bi.zero)
+
+inv = (x, p)-> modular_exp(x, p.minus(bi(2)), p)
+
+containsPoint = (x, y, a, b, p)-> (y.pow(2).minus(x.pow(3).plus(a.multiply(x)).plus(b)) ).mod(p).eq(bi.zero)
+
+
+p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+a = bi 0
+b = bi 7
+# gc = bi helper.hex2dec "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798"
+# gu = bi helper.hex2dec "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8"
+n = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+# h = bi 1
+
+gx = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+gy = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+# puts containsPoint gx, gy, a, b, p
+
+# ダブル計算
+doublePt = (x,y,p)->
+  res = {}
+  if y.eq(bi.zero)
+    res.x = 0
+    res.y = 0
+    return res
+  else
+    nu = bi(3).multiply( modular_exp(x,bi(2),p) ).multiply(inv( bi(2).multiply(y), p ))
+    x3 = modular_exp(nu, bi(2), p).minus(bi(2).multiply(x))
+    y3 = nu.multiply( x.minus(x3) ).minus(y)
+    res.x = x3.mod p
+    res.y = y3.mod p
+    return res
+
+# dp = doublePt gx,gy,p
+# puts dp.x.toString()
+# puts dp.y.toString()
+
+# 加算
+addPt = (x1,y1,x2,y2,p)->
+  res = {}
+  
+  if x1.eq(-1) && y1.eq(-1)
+    res.x = x2
+    res.y = y2
+    return res
+  
+  if x2.eq(-1) && y2.eq(-1)
+    res.x = x1
+    res.y = y1
+    return res
+  
+  if x1.eq(x2)
+    if (y1.plus(y2)).mod(p).eq(0)
+      res.x = bi(-1)
+      res.y = bi(-1)
+      return res
+    else
+      return doublePt(x1,y1,p)
+  else
+    lm = (y1.minus(y2)).multiply( inv(x1.minus(x2), p) )
+    x3 = modular_exp(lm,bi(2),p).minus(x1.plus(x2))
+    y3 = lm.multiply(x1.minus(x3)).minus(y1)
+    res.x = x3.mod p
+    res.y = y3.mod p
+    return res
+
+scalarmult = (x,y,e,p)->
+  res = {}
+  if e.eq(0)
+    res.x = bi(-1)
+    res.y = bi(-1)
+    return res
+  
+  res = scalarmult(x, y, e.divide(2),p)
+  res = addPt(res.x, res.y, res.x, res.y, p)
+  res = addPt(res.x, res.y, x, y, p) if e.and(1)
+  
+  return res
+
+
+
+
+
+
+
+
+
+
+
+
+###
+puts "x", helper.dec2hex gx
+puts "y", helper.dec2hex gy
+puts isoncurve gx, gy, p
+
+gg = addPt gx, gy, gx, gy, p
+puts "x", helper.dec2hex gg.x
+puts "y", helper.dec2hex gg.y
+puts isoncurve gg.x, gg.y, p
+
+ggg = addPt gg.x, gg.y, gx, gy, p
+puts "x", helper.dec2hex ggg.x
+puts "y", helper.dec2hex ggg.y
+puts isoncurve ggg.x, ggg.y, p
+
+gggg = addPt ggg.x, ggg.y, gx, gy, p
+puts "x", helper.dec2hex gggg.x
+puts "y", helper.dec2hex gggg.y
+puts isoncurve gggg.x, gggg.y, p
+
+
+# gcはxのみ。yの計算
+sqrt = (x)->
+  a = x
+  [0..100].forEach ->
+    x = x.minus(x.multiply(x).minus(a).divide(bi(2).multiply(x)))
+  x.minus(1)
+
+# gc "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798"
+
+# puts helper.dec2hex gc.pow(3).plus(7).mod(p).toString()
+# 6e55c61873b6ea5a5c01ec80659a39060fdc1796adee6ffdb308c8808cb16313
+# 4866d6a5ab41ab2c6bcc57ccd3735da5f16f80a548e5e20a44e4e9b8118c26f2
+# puts helper.dec2hex sqrt(gc.pow(3).plus(7).mod(p)).toString()
+# 372ae30c39db75d7d8aba0eadd775d95581c197
+# 24336b52d5a0d640e090d6911463b89241b8d4b
+# gul = bi helper.hex2dec "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8"
+# puts helper.dec2hex ((gc.pow(3).divide(gul)).plus(7).divide(gul).mod(p)).toString()
+
+
+# gu "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8"
+
+# x = bi helper.hex2dec "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798"
+# y = bi helper.hex2dec "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8"
+###
+
+
+
+###
+# 公開鍵Tの作成
+t = scalarmult(gx, gy, n, p)
+puts "t",t.x.toString()
+puts "t",t.y.toString()
+
+k = bi(3)
+pk = scalarmult(gx, gy, k, p)
+puts "pk",helper.dec2hex pk.x.abs().toString()
+puts "pk",helper.dec2hex pk.y.abs().toString()
+###
+
+###
+msg = "aaa"
+
+nonce = bi 2
+lr = scalarmult(gx, gy, nonce, p) 
+sr = lr.x.mod(n)
+
+digest = helper.createHash msg
+msg_i = bi helper.hex2dec digest
+s = (inv(nonce,n).multiply(msg_i.plus(sr.multiply(k)))).mod(n)
+puts sr.toString()
+puts s.toString()
+
+
+si = inv(s,n)
+u1 = msg_i.multiply(si).mod(n)
+u2 = sr.multiply(si).mod(n)
+
+uu1 = scalarmult(gx, gy, u1, p)
+uu2 = scalarmult(pk.x, pk.y, u2, p)
+v = addPt uu1.x, uu1.y, uu2.x, uu2.y, p
+
+result = v.x.minus(sr).mod(n).eq(0)
+puts result
+# puts n.toString()
+###
+
+
+
+###
+ec = new require('elliptic').ec('secp256k1')
+kp = ec.genKeyPair()
+puts kp
+pk = kp.getPublic()
+puts pk.x.toString("hex")
+puts pk.y.toString("hex")
+###
+
+
+###
+# エポック秒ゼロ埋め
+# 長くなっただけだし、キャストが氾濫してイマイチ
+epoch2datepadding = (d)->
+  d.getFullYear() + "/" \
+   + ( (d.getMonth()+1).toString().padStart(2,"0")  ) + "/" \
+   + ( d.getDate()).toString().padStart(2,"0") + " " \
+   + ( d.getHours()).toString().padStart(2,"0") + ":" \
+   + ( d.getMinutes()).toString().padStart(2,"0")  + ":" \
+   + ( d.getSeconds()).toString().padStart(2,"0")
+
+
+puts helper.epoch2date new Date()
+puts epoch2datepadding new Date()
+###
+
+
+###
+# inject on entries
+Array.prototype.inject = (cb,cv=null)->
+  ite = @.entries()
+  a = cv if cv
+  loop
+    b = ite.next()
+    if a? == false
+      a = b.value[1]
+      b = ite.next()
+    break if b.done
+    a = cb a, b.value[1]
+  a
+
+arr = [23,54,3,2,,3,35]
+console.log arr.filter((j)->j).inject(  ((a,b)-> a + b)  )
+console.log arr.filter((j)->j).inject(  ((a,b)-> a + b),5  )
+###
+
+
+
+
+###
+# collect on entries
+Array.prototype.collect = (cb)->
+  ite = @.entries()
+  loop
+    e = ite.next()
+    break if e.done
+    cb e.value[1]
+
+arr = [23,54,3,2,,3,35]
+
+console.log arr.filter((j)->j).collect((j)-> j + 1)
+###
+
+
+###
+# collect
+Array.prototype.collect = (cb)->
+  i = 0
+  while i < @.length
+    res = cb @[i]
+    i++
+    res
+  
+
+arr = [23,54,3,2,,3,35]
+
+console.log arr.filter((j)->j).collect((j)-> j + 1)
+###
+
+
+
+###
+# 楕円曲線暗号 bi版その二
+# やはり謎
+
+
+# 楕円判定
+# y.pow(2) = x.pow(3).plus(x).plus(7).mod(p)
+isoncurve = (x, y, p)-> y.pow(2).minus(x.pow(3)).minus(7).mod(p).eq(bi.zero)
+
+invMod = (k, mod)-> modular_exp(k, mod.minus(bi(2)), mod)
+inv =    (x, p)->   modular_exp(x, p.minus(bi(2)), p)
+
+
+# ダブル計算
+ecDouble = (p, ca, cb, cp)->
+  res = {}
+  lam = (bi(3).multiply(p.x.pow(2).plus(ca)).multiply(invMod(bi(2).multiply(p.y), cp)) ).mod(cp)
+  
+  res.x = ( lam.pow(2).minus(2).multiply(p.x)).mod(cp)
+  res.y = (lam.multiply(p.x.minus(res.x)).minus(p.y)).mod(cp)
+  res
+
+# 加算
+ecAdd = (p, b, cp)->
+  res = {}
+  lam = ((b.y.minus(p.y)).multiply(invMod(b.x.minus(p.x), cp))).mod(cp)
+  
+  res.x = (((lam.pow(2))).minus(p.x).minus(b.x)).mod(cp)
+  res.y = (lam.multiply(p.x.minus(res.x)).minus(p.y)).mod(cp)
+  res
+
+# 16進数文字を2進数に変換
+hex2bin = (str)-> str.split("").map((i)->parseInt(i,16).toString(2)).join("")
+# puts hex2bin helper.getHash()
+
+
+doublePt = (x, y, p)->
+  res = {}
+  
+  if y.eq(bi.zero)
+    res.x = bi.zero
+    res.y = bi.zero
+    return res
+  
+  nu = bi(3).multiply(modular_exp(x, bi(2), p)).multiply( inv(bi(2).multiply(y), p) )
+  x3 = modular_exp(nu, bi(2), p).minus(2).multiply(x)
+  y3 = nu.multiply(x.minus(x3)).minus(y)
+  
+  res.x = x3.mod p
+  res.y = y3.mod p
+  res
+
+addPt = (x1, y1, x2, y2, p)->
+  res = {}
+  
+  if x1.eq(bi.zero) and y1.eq(bi.zero)
+    res.x = x2
+    res.y = y2
+    return res
+  
+  if x2.eq(bi.zero) and y2.eq(bi.zero)
+    res.x = x1
+    res.y = y1
+    return res
+  
+  if x1.eq(x2)
+    if y1.plus(y2).mod(p).eq(bi.zero)
+      res.x = bi.zero
+      res.y = bi.zero
+      return res
+    else
+      return doublePt(x1, y1, p)
+  
+  lm = y1.minus(y2).multiply( inv(x1.minus(x2), p) )
+  x3 = modular_exp(lm, bi(2), p).minus(x1.plus(x2))
+  y3 = lm.multiply(x1.minus(x3)).minus(y1)
+  
+  res.x = x3.mod p
+  res.y = y3.mod p
+  res
+
+
+
+scalarMult = (x, y, e, p)->
+  res = {}
+  if e.eq(bi.zero)
+    res.x = bi.zero
+    res.y = bi.zero
+    return res
+  
+  q = scalarMult x, y, e.divide(2), p
+  q = addPt(q.x, q.y, q.x, q.y, p)
+  if e.and(1) 
+    q = addPt(q.x, q.y, x, y, p)
+  
+  res.x = q.x
+  res.y = q.y
+  res
+
+
+# スカラーは16進文字列
+ecMulti = (scalar)->
+  throw 'invalid scalar/ purivate key' if scalar == 0
+  
+  # scalar_bin = hex2bin scalar
+  # xとyの固定値(素数ではなさそう) 
+  # puts helper.dec2hex bi(2).pow(256).minus(bi(2).pow(32)).minus(977).toString()
+  cp = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  ca = bi helper.hex2dec "0000000000000000000000000000000000000000000000000000000000000000"
+  cb = bi helper.hex2dec "0000000000000000000000000000000000000000000000000000000000000007"
+  cr = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+  
+  x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+  
+  throw "not curve" if isoncurve(x,y,cp) == false
+  
+  
+  t = scalarMult x, y, cr, cp
+  puts helper.dec2hex t.x.abs().toString()
+  puts helper.dec2hex t.y.abs().toString()
+  
+  res = {}
+  res.x = t.x
+  res.y = t.y
+  
+  privkey = bi helper.hex2dec "00948dda57c9964c62703b1d54f40008e351da1cc0e0a562eac4c3f7dd369c5feb"
+  pub = scalarMult(x, y, privkey, cp)
+  puts helper.dec2hex pub.x.abs().toString()
+  puts helper.dec2hex pub.y.abs().toString()
+
+  
+  # ビット数回繰り返す
+  [0...scalar_bin.length].forEach (i)->
+    ed = ecDouble(res, ca, cb, cp)
+    res.x = ed.x
+    res.y = ed.y
+    
+    if scalar_bin[i] == "1"
+      ea = ecAdd(res, base, cp)
+      res.x = ea.x
+      res.y = ea.y
+  
+
+  res.x = res.x.multiply(-1) if res.x.sign
+  res.x = helper.dec2hex res.x.toString()
+  
+  res.y = res.y.multiply(-1) if res.y.sign
+  res.y = helper.dec2hex res.y.toString()
+  res
+
+ec = new require('elliptic').ec('secp256k1')
+
+pk = ec.keyFromPrivate("00948dda57c9964c62703b1d54f40008e351da1cc0e0a562eac4c3f7dd369c5feb").getPublic()
+puts pk.x.toString("hex")
+puts pk.y.toString("hex")
+
+
+
+keygen = (hash)->
+  res = {}
+  
+  res.pri = if hash then  hash else helper.getHash()
+  pt = ecMulti res.pri
+  
+  res.x = pt.x
+  res.y = pt.y
+  res
+
+sign = (val, priv)->
+  res = {}
+  sig = ec.keyFromPrivate(priv).sign val
+  
+  res.r = sig.r.toString("hex")
+  res.s = sig.s.toString("hex")
+  res
+
+verify = (val, x, y, r, s)->
+  pk = ec.keyFromPublic
+    x: x
+    y: y
+  
+  sig = 
+    r: r
+    s: s
+  
+  pk.verify val, sig
+
+
+
+val = "1"
+
+key = keygen()
+# puts key
+###
+
+
+###
+sig = sign val, key.pri
+puts sig
+
+flg = verify val, key.x, key.y, sig.r, sig.s
+puts flg
+"out----------!!!!!!!!!!!!!!!!!!!!!!" if flg == false
+###
+
+
 
 
 
@@ -79,13 +635,13 @@ gen_prime = (bit)->
   return ret
 # ================
 
-
+# y.pow(2) = x.pow(3).plus(x).plus(7).mod(p)
 invMod = (k, mod)-> modular_exp k, mod.minus(bi(2)), mod
 
 # ダブル計算
 ecDouble = (p, ca, cb, cp)->
   res = {}
-  lam = (bi(3).multiply(p.x.pow(2).plus(cb)).multiply(invMod(bi(2).multiply(p.y), cp)) ).mod(cp)
+  lam = (bi(3).multiply(p.x.pow(2).plus(ca)).multiply(invMod(bi(2).multiply(p.y), cp)) ).mod(cp)
   
   res.x = ( lam.pow(2).minus(2).multiply(p.x)).mod(cp)
   res.y = (lam.multiply(p.x.minus(res.x)).minus(p.y)).mod(cp)
@@ -111,13 +667,14 @@ ecMulti = (scalar)->
   
   scalar_bin = hex2bin scalar
   # xとyの固定値(素数ではなさそう) 
-  cp = gen_prime 128
-  ca = bi gen_prime 16
-  cb = bi gen_prime 16
+  cp = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  ca = bi helper.hex2dec "0000000000000000000000000000000000000000000000000000000000000000"
+  cb = bi helper.hex2dec "0000000000000000000000000000000000000000000000000000000000000007"
+  cr = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
   
   base = {}
-  base.x = gen_prime 256
-  base.y = gen_prime 256
+  base.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  base.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
   
   res = {}
   res.x = base.x
@@ -175,9 +732,9 @@ verify = (val, x, y, r, s)->
 
 
 
-val = "aeaaああいあいあおいうあ3ae"
+val = "1"
 
-key = keygen()
+key = keygen("1")
 puts key
 
 sig = sign val, key.pri
@@ -187,7 +744,6 @@ flg = verify val, key.x, key.y, sig.r, sig.s
 puts flg
 "out----------!!!!!!!!!!!!!!!!!!!!!!" if flg == false
 ###
-
 
 
 ###

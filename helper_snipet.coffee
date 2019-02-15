@@ -141,4 +141,11 @@ dec2hexsub = (req, res)->
     res = m.toString(16) + res
     dec2hexsub req.divide(16), res
 
-module.exports.dec2hex = (str)-> dec2hexsub bi(str), ""
+module.exports.dec2hex = (str)-> 
+  bis = bi(str)
+  if bis.sign
+    bis = dec2hexsub bis.abs(), ""
+    "-" + bis
+  else
+    dec2hexsub bis.abs(), ""
+
