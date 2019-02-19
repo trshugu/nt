@@ -6,6 +6,35 @@ helper = require "./helper"
 
 
 
+###
+# 松
+tei = 6
+
+[8..16].forEach (kai)->
+  all = 0
+  mat = 0
+  # [0...].forEach (i)->
+  i=0
+
+  m = parseInt("1" + "0".repeat(kai))
+  while i < m
+    # puts i.toString().split(""), i.toString().split("").every (e)-> [0...tei].some (s)-> e.toString().match s.toString()
+    str = ("0".repeat(kai)+ i.toString()).slice(-kai)
+    if str.split("").every (e)-> [0...tei].some (s)-> e.toString().match s.toString()
+      # puts str
+      flg = true
+      [0...tei].forEach (r)->
+        flg = false if str.match(r.toString()) == null
+      
+      mat++ if flg
+      all++
+    i++
+
+  puts mat,all, Math.floor(mat/all *100)+ "%"
+
+###
+
+
 
 
 ###
