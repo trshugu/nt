@@ -6,6 +6,479 @@ helper = require "./helper"
 
 
 
+
+
+
+
+
+
+
+
+# いつもの========
+bi = require "big-integer"
+
+# 高速指数演算
+modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数
+gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+gen_prime = (bit)->
+  while true
+    ret = gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+# ================
+
+
+# secp256k v2
+# https://chuckbatson.wordpress.com/2014/11/26/secp256k1-test-vectors/
+
+# 本当はこう書くべき
+secp256k1 = new require('elliptic').ec('secp256k1')
+
+# 定数的なもの p,a,b,G,n,h
+
+# 素数 p(modする)
+# # puts helper.dec2hex bi(2).pow(256).minus(bi(2).pow(32)).minus(977).toString()
+p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+a = bi 0
+b = bi 7
+
+# ポイントG(x,y)
+g = {}
+g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+
+# 楕円判定
+isoncurve = (g, p)-> (g.y.pow(2).minus(g.x.pow(3).plus(bi(7)))).mod(p).eq(bi.zero)
+
+# x**(p-2) % p
+# inv = (x, p)-> modular_exp(x, p.minus(bi(2)), p)
+
+# マイナス時の補数→ではなかった
+n = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+
+
+
+
+
+# 2倍(2G=G+G)
+doublePt = (g,p)->
+  res = {}
+  if g.y.eq(bi.zero)
+    res.x = 0
+    res.y = 0
+    return res
+  else
+    nu = bi(3).multiply( modular_exp(g.x,bi(2),p) ).multiply(  modular_exp( bi(2).multiply(g.y), p.minus(bi(2)), p ))
+    x3 = modular_exp(nu, bi(2), p).minus(bi(2).multiply(g.x))
+    y3 = nu.multiply( g.x.minus(x3) ).minus(g.y)
+    res.x = x3.mod(p)
+    res.y = y3.mod(p)
+    return res
+
+# たし算(G+G)
+addPt = (g1,g2,p)->
+  res = {}
+  
+  return g2 if g1.x.eq(0) && g1.y.eq(0)
+  return g1 if g2.x.eq(0) && g2.y.eq(0)
+  
+  if g1.x.eq(g2.x)
+    if (g1.y.plus(g2.y)).mod(p).eq(0)
+      res.x = bi(0)
+      res.y = bi(0)
+      return res
+    else
+      return doublePt(g1,p)
+  
+  # lm = (g1y-g2y) * ( (g1x-g2x)**p-2 % p )
+  lm = (g1.y.minus(g2.y)).multiply( modular_exp(g1.x.minus(g2.x), p.minus(bi(2)), p) )
+  
+  # x3 = (lm**2%p) - (g1x+g2x)
+  x3 = modular_exp(lm,bi(2),p).minus(g1.x.plus(g2.x))
+  
+  # y3 = lm*(g1x-x3)-g1y
+  y3 = lm.multiply(g1.x.minus(x3)).minus(g1.y)
+  
+  res.x = x3.mod(p)
+  res.y = y3.mod(p)
+  return res
+
+# スカラーかけ算(n-1G)
+scalarmult = (g,e,p)->
+  res = {}
+  if e.eq(0)
+    res.x = bi(0)
+    res.y = bi(0)
+    return res
+  
+  res = scalarmult(g, e.divide(2),p)
+  res = addPt(res, res, p)
+  res = addPt(res, g, p) if e.and(1).eq(1)
+  
+  return res
+
+
+ccv = (g,e,p)->
+  res = scalarmult g, e, p
+  res.x = res.x.plus(p) if res.x.sign
+  res.y = res.y.plus(p) if res.y.sign
+  
+  res
+
+ppt = (g)->
+  console.log "x:",helper.dec2hex(g.x.toString()), "y:", helper.dec2hex(g.y.toString())
+
+
+keyFromPublic = (pri)->
+  e = bi helper.hex2dec pri
+  
+  # ポイントG(x,y)
+  g = {}
+  g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+  
+  # 素数 p(modする)
+  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  
+  res = ccv g, e, p
+  res.x = helper.dec2hex res.x.toString()
+  res.y = helper.dec2hex res.y.toString()
+  res
+
+
+# compress形式からyを算出
+ccvuncompress = (val)-> 
+  x = bi helper.hex2dec(val)
+  a = modular_exp(x, bi(3), p).plus(7).mod(p)
+  helper.dec2hex modular_exp(a, p.plus(1).divide(4), p)
+
+
+
+# 署名を自力で
+kp = secp256k1.keyFromPrivate("1")
+
+sig = kp.sign "asdf"
+puts "sig",sig
+
+# トランザクションをRLPエンコードしたもののKeccak256ハッシュ値hが署名生成に用いられ
+# tx公開鍵xがr
+# rはxなのでyは求まる→求まらない
+
+# r = helper.dec2hex sig.r.toString()
+# puts "sigr", r
+# puts ccvuncompress(helper.dec2hex sig.r.toString())
+
+h = helper.createHash "0000"
+dech = helper.hex2dec h
+
+puts "h",h
+puts "dech",dech
+
+# puts bi(helper.hex2dec(h)).plus(bi(1)).multiply(bi(r)).mod(p)
+# puts helper.dec2hex bi(helper.hex2dec(h)).plus(bi(1)).multiply(bi(helper.hex2dec(r))).mod(p).toString()
+
+r = ccv g, bi(dech.toString()), p
+rx = r.x.mod(n)
+puts "rx:", helper.dec2hex rx.toString()
+
+# s = (inv(nonce,l) * (msg_i + r * sk)) % l
+# s = modular_exp(bi(4), n.minus(bi(2)), n).multiply(bi(helper.hex2dec(h)).plus(rx).multiply(1)).mod(n)
+# puts helper.dec2hex s.toString()
+
+
+
+
+# 公開鍵で検証
+puts kp.verify "asdf", sig
+
+
+
+
+
+
+###
+# 署名と検証3 ライブラリを使わずに
+# 秘密鍵生成
+pri = helper.getHash()
+
+# 公開鍵生成
+pub = keyFromPublic pri
+puts "pub",pub
+
+# 秘密鍵で署名
+puts "pri",pri
+
+val = "asdf"
+
+sig = secp256k1.keyFromPrivate(pri).sign val
+puts "sig",sig
+
+
+# 公開鍵で検証
+puts secp256k1.keyFromPublic(pub).verify "asdf", sig
+###
+
+
+
+
+
+###
+# 署名と検証2
+# 秘密鍵生成
+kp = secp256k1.genKeyPair()
+
+# 公開鍵生成
+kp.getPublic()
+puts "kp",kp
+pub = {}
+pub.x = helper.dec2hex kp.pub.x.toString()
+pub.y = helper.dec2hex kp.pub.y.toString()
+
+puts "pub",pub
+
+# 秘密鍵で署名
+pri = helper.dec2hex kp.priv.toString()
+puts "pri",pri
+
+val = "asdf"
+
+sig = secp256k1.keyFromPrivate(pri).sign val
+puts "sig",sig
+
+# 公開鍵で検証
+puts secp256k1.keyFromPublic(pub).verify "asdf", sig
+###
+
+
+
+
+###
+# 署名と検証
+kp = secp256k1.genKeyPair()
+# kp.getPublic()
+val = "val"
+sig = kp.sign val
+puts sig
+
+puts  secp256k1.verify val, sig
+###
+
+
+
+
+
+
+
+
+
+###
+ppt keyFromPublic "8d6aafb337d6e3dd5a96c15495c6cd4b651e52d082e3e2a7892835bb949ce107"
+# x: b4eea14b6145a897f875613c80fe3b3f50d469a5b2886b505f55f6a308b9e874
+# y: 38dedea613d290478571ffb079ad52267bd6c42157c05c9217072c6fb11f44be
+
+ccvuncompress = (val)-> 
+  x = bi helper.hex2dec(val)
+  a = modular_exp(x, bi(3), p).plus(7).mod(p)
+  helper.dec2hex modular_exp(a, p.plus(1).divide(4), p)
+
+
+puts ccvuncompress "b4eea14b6145a897f875613c80fe3b3f50d469a5b2886b505f55f6a308b9e874"
+###
+
+
+
+###
+# xからyを求める
+# 座標xに対しyは2点
+# 素数は2以外、奇数なのでyと−yは、一方が偶数で他方は奇数
+# 従ってyが偶数であれば0x02を、奇数であれば0x03を先頭に付与
+# 偶数の方を取ることが多い
+# compress形式でy座標が偶数の場合は04ではなく02
+
+# Uncompressed public key is:
+# 0x04 + x-coordinate + y-coordinate
+
+# Compressed public key is:
+# 0x02 + x-coordinate if y is even
+# 0x03 + x-coordinate if y is odd
+
+
+ppt keyFromPublic "8d6aafb337d6e3dd5a96c15495c6cd4b651e52d082e3e2a7892835bb949ce107"
+# x: b4eea14b6145a897f875613c80fe3b3f50d469a5b2886b505f55f6a308b9e874
+# y: 38dedea613d290478571ffb079ad52267bd6c42157c05c9217072c6fb11f44be
+
+# y**2 = x**3+7
+ee = bi helper.hex2dec("b4eea14b6145a897f875613c80fe3b3f50d469a5b2886b505f55f6a308b9e874")
+puts helper.dec2hex modular_exp(ee, bi(3), p).toString()
+puts helper.dec2hex modular_exp(ee, bi(3), p).plus(7).toString()
+puts helper.dec2hex modular_exp(ee, bi(3), p).plus(7).mod(p).toString()
+a = modular_exp(ee, bi(3), p).plus(7).mod(p)
+puts helper.dec2hex modular_exp(a, p.plus(1).divide(4), p)
+
+
+# 実際の鍵で検証
+# ppt keyFromPublic "948dda57c9964c62703b1d54f40008e351da1cc0e0a562eac4c3f7dd369c5feb"
+
+# x: 3952764a8d90532638532fcb7ba0b615181ef2d22b7d64a6d35e665900e242ad
+# x: 3952764a8d90532638532fcb7ba0b615181ef2d22b7d64a6d35e665900e242ad
+
+# y: 661b4dda0ad3ac2480ff0fb235c6220243764a4276162d3626b664f478c7589e
+# y: 661b4dda0ad3ac2480ff0fb235c6220243764a4276162d3626b664f478c7589e
+# →実際の補数はpっぽい？
+
+
+# 04の場合はuncompress
+# ppt keyFromPublic "948dda57c9964c62703b1d54f40008e351da1cc0e0a562eac4c3f7dd369c5feb"
+# x: 3952764a8d90532638532fcb7ba0b615181ef2d22b7d64a6d35e665900e242ad
+#    3952764a8d90532638532fcb7ba0b615181ef2d22b7d64a6d35e665900e242ad
+
+# y: 661b4dda0ad3ac2480ff0fb235c62200fe252729255ecd71e688c38248fd9db0
+#    661b4dda0ad3ac2480ff0fb235c6220243764a4276162d3626b664f478c7589e
+# n: 661b4dda0ad3ac2480ff0fb235c6220243764a4276162d3626b664f578c75c6e
+# p: 661b4dda0ad3ac2480ff0fb235c6220243764a4276162d3626b664f478c7589e
+###
+
+
+
+###
+# ランダムな64文字のハッシュをpriキーとする
+# pri = helper.getHash()
+kp = secp256k1.genKeyPair()
+
+puts kp
+puts helper.dec2hex kp.priv.toString()
+
+ppt keyFromPublic helper.dec2hex(kp.priv.toString())
+# puts "1:",secp256k1.keyFromPrivate(pri).getPublic()
+puts kp.getPublic()
+###
+
+
+
+###
+ppt keyFromPublic "1"
+puts "1:",secp256k1.keyFromPrivate("1").getPublic()
+
+ppt keyFromPublic "2"
+puts "2:",secp256k1.keyFromPrivate("2").getPublic()
+
+ppt keyFromPublic "3"
+puts "3:",secp256k1.keyFromPrivate("3").getPublic()
+
+ppt keyFromPublic "4"
+puts "4:",secp256k1.keyFromPrivate("4").getPublic()
+
+ppt keyFromPublic "5"
+puts "5:",secp256k1.keyFromPrivate("5").getPublic()
+
+ppt keyFromPublic "6"
+puts "6:",secp256k1.keyFromPrivate("6").getPublic()
+
+ppt keyFromPublic helper.dec2hex "112233445566778899"
+puts "112:",secp256k1.keyFromPrivate(helper.dec2hex("112233445566778899")).getPublic()
+
+
+
+# よって、Gを秘密鍵n分計算した値
+ppt ccv g, n, p, n
+ppt ccv g, bi(helper.hex2dec("948dda57c9964c62703b1d54f40008e351da1cc0e0a562eac4c3f7dd369c5feb")), p, n
+ppt ccv g, bi(1), p, n
+ppt ccv g, bi(2), p, n
+ppt ccv g, bi(3), p, n
+ppt ccv g, bi(4), p, n
+ppt ccv g, bi(5), p, n
+ppt ccv g, bi(6), p, n
+ppt ccv g, bi("112233445566778899"), p, n
+
+puts "====library===="
+puts "1:",secp256k1.keyFromPrivate("1").getPublic()
+puts "2:",secp256k1.keyFromPrivate("2").getPublic()
+puts "3:",secp256k1.keyFromPrivate("3").getPublic()
+puts "4:",secp256k1.keyFromPrivate("4").getPublic()
+puts "5:",secp256k1.keyFromPrivate("5").getPublic()
+puts "6:",secp256k1.keyFromPrivate("6").getPublic()
+puts "112:",secp256k1.keyFromPrivate(helper.dec2hex("112233445566778899")).getPublic()
+
+
+
+# いちばい
+puts isoncurve g, p
+
+# にばい
+dou = doublePt g, p
+puts isoncurve dou, p
+
+# G + 2G
+plu = addPt g, dou, p
+puts isoncurve plu, p
+
+# 3G * 4
+mul = scalarmult plu, bi(4), p
+puts isoncurve mul, p
+
+
+# ppt g
+# ppt dou
+# ppt plu
+# ppt mul
+###
+
+
+
+
+
+
 ###
 # 松
 tei = 6
@@ -37,7 +510,6 @@ tei = 6
 
 
 
-###
 ###
 # secp256k
 # https://chuckbatson.wordpress.com/2014/11/26/secp256k1-test-vectors/
@@ -205,6 +677,7 @@ scalarmult = (x,y,e,p)->
   
   return res
 
+###
 
 
 
