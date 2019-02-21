@@ -180,7 +180,7 @@ ppt = (g)->
   console.log "x:",helper.dec2hex(g.x.toString()), "y:", helper.dec2hex(g.y.toString())
 
 
-keyFromPublic = (pri)->
+keyFromPrivate = (pri)->
   e = bi helper.hex2dec pri
   
   # ポイントG(x,y)
@@ -205,11 +205,187 @@ ccvuncompress = (val)->
 
 
 
-# 署名を自力で
-kp = secp256k1.keyFromPrivate("1")
+# 署名を自力でv4
+value = "0000"
+secretkey = gen_rand(32).toString()
 
-sig = kp.sign "asdf"
+# ライブラリ
+kp = secp256k1.keyFromPrivate secretkey
+sig = kp.sign value
 puts "sig",sig
+puts kp.verify value, sig
+# ==========
+
+
+
+
+
+
+
+
+
+# 署名を自力でv3
+value = "0000"
+
+# secretkeyはhex
+secretkey = gen_rand(32).toString()
+# secretkey = "3"
+
+
+kp = secp256k1.keyFromPrivate secretkey
+sig = kp.sign value
+puts "sig",sig
+puts kp.verify value, sig
+
+
+
+sign = (value, pri)->
+  res = {}
+  dech = bi helper.hex2dec helper.createHash(value)
+  nonce = gen_rand(16)
+  res.r = ccv(g,nonce,p).x.mod(n)
+  res.s = modular_exp(bi(nonce), n.minus(2), n).multiply( bi(dech).plus(res.r.multiply(bi(helper.hex2dec(pri)))) ).mod(n)
+  
+  res
+
+
+dech = bi helper.hex2dec helper.createHash(value)
+
+# nonceは bi
+# nonce = gen_rand(16)
+# nonce = bi(16)
+# nonce = bi(helper.hex2dec("a"))
+
+# r = ccv(g,nonce,p).x.mod(n)
+# s = modular_exp(nonce, n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(secretkey))) ).mod(n)
+# puts "r", helper.dec2hex r.toString()
+# puts "s", helper.dec2hex s.toString()
+
+gsig = sign value, secretkey
+puts "gr", helper.dec2hex gsig.r.toString()
+puts "ss", helper.dec2hex gsig.s.toString()
+
+
+pub = ccv(g, bi(secretkey), p)
+
+
+
+
+# ======
+verify = (value, sig)->
+  dech = bi helper.hex2dec helper.createHash(value)
+  bir = bi helper.hex2dec sig.r.toString()
+  bis = bi helper.hex2dec sig.s.toString()
+  
+  si = modular_exp(bis, n.minus(2), n)
+  p1 = scalarmult(g, dech.multiply(si).mod(n), p)
+  p2 = scalarmult(pub, bir.multiply(si).mod(n), p)
+  v = addPt(p1, p2, p)
+  v.x.minus(bir).mod(n).eq(0)
+
+puts verify value, gsig
+
+
+
+###
+###
+
+
+
+###
+si = modular_exp(gsig.s, n.minus(2), n)
+p1 = scalarmult(g, dech.multiply(si).mod(n), p)
+p2 = scalarmult(pub, gsig.r.multiply(si).mod(n), p)
+v = addPt(p1, p2, p)
+result = v.x.minus(gsig.r).mod(n).eq(0)
+puts result
+###
+
+
+###
+si = modular_exp(s, n.minus(2), n)
+p1 = scalarmult(g, dech.multiply(si).mod(n), p)
+p2 = scalarmult(pub, r.multiply(si).mod(n), p)
+v = addPt(p1, p2, p)
+result = v.x.minus(r).mod(n).eq(0)
+puts result
+###
+
+
+
+
+
+###
+# 署名を自力でv2
+# ハッシュ関数の選択が謎。検証は可能
+value = "0000"
+secretkey = "3"
+
+kp = secp256k1.keyFromPrivate secretkey
+sig = kp.sign value
+puts "sig",sig
+puts kp.verify value, sig
+
+# dech = bi helper.hex2dec helper.createHash(value)
+
+crypto = require 'crypto'
+hmac = crypto.createHmac 'sha256', secretkey
+hmac.update value
+dech = bi helper.hex2dec  hmac.digest('hex')
+puts helper.dec2hex dech.toString()
+
+nonce = "5"
+
+r = bi(helper.hex2dec(keyFromPrivate(nonce).x)).mod(n)
+s = modular_exp(bi(nonce), n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(secretkey))) ).mod(n)
+puts "r", helper.dec2hex r.toString()
+puts "s", helper.dec2hex s.toString()
+
+pub = ccv(g, bi(secretkey), p)
+
+# ======
+si = modular_exp(s, n.minus(2), n)
+p1 = scalarmult(g, dech.multiply(si).mod(n), p)
+p2 = scalarmult(pub, r.multiply(si).mod(n), p)
+v = addPt(p1, p2, p)
+result = v.x.minus(r).mod(n).eq(0)
+puts result
+###
+
+
+
+
+###
+# 圧縮前
+si = modular_exp s, n.minus(2), n
+u1 = dech.multiply(si).mod(n)
+u2 = r.multiply(si).mod(n)
+p1 = scalarmult(g, u1, p)
+p2 = scalarmult(pub, u2, p)
+v = addPt p1, p2, p
+result = v.x.minus(r).mod(n).eq(0)
+puts result
+###
+
+
+
+
+
+
+###
+# 署名を自力で
+kp = secp256k1.keyFromPrivate("3")
+
+# 秘密鍵=1で署名すると？
+sig = kp.sign "0000"
+puts "sig",sig
+# r: <BN: 2e200993f6084174eab3e0a5548a0e65e1bcb410c499b9551c55e726f30e58e4>,
+# s: <BN: 9a9e8568aad76b1d952a5e638b319910ba3889cbbd8087502af9fd950ddc3baa>,
+# recoveryParam: 0
+
+# 公開鍵で検証
+puts kp.verify "0000", sig
+
 
 # トランザクションをRLPエンコードしたもののKeccak256ハッシュ値hが署名生成に用いられ
 # tx公開鍵xがr
@@ -220,27 +396,107 @@ puts "sig",sig
 # puts ccvuncompress(helper.dec2hex sig.r.toString())
 
 h = helper.createHash "0000"
-dech = helper.hex2dec h
+dech = bi helper.hex2dec h
 
-puts "h",h
-puts "dech",dech
+puts "h:",h
+puts "dech:",dech.toString()
+
+
+
+# 署名→秘密鍵とh(m)からrとsを作成する
+sk = "3"
+pk = keyFromPrivate sk
+puts "pk:",pk
+
+# 乱数k(nonce)
+k = "2"
+rxy = keyFromPrivate k
+# puts "rxy", rxy
+
+r = bi(helper.hex2dec(rxy.x)).mod n
+puts "r", helper.dec2hex(r.toString())
+
+# s = (inv(nonce,l) * (msg_i + r * sk)) % l
+# (  (k ** n-2 % n) * (dech + (r * sk))  ) % n
+s = modular_exp(bi(k), n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(sk))) ).mod(n)
+puts "s", helper.dec2hex s.toString()
+
+# puts "1", bi(k).pow(n.minus(2))
+# puts "2", bi(k).pow(n.minus(2)).mod(n)
+# puts "1", helper.dec2hex modular_exp(bi(k), n.minus(2), n).toString()
+# puts "2", helper.dec2hex bi(dech).plus(r.multiply(bi(sk))).toString()
+# puts "3", helper.dec2hex modular_exp(bi(k), n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(sk))) ).toString()
+# puts "4", helper.dec2hex modular_exp(bi(k), n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(sk))) ).mod(n).toString()
+
+
+
+# 検証→公開鍵とh(m)とrとsで検証する
+# si = inv(s,l) s, l-2, l
+si = modular_exp s, n.minus(2), n
+# puts helper.dec2hex si.toString()
+
+# u1 = (msg_i * si) % l
+u1 = dech.multiply(si).mod(n)
+# puts helper.dec2hex u1.toString()
+
+# u2 = (r * si) % l
+u2 = r.multiply(si).mod(n)
+# puts helper.dec2hex u2.toString()
+
+# V = add_pt(scalarmult(G, u1), scalarmult(PK, u2)) 
+p1 = scalarmult g,  u1, p
+# puts p1
+# puts pk.x
+
+bipk = {}
+bipk.x = bi helper.hex2dec pk.x
+bipk.y = bi helper.hex2dec pk.y
+p2 = scalarmult bipk, u2, p
+# puts p2
+
+v = addPt p1, p2, p
+puts "vx", helper.dec2hex v.x.toString()
+puts "vy", helper.dec2hex v.y.toString()
+
+puts "vx-1:", helper.dec2hex v.x.minus(r).toString()
+
+
+result = v.x.minus(r).mod(n)
+puts result
+# print("V = (%d, %d)" % (V[0], V[1]))
+# result = (((V[0] - r) % l) == 0)
+
+# print("result %d" % result)
+###
+
+
+
+###
+# 乱数k
+z = dech
+k = 123
+omega = gamma.pow(k)
+r = omega.x
+s = z.plus(sx).multiply(r).divide(k)
+
+pus r
+pus s
+
 
 # puts bi(helper.hex2dec(h)).plus(bi(1)).multiply(bi(r)).mod(p)
 # puts helper.dec2hex bi(helper.hex2dec(h)).plus(bi(1)).multiply(bi(helper.hex2dec(r))).mod(p).toString()
 
-r = ccv g, bi(dech.toString()), p
-rx = r.x.mod(n)
-puts "rx:", helper.dec2hex rx.toString()
+# r = ccv g, bi(dech.toString()), p
+# rx = r.x.mod(n)
+# puts "rx:", helper.dec2hex rx.toString()
 
 # s = (inv(nonce,l) * (msg_i + r * sk)) % l
 # s = modular_exp(bi(4), n.minus(bi(2)), n).multiply(bi(helper.hex2dec(h)).plus(rx).multiply(1)).mod(n)
 # puts helper.dec2hex s.toString()
+###
 
 
 
-
-# 公開鍵で検証
-puts kp.verify "asdf", sig
 
 
 
