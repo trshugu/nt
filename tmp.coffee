@@ -10,10 +10,45 @@ helper = require "./helper"
 
 
 
+###
+# Keccak-256("")
+# 0x c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470
+# SHA3-256("")
+# 0x a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a
+
+keccak = require "keccak"
+console.log keccak("keccak256").update("").digest("hex")
+console.log keccak("keccak256").update("test").digest("hex")
+console.log helper.createHash("")
+
+
+console.log require('js-sha3').keccak256("")
+console.log require('js-sha3').sha3_256("")
+
+{SHA3, Keccak}= require "sha3"
+h = new SHA3 256
+h.update ""
+console.log h.digest("hex")
+
+k = new Keccak 256
+k.update ""
+console.log k.digest("hex")
+
+puts "===="
+jssha3 = require "js-sha3"
+console.log jssha3.shake128("test", 64)
+console.log jssha3.shake128("test", 256)
+console.log jssha3.shake128("test", 257)
+console.log jssha3.shake256("test", 64)
+console.log jssha3.shake256("test", 512)
+console.log jssha3.shake256("test", 513)
+###
 
 
 
 
+
+###
 # いつもの========
 bi = require "big-integer"
 
@@ -205,9 +240,84 @@ ccvuncompress = (val)->
 
 
 
+
+# 署名を自力でv5
+sign = (value, pri)->
+  res = {}
+  dech = bi helper.hex2dec helper.createHash(value)
+  nonce = gen_rand(64)
+  r = ccv(g,nonce,p).x.mod(n)
+  s = modular_exp(nonce, n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(helper.hex2dec(pri)))) ).mod(n)
+  
+  res.r = helper.dec2hex r.toString()
+  res.s = helper.dec2hex s.toString()
+  
+  res
+
+verify = (value, sig, pub)->
+  dech = bi helper.hex2dec helper.createHash(value)
+  bir = bi helper.hex2dec sig.r.toString()
+  bis = bi helper.hex2dec sig.s.toString()
+  
+  si = modular_exp(bis, n.minus(2), n)
+  u1 = dech.multiply(si).mod(n)
+  u2 = bir.multiply(si).mod(n)
+  p1 = scalarmult(g, u1, p)
+  p2 = scalarmult(pub, u2, p)
+  v = addPt(p1, p2, p)
+  v.x = v.x.plus(p) if v.x.sign
+  v.y = v.y.plus(p) if v.y.sign
+  v.x.minus(bir).mod(n).eq(0)
+
+
+
+
+value = "yamaya"
+secretkey = helper.dec2hex gen_rand(64).toString()
+
+# ライブラリ
+kp = secp256k1.keyFromPrivate secretkey
+sig = kp.sign value
+puts "sig",sig
+puts kp.verify value, sig
+
+# 自作
+gsig = sign value, secretkey
+puts "gsig", gsig
+pub = ccv(g, bi(helper.hex2dec(secretkey)), p)
+puts verify value, sig, pub
+
+# ライブラリの署名を使う
+puts kp.verify value, gsig
+###
+
+
+
+###
+value = "yamaya"
+secretkey = helper.dec2hex gen_rand(64).toString()
+
+# ライブラリ
+kp = secp256k1.keyFromPrivate secretkey
+sig = kp.sign value
+puts "sig",sig
+puts kp.verify value, sig
+
+# 自作
+gsig = sign value, secretkey
+puts "gsig", gsig
+pub = ccv(g, bi(helper.hex2dec(secretkey)), p)
+puts verify value, gsig, pub
+###
+
+
+
+
+
+###
 # 署名を自力でv4
 value = "0000"
-secretkey = gen_rand(32).toString()
+secretkey = helper.dec2hex gen_rand(64).toString()
 
 # ライブラリ
 kp = secp256k1.keyFromPrivate secretkey
@@ -218,12 +328,56 @@ puts kp.verify value, sig
 
 
 
+sign = (value, pri)->
+  res = {}
+  dech = bi helper.hex2dec helper.createHash(value)
+  nonce = gen_rand(64)
+  r = ccv(g,nonce,p).x.mod(n)
+  s = modular_exp(nonce, n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(helper.hex2dec(pri)))) ).mod(n)
+  
+  res.r = helper.dec2hex r.toString()
+  res.s = helper.dec2hex s.toString()
+  
+  res
+
+
+gsig = sign value, secretkey
+puts "gr", gsig.r
+puts "ss", gsig.s
+pub = ccv(g, bi(helper.hex2dec(secretkey)), p)
+puts "pubx", helper.dec2hex pub.x.toString()
+puts "puby", helper.dec2hex pub.y.toString()
+
+# ======
+verify = (value, sig, pub)->
+  dech = bi helper.hex2dec helper.createHash(value)
+  bir = bi helper.hex2dec sig.r.toString()
+  bis = bi helper.hex2dec sig.s.toString()
+  
+  puts "bir", sig.r.toString()
+  puts "bis", sig.s.toString()
+  si = modular_exp(bis, n.minus(2), n)
+  u1 = dech.multiply(si).mod(n)
+  u2 = bir.multiply(si).mod(n)
+  p1 = scalarmult(g, u1, p)
+  p2 = scalarmult(pub, u2, p)
+  v = addPt(p1, p2, p)
+  v.x = v.x.plus(p) if v.x.sign
+  v.y = v.y.plus(p) if v.y.sign
+    
+  puts "vx", helper.dec2hex v.x.toString()
+  puts "vy", helper.dec2hex v.y.toString()
+  v.x.minus(bir).mod(n).eq(0)
+
+
+puts verify value, gsig, pub
+
+###
 
 
 
 
-
-
+###
 # 署名を自力でv3
 value = "0000"
 
@@ -285,9 +439,6 @@ verify = (value, sig)->
 
 puts verify value, gsig
 
-
-
-###
 ###
 
 
