@@ -8,6 +8,173 @@ helper = require "./helper"
 
 
 
+###
+# console.log jssha3.shake128.create(128).update("test").hex()
+# console.log jssha3.shake128.create(256).update("test").hex()
+# console.log jssha3.shake128.create(512).update("test").hex()
+# console.log jssha3.shake256.create(512).update("test").hex()
+
+console.log jssha3.shake128("test", 511)
+console.log jssha3.shake128("test", 512)
+console.log jssha3.shake128("test", 513)
+console.log jssha3.shake128("test", 1024)
+console.log jssha3.shake128.create(1024).update("test").hex()
+# console.log jssha3.shake256.create(1024).update("test").hex()
+# console.log jssha3.shake256("test", 512)
+###
+
+
+
+###
+# shake計測
+jssha3 = require "js-sha3"
+
+NS_PER_SEC = 1e9
+cm = (i)-> i.toString().split("").reverse().join("").match(/.{1,3}/g).join(",").split("").reverse().join("")
+
+c = 1000000
+
+# shake128 128ビット1
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake128.create(128).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake128(128)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# 128ビット2
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake128.create(128).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake128(128)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# 128ビット3
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake128.create(128).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake128(128)", cm diff[0] * NS_PER_SEC + diff[1]
+
+
+# shake128 256ビット1
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake128.create(256).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake128(256)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# 256ビット2
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake128.create(256).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake128(256)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# 256ビット3
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake128.create(256).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake128(256)", cm diff[0] * NS_PER_SEC + diff[1]
+
+
+# shake256 128ビット1
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake256.create(128).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake256(128)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# shake256 128ビット2
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake256.create(128).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake256(128)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# shake256 128ビット3
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake256.create(128).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake256(128)", cm diff[0] * NS_PER_SEC + diff[1]
+
+
+# shake256 256ビット1
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake256.create(256).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake256(256)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# shake256 256ビット2
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake256.create(256).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake256(256)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# shake256 256ビット3
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake256.create(256).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake256(256)", cm diff[0] * NS_PER_SEC + diff[1]
+
+
+# shake256 512ビット1
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake256.create(512).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake256(512)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# shake256 512ビット2
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake256.create(512).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake256(512)", cm diff[0] * NS_PER_SEC + diff[1]
+
+# shake256 512ビット3
+i = 0
+nano = process.hrtime()
+while i < c
+  jssha3.shake256.create(512).update("test").hex()
+  i++
+diff = process.hrtime(nano)
+console.log "shake256(512)", cm diff[0] * NS_PER_SEC + diff[1]
+###
+
+
 
 
 ###
