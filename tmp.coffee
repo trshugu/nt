@@ -8,6 +8,75 @@ helper = require "./helper"
 
 
 
+
+
+###
+# 再socket.io2
+require('http').createServer (req, res)-> 
+  res.writeHead 200, "Content-Type":"text/html"
+  res.end require('pug').compileFile("./tmp.pug")(nani:"gasi")
+.listen(80)
+
+io = require('socket.io').listen(3002)
+io.sockets.on "connection", (soc)->
+  console.log "server_conn"
+  
+  # io全体(自分も含めた)に対してemit
+  soc.on "ioemit",(data)->
+    console.log "全"
+    io.emit "cast",(data)
+  
+  # 自分以外のsocへbroadcast
+  soc.on 'broadcast', (data) ->
+    console.log "他"
+    soc.broadcast.emit "cast",(data)
+  
+  # 自分のみ
+  soc.on 'socemit', (data) ->
+    console.log "自"
+    soc.emit "cast",(data)
+###
+
+
+
+###
+# 再socket.io
+switch process.argv[2]
+  when "1"
+    console.log "1"
+    require('http').createServer (req, res)-> 
+      res.writeHead 200, "Content-Type":"text/html"
+      res.end require('pug').compileFile("./tmp.pug")(nani:"gasi")
+    .listen(80)
+  when "2"
+    console.log "2"
+    io = require('socket.io').listen(3002)
+    io.sockets.on "connection", (soc)->
+      console.log "server_conn"
+      
+      # io全体(自分も含めた)に対してemit
+      soc.on "ioemit",(data)->
+        console.log "全"
+        io.emit "cast",(data)
+      
+      # 自分以外のsocへbroadcast
+      soc.on 'broadcast', (data) ->
+        console.log "他"
+        soc.broadcast.emit "cast",(data)
+      
+      # 自分のみ
+      soc.on 'socemit', (data) ->
+        console.log "自"
+        soc.emit "cast",(data)
+    
+    
+    # io.adapter require("socket.io-redis")()
+###
+
+
+
+
+
 ###
 # console.log jssha3.shake128.create(128).update("test").hex()
 # console.log jssha3.shake128.create(256).update("test").hex()
