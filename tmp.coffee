@@ -8,6 +8,25 @@ helper = require "./helper"
 
 
 
+###
+nanigasi = (cb)->
+  setTimeout ->
+    cb "nanigsi"
+  ,1000
+
+nanigasip = ()-> new Promise (f,r)->
+  setTimeout ->
+    f "nanigsi"
+  ,1000
+
+
+exec = ->
+  console.log "1"
+  console.log await nanigasip()
+  console.log "2"
+
+exec()
+###
 
 
 ###
