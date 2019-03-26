@@ -8,6 +8,54 @@ helper = require "./helper"
 
 
 
+
+###
+console.log "### (i+j)%2"
+console.log "```"
+[0...16].forEach (i)-> console.log [0...16].map((j)-> if (i+j)%2==0 then "■" else "□").join("")
+console.log "```"
+
+console.log "### i%2"
+console.log "```"
+[0...16].forEach (i)-> console.log [0...16].map((j)-> if i%2==0 then "■" else "□").join("")
+console.log "```"
+
+console.log "### j%3"
+console.log "```"
+[0...16].forEach (i)-> console.log [0...16].map((j)-> if j%3==0 then "■" else "□").join("")
+console.log "```"
+
+console.log "### (i+j)%3"
+console.log "```"
+[0...16].forEach (i)-> console.log [0...16].map((j)-> if (i+j)%3==0 then "■" else "□").join("")
+console.log "```"
+
+console.log "### ((i/2) + (j/3))%2"
+console.log "```"
+[0...16].forEach (i)-> console.log [0...16].map((j)-> if ((i/2) + (j/3))%2==0 then "■" else "□").join("")
+console.log "```"
+
+console.log "### (i*j)%2 + (i*j)%3"
+console.log "```"
+[0...16].forEach (i)-> console.log [0...16].map((j)-> if (i*j)%2 + (i*j)%3==0 then "■" else "□").join("")
+console.log "```"
+
+console.log "### ((i*j)%2 + (i*j)%3)%2"
+console.log "```"
+[0...16].forEach (i)-> console.log [0...16].map((j)-> if ((i*j)%2 + (i*j)%3)%2==0 then "■" else "□").join("")
+console.log "```"
+
+console.log "### ((i*j)%3 + (i+j)%2)%2"
+console.log "```"
+[0...16].forEach (i)-> console.log [0...16].map((j)-> if ((i*j)%3 + (i+j)%2)%2==0 then "■" else "□").join("")
+console.log "```"
+
+
+###
+
+
+
+
 ###
 nanigasi = (cb)->
   setTimeout ->
