@@ -4,6 +4,9 @@
   "description": "nt\r ==",
   "main": "tmp.coffee",
   "dependencies": {
+    "base32": "0.0.6",
+    "base32-decode": "^1.0.0",
+    "base32-encode": "^1.1.1",
     "base58": "^2.0.1",
     "big-integer": "^1.6.40",
     "bitcore-mnemonic": "^1.7.0",
@@ -30,6 +33,7 @@
     "node-uuid": "^1.4.8",
     "propel": "^3.3.1",
     "pug": "^2.0.3",
+    "readline": "^1.3.0",
     "redis": "^2.8.0",
     "request": "^2.87.0",
     "secp256k1": "^3.6.1",

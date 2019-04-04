@@ -12,6 +12,94 @@ helper = require "./helper"
 
 
 
+###
+type = "major"
+
+ds =
+  'major': [0, 4, 7]
+  'minor': [0, 3, 7]
+
+console.log ds[type]
+###
+
+###
+console.log require("fs").readFileSync("./width_.png").toString("base64")
+###
+
+
+
+
+###
+convert_base32 = (i)->
+  switch i
+    when "0" then return  "A"
+    when "1" then return  "B"
+    when "2" then return  "C"
+    when "3" then return  "D"
+    when "4" then return  "E"
+    when "5" then return  "F"
+    when "6" then return  "G"
+    when "7" then return  "H"
+    when "8" then return  "I"
+    when "9" then return  "J"
+    when "10" then return "K"
+    when "11" then return "L"
+    when "12" then return "M"
+    when "13" then return "N"
+    when "14" then return "O"
+    when "15" then return "P"
+    when "16" then return "Q"
+    when "17" then return "R"
+    when "18" then return "S"
+    when "19" then return "T"
+    when "20" then return "U"
+    when "21" then return "V"
+    when "22" then return "W"
+    when "23" then return "X"
+    when "24" then return "Y"
+    when "25" then return "Z"
+    when "26" then return "2"
+    when "27" then return "3"
+    when "28" then return "4"
+    when "29" then return "5"
+    when "30" then return "6"
+    when "31" then return "7"
+
+enc = Buffer.from("asdfghjk").toString("hex").split("").map( (i)-> ("000" + parseInt(i, 16).toString(2)).slice(-4) ).join("").match(/.{1,5}/g).map( (i)-> convert_base32( parseInt((i + "0000").slice(0,5),2).toString() ) ).join("").split().map((i)-> i + "=".repeat(8- (i.length % 8)))[0]
+console.log enc
+# console.log require("base32-encode")(Buffer.from("asdfghjk"), 'RFC4648')
+
+base32decode = require "base32-decode"
+console.log Buffer.from(base32decode(enc , 'RFC4648')).toString()
+###
+
+
+
+###
+base32encode = require "base32-encode"
+base32decode = require "base32-decode"
+
+
+console.log base32encode(Buffer.from("asdfghjk"), 'RFC4648')
+console.log Buffer.from(base32decode(base32encode(Buffer.from("asdfghjk"), 'RFC4648'), 'RFC4648')).toString()
+###
+
+
+
+
+###
+# BASE32
+base32 = require "base32"
+
+encoded = base32.encode('asdfghjk')
+# MFZWIZTHNBVGW===
+decoded = base32.decode(encoded)
+
+# c5tp8tk7d1n6p
+console.log encoded
+console.log decoded
+###
+
 
 
 ###
