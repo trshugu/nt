@@ -9,6 +9,74 @@ helper = require "./helper"
 
 
 
+###
+arr1 = [
+  "lkj;klj"
+  "afdasdfwe"
+  "afdasdfwe"
+  "asdfefewa"
+  "asdfdf"
+  "fefa"
+  "afdasdfwe"
+  "afdasdfwe"
+  "fesafd"
+  "fesasdf"
+  "asdfea"
+  "asdfea"
+  "asdfea"
+  "asdfea"
+  "asdfea"
+  "fed"
+  "afdasdfwe"
+  "afdasdfwe"
+  "afdasdfwe"
+  "afdasdfwe"
+  "asdfasdfsdf"
+]
+
+arr2 = [
+  "asdfsad"
+  "asdfefewa"
+  "fesasdf"
+  "fesasdf"
+  "asdfefewa"
+  "asdfefewa"
+  "asdfea"
+  "afdasdfwe"
+  "fesasdf"
+  "fesasdf"
+  "fesasdf"
+  "fesasdf"
+  "fesasdf"
+  "asdfeas"
+  "qwrqwefdv"
+  "xcvxccviou"
+]
+
+puts "arr1", arr1.length
+puts "arr2", arr2.length
+
+mergeArr = []
+
+arr1.forEach (i)->
+  if mergeArr.indexOf(i) == -1
+    mergeArr.push i
+
+arr2.forEach (i)->
+  if mergeArr.indexOf(i) == -1
+    mergeArr.push i
+
+# puts mergeArr
+puts mergeArr.length
+###
+
+
+###
+j = 0
+while j < 4
+  console.log j
+  ++j
+###
 
 
 
