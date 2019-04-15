@@ -9,6 +9,21 @@ helper = require "./helper"
 
 
 
+
+###
+mergeArr = []
+require("fs").readFileSync("./choontmp.txt").toString().split("\n").forEach (i)->
+  if mergeArr.indexOf(i) == -1
+    mergeArr.push i
+
+mergeArr.sort()
+# puts mergeArr
+puts mergeArr.length
+mergeArr.forEach (i)->
+  require("fs").appendFileSync "./choonmerge.txt", i + "\n", {encoding: "utf8"}
+###
+
+
 ###
 arr1 = [
   "lkj;klj"
