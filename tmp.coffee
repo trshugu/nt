@@ -9,6 +9,59 @@ helper = require "./helper"
 
 
 
+###
+# promiseに於いてクロージャを使う
+# →想定通りにはならなかった
+fun = (a)-> 
+  c = 1
+  puts c
+  return new Promise (f,r)->
+    c += 1
+    puts c
+    f c + "done"
+  
+  puts c += 1
+
+
+p = fun "a"
+
+p
+.then (v)-> puts v
+.catch (r)-> puts r
+
+p
+.then (v)-> puts v
+.catch (r)-> puts r
+
+p
+.then (v)-> puts v
+.catch (r)-> puts r
+###
+
+
+###
+net = require "net"
+sev = net.createServer (conn)->
+  console.log  "create"
+  conn.on "data", (data)->
+    console.log 'server-> ' + data + ' from ' + conn.remoteAddress + ':' + conn.remotePort
+    conn.write "sev rep:" + data
+  
+  conn.on "close", -> console.log "closed"
+.listen 3000
+
+net = require "net"
+cli = new net.Socket()
+cli.setEncoding "utf8"
+
+cli.connect "3000", "localhost", -> cli.write "cliconn"
+process.stdin.resume()
+process.stdin.on "data", (data)-> cli.write data
+cli.on "data", (data)-> console.log "cli-> " + data
+cli.on "close", -> console.log "cli-> closed" + data
+###
+
+
 
 ###
 mergeArr = []
