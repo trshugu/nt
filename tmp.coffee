@@ -7,6 +7,31 @@ helper = require "./helper"
 
 
 
+###
+# resolveは複数回実行できないけど処理はすすむ
+pp = -> new Promise (f,r)->
+  console.log "haitta"
+  f "ikkaimeeee"
+  f "niiiikaimeeee"
+  
+  setTimeout ->
+    console.log "st1"
+    f "done"
+    return "nanika"
+    console.log "st2"
+  , 1000
+  console.log 3
+
+
+console.log 1
+pp().then (v)-> console.log v
+console.log 2
+
+console.log 8
+console.log pp().then (v)-> console.log v
+console.log 9
+###
+
 
 
 ###
