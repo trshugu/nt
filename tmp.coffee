@@ -7,6 +7,77 @@ helper = require "./helper"
 
 
 
+
+
+
+
+###
+# ゲームっぽく
+conjunction = ->
+  switch Math.floor(Math.random() * 100)
+    when 0
+      "レジェンドレア"
+    when 1,2,3
+      "ウルトラスーパーレア"
+    when 4,5,6,7,8,9,10
+      "スーパーレア"
+    when 98,99
+      "キャンペーン的なやつ"
+    else
+      "レア"
+
+juurenn = ->
+  [0...10].forEach ->
+    console.log conjunction()
+
+juurenn()
+###
+
+
+
+
+
+###
+arr = {}
+[1..1000].forEach ->
+  r = Math.floor(Math.random() * 10)
+  switch
+    when r <= 5
+      arr[0] = arr[0] + 1 || 1
+    else
+      arr[1] = arr[1] + 1 || 1
+
+console.log arr
+###
+
+
+###
+# 6:4みたいな割合
+arr = {}
+[1..1000].forEach ->
+  r = Math.floor(Math.random() * 10)
+  switch r
+    when 0,1,2,3,4,5
+      arr[0] = arr[0] + 1 || 1
+    else
+      arr[1] = arr[1] + 1 || 1
+
+console.log arr
+###
+
+
+
+###
+
+arr = {}
+[1..1000].forEach ->
+  c = Math.floor(Math.random() * 20)
+  arr[c] = arr[c] + 1 || 1
+
+console.log arr
+###
+
+
 ###
 # resolveは複数回実行できないけど処理はすすむ
 pp = -> new Promise (f,r)->
