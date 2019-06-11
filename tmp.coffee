@@ -11,6 +11,23 @@ helper = require "./helper"
 
 
 
+
+
+
+
+###
+pm = require "pm2"
+pm.restart "all",(e,d)-> puts e,d
+###
+
+###
+# nodeでgitを使う
+git = require("simple-git/promise")()
+git.pull().then (v)-> puts v
+git.revparse(["HEAD"]).then (v)-> puts v
+###
+
+
 ###
 # ゲームっぽく
 conjunction = ->
