@@ -149,3 +149,65 @@ module.exports.dec2hex = (str)->
   else
     dec2hexsub bis.abs(), ""
 
+
+# 高速指数演算
+module.exports.modular_exp = (a, b, n)->
+  res = bi.one
+  while b.neq(0)
+    if b.and(1).neq(0)
+      res = res.multiply(a).mod(n)
+    
+    a = a.multiply(a).mod(n)
+    b = b.shiftRight(1)
+  
+  res
+
+# ランダムな素数生成
+module.exports.gen_rand = (bit_length)->
+  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
+  ret = bi(1)
+  bits.forEach (b)->
+    ret = ret.multiply(2).plus(b)
+  
+  ret.multiply(2).plus(1)
+
+# 素数確認
+mr_primary_test = (n, k=100)->
+  return false if n.eq 1
+  return true if n.eq 2
+  return false if n.mod(2).eq(0)
+  
+  d = n.minus(1)
+  s = bi.zero
+  while d.mod(2).neq(0)
+    d = d.divide(2)
+    s = s.plus(1)
+  
+  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  res = r.some (a)->
+    if helper.modular_exp(a, d, n).neq(1)
+      pl = [0...s].map (rr)-> 
+        bi(2).pow(rr).multiply(d)
+      
+      flg = true
+      
+      pl.forEach (p)->
+        if helper.modular_exp(a, p, n).eq(1)
+          flg = false
+          return
+      
+      if flg
+        return true
+    
+  return res == false
+
+# 素数生成
+module.exports.gen_prime = (bit)->
+  while true
+    ret = @gen_rand(bit)
+    if mr_primary_test(ret)
+      break
+  
+  return ret
+
+

@@ -14,6 +14,211 @@ helper = require "./helper"
 
 
 
+###
+bi = require "big-integer"
+
+# 2倍(2G=G+G)
+doublePt = (g,p)->
+  res = {}
+  if g.y.eq(bi.zero)
+    res.x = 0
+    res.y = 0
+    return res
+  else
+    nu = bi(3).multiply( helper.modular_exp(g.x,bi(2),p) ).multiply(  helper.modular_exp( bi(2).multiply(g.y), p.minus(bi(2)), p ))
+    x3 = helper.modular_exp(nu, bi(2), p).minus(bi(2).multiply(g.x))
+    y3 = nu.multiply( g.x.minus(x3) ).minus(g.y)
+    res.x = x3.mod(p)
+    res.y = y3.mod(p)
+    return res
+
+
+# たし算(G+G)
+addPt = (g1,g2,p)->
+  res = {}
+  
+  return g2 if g1.x.eq(0) && g1.y.eq(0)
+  return g1 if g2.x.eq(0) && g2.y.eq(0)
+  
+  if g1.x.eq(g2.x)
+    if (g1.y.plus(g2.y)).mod(p).eq(0)
+      res.x = bi(0)
+      res.y = bi(0)
+      return res
+    else
+      return doublePt(g1,p)
+  
+  # lm = (g1y-g2y) * ( (g1x-g2x)**p-2 % p )
+  lm = (g1.y.minus(g2.y)).multiply( helper.modular_exp(g1.x.minus(g2.x), p.minus(bi(2)), p) )
+  
+  # x3 = (lm**2%p) - (g1x+g2x)
+  x3 = helper.modular_exp(lm,bi(2),p).minus(g1.x.plus(g2.x))
+  
+  # y3 = lm*(g1x-x3)-g1y
+  y3 = lm.multiply(g1.x.minus(x3)).minus(g1.y)
+  
+  res.x = x3.mod(p)
+  res.y = y3.mod(p)
+  return res
+
+
+# スカラーかけ算(n-1G)
+scalarmult = (g,e,p)->
+  res = {}
+  if e.eq(0)
+    res.x = bi(0)
+    res.y = bi(0)
+    return res
+  
+  res = scalarmult(g, e.divide(2),p)
+  res = addPt(res, res, p)
+  res = addPt(res, g, p) if e.and(1).eq(1)
+  
+  return res
+
+
+ccv = (g,e,p)->
+  res = scalarmult g, e, p
+  res.x = res.x.plus(p) if res.x.lt 0
+  res.y = res.y.plus(p) if res.y.lt 0
+  res
+
+
+# 素数 p(modする)
+p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+
+# ポイントG(x,y)
+g = {}
+g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+
+# 秘密鍵を生成
+secretkey = helper.dec2hex helper.gen_rand(256).toString()
+
+puts "priv", secretkey
+
+# 公開鍵を生成
+pubpt = ccv(g, bi(helper.hex2dec(secretkey)), p)
+
+pub = {}
+pub.x = ("00" + (helper.dec2hex(pubpt.x.toString()))).slice(-64)
+pub.y = ("00" + (helper.dec2hex(pubpt.y.toString()))).slice(-64)
+puts "pub",pub
+
+
+keccak = require("keccak")("keccak256")
+pubhash =  keccak.update(Buffer.from(pub.x + pub.y, "hex")).digest("hex")
+console.log "pubhash",pubhash
+console.log "address:","0x" + pubhash.slice(-40)
+###
+
+
+
+###
+puts "==liblary================================="
+secp256k1 = new require('elliptic').ec('secp256k1')
+secretkey = "a4a7d40e13864b41d579a5b0b3ba05ce6ea566819034495a2a143417abeed82b"
+kp = secp256k1.keyFromPrivate(secretkey)
+puts "priv", helper.dec2hex kp.priv.toString()
+
+
+
+kp.getPublic()
+pub = {}
+pub.x = ("00" + (helper.dec2hex(kp.pub.x.toString()))).slice(-64)
+pub.y = ("00" + (helper.dec2hex(kp.pub.y.toString()))).slice(-64)
+
+puts "pub", pub
+puts "pubxy", pub.x + pub.y
+
+keccak = require("keccak")("keccak256")
+pubhash =  keccak.update(Buffer.from(pub.x + pub.y, "hex")).digest("hex")
+console.log "pubhash",pubhash
+console.log "address:","0x" + pubhash.slice(-40)
+###
+
+
+###
+# もういい加減、素数の生成はhelperに移動させる
+secp256k1 = new require('elliptic').ec('secp256k1')
+keccak = require("keccak")("keccak256")
+
+kp = secp256k1.genKeyPair()
+puts "priv", helper.dec2hex kp.priv.toString()
+
+kp.getPublic()
+pub = {}
+pub.x = ("00" + (helper.dec2hex(kp.pub.x.toString()))).slice(-64)
+pub.y = ("00" + (helper.dec2hex(kp.pub.y.toString()))).slice(-64)
+
+puts "pub", pub
+puts "pubxy", pub.x + pub.y
+
+pubhash =  keccak.update(Buffer.from(pub.x + pub.y, "hex")).digest("hex")
+console.log "pubhash",pubhash
+console.log "address:","0x" + pubhash.slice(-40)
+###
+
+
+
+###
+# ng
+geth = require "geth"
+geth.start
+  networkid: "10101"
+  port: 30303
+  rpcport: 8545
+  mine: null
+  , (e,d)->
+    if e?
+      console.log "e",e
+    else
+      console.log d
+###
+
+
+
+
+###
+keccak = require "keccak"
+console.log keccak("keccak256").update("aaaa").digest("hex")
+console.log keccak("keccak256").update(Buffer.from("aaaa", "hex")).digest("hex")
+###
+
+
+
+
+
+
+###
+# 使えない
+Web3 = require("web3")
+provider = new Web3.providers.HttpProvider('http://localhost:8545')
+web3 = new Web3 provider
+
+# puts web3
+puts web3.eth.accounts[0]
+###
+
+
+
+###
+Web3 = require("web3")
+web3 = new Web3()
+
+# web3.setProvider new Web3.providers.HttpProvider('http://localhost:8545')
+
+# web3.personal.newAccount("test");
+# console.log(_account)
+# web3.setProvider('ws://localhost:8546')
+
+web3.setProvider(new Web3.providers.WebsocketProvider('ws://localhost:8546'))
+###
+
+
+
+
+
 
 ###
 pm = require "pm2"
