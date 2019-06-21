@@ -12,6 +12,21 @@ helper = require "./helper"
 
 
 
+Web3 = require("web3")
+web3 = new Web3 new Web3.providers.HttpProvider('http://localhost:8545')
+
+web3.eth.getAccounts()
+.then (v)-> console.log v
+.catch (e)-> console.log "e",e
+
+# puts web3.eth.accounts
+# puts web3.utils.keccak256('234')
+
+# web3.eth.personal.newAccount("")
+# .then (v)-> console.log v
+# .catch (e)-> console.log "e",e
+
+
 
 
 ###
@@ -191,15 +206,18 @@ console.log keccak("keccak256").update(Buffer.from("aaaa", "hex")).digest("hex")
 
 
 ###
-# 使えない
+# 使えない→使えた
 Web3 = require("web3")
 provider = new Web3.providers.HttpProvider('http://localhost:8545')
 web3 = new Web3 provider
 
 # puts web3
-puts web3.eth.accounts[0]
-###
+# puts web3.eth.accounts
 
+web3.eth.personal.newAccount("")
+.then (v)-> console.log v
+.catch (e)-> console.log "e",e
+###
 
 
 ###
