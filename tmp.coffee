@@ -11,7 +11,7 @@ helper = require "./helper"
 
 
 
-
+###
 Web3 = require("web3")
 web3 = new Web3 new Web3.providers.HttpProvider('http://localhost:8545')
 
@@ -25,7 +25,28 @@ web3.eth.getAccounts()
 # web3.eth.personal.newAccount("")
 # .then (v)-> console.log v
 # .catch (e)-> console.log "e",e
+###
 
+
+
+
+###
+# lisp
+lisp = require "lisp"
+
+puts lisp '(+ 1 2 3 4)'
+puts lisp '(+ "hell" "world")'
+puts lisp '(+ 5 (* 2 2) (/ 4 2))'
+puts lisp '(head \'(1 2 3 4))'
+puts lisp '(tail \'(1 2 3 4))'
+###
+
+
+###
+cron = require 'node-cron'
+cron.schedule '0 * * * * *', ->
+  console.log 'hell'
+###
 
 
 
