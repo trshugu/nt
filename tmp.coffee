@@ -9,6 +9,323 @@ helper = require "./helper"
 
 
 
+###
+# Q5
+# 1～3の配列を8個つくる処理
+prm = (max, pow, ind=0, li=[])->
+  if pow == ind
+    return li
+  else
+    tmp = []
+    if li.length == 0
+      [1..max].forEach (i)->
+        arr = []
+        arr.push i
+        tmp.push arr
+    else
+      li.forEach (j)->
+        arr = j.map (k)-> k
+        
+        [1..max].forEach (i)->
+          arr = j.map (k)-> k
+          arr.push i
+          tmp.push arr
+        
+        
+    li = tmp
+    
+    return prm max, pow, ind+1, li
+
+# 加減算何もなしの配列を文字列にするやつ
+patformatter = (pat)->
+  li = [1..9]
+  patemp = pat.map (p)-> p
+  result = li.shift().toString()
+  while li.length > 0
+    item = li.shift()
+    ope = patemp.shift()
+    
+    switch ope
+      when 1
+        result = result + "+" + item.toString()
+      when 2
+        result = result + "-" + item.toString()
+      when 3
+        result = result + item.toString()
+  
+  
+  result
+
+prm(3, 8).forEach (pat)->
+  patemp = pat.map (p)-> p
+  if eval(patformatter(pat)) == 100
+    puts patformatter patemp
+###
+
+
+
+
+###
+# [1..9].forEach (i)-> puts i
+
+
+prm = (max, pow, ind=0, li=[])->
+  if pow == ind
+    return li
+  else
+    tmp = []
+    if li.length == 0
+      [1..max].forEach (i)->
+        arr = []
+        arr.push i
+        tmp.push arr
+    else
+      li.forEach (j)->
+        arr = j.map (k)-> k
+        
+        [1..max].forEach (i)->
+          arr = j.map (k)-> k
+          arr.push i
+          tmp.push arr
+        
+        
+    li = tmp
+    
+    return prm max, pow, ind+1, li
+
+
+onetoninepatcalc = (pat)->
+  li = [1..9]
+  result = li.shift()
+  pm = "plus"
+  cnt = 1
+  pre = 0
+  
+  while li.length > 0
+    item = li.shift()
+    ope = pat.shift()
+    # puts ope
+    # puts pm
+    # puts cnt
+    switch ope
+      when 1
+        result = result + item
+        pm = "plus"
+      when 2
+        result = result - item
+        pm = "minus"
+      when 3
+        result = parseInt(result.toString() + item.toString())
+        pre = item
+        # switch pm
+        #   when "plus"
+        #     result = result + item + ((item-1)*10**cnt-(item-1))
+        #   when "minus"
+        #     result = result - item - ((item-1)*10**cnt-(item-1))
+    
+    puts result
+  
+  result
+
+patformatter = (pat)->
+  li = [1..9]
+  patemp = pat.map (p)-> p
+  result = li.shift().toString()
+  while li.length > 0
+    item = li.shift()
+    ope = patemp.shift()
+    
+    switch ope
+      when 1
+        result = result + "+" + item.toString()
+      when 2
+        result = result + "-" + item.toString()
+      when 3
+        result = result + item.toString()
+  
+  
+  result
+
+
+# puts onetoninepatcalc [3, 3]
+# puts eval patformatter [3,3,1,3,2,3,1,2]
+
+prm(3, 8).forEach (pat)->
+  patemp = pat.map (p)-> p
+  res = eval(patformatter(pat))
+  
+  if res == 100
+    # puts patemp
+    # puts patformatter patemp
+    puts patformatter patemp
+###
+
+
+
+###
+# puts onetoninepatcalc [1,1,1,1,1,1,1,1]
+# puts patformatter [1,3]
+puts onetoninepatcalc [1,1,1,2,3]
+
+
+
+prm(3, 8).forEach (pat)->
+  puts pat
+  [0...8].forEach (idx)-> puts idx
+  # pat.forEach (ope)-> puts ope
+###
+
+
+
+###
+# Q4
+# li = [3,5,7]
+li = [50, 2, 1, 9]
+cmb = (len, ind=1, li=[[0]])->
+  # puts "li",li
+  if len == ind
+    return li
+  else
+    tmp = []
+    
+    li.forEach (item)->
+      c = 0
+      while c <= item.length
+        tmp.push item.slice(0,c).concat(ind).concat(item.slice(c,item.length)).flat()
+        # puts "tmp",tmp
+        c++
+    
+    
+    li = tmp
+    
+    return cmb len, ind+1, li
+
+
+
+# puts cmb li.length
+# puts cmb(4)
+
+console.log (cmb(li.length).map (i)-> i.map((j)-> li[j]).join("")).map((k)-> parseInt(k)).sort().pop()
+###
+
+
+###
+li = [50, 2, 1, 9]
+
+li = [3,5,7]
+
+# リスト全部に値を入れるやつ
+liins = (li,i)->
+  result = []
+  c = 0
+  while c <= li.length
+    if c == 0
+      result.push [i].concat(li)
+    else
+      result.push li.slice(0,c).concat(i).concat(li.slice(c,li.length)).flat()
+    
+    c++
+  result
+
+# puts liins [], 9
+
+m = []
+m.push [li.shift()]
+n = 0
+while n < li.length
+  m = m.map (i)-> liins(i, li[n]).map (i)-> i
+  # m = liins(m, li[n]).map (i)-> i.flat()
+  puts m
+  n++
+
+
+
+# puts m.map (i)-> i
+
+strsort = (li)->
+  licomb = []
+  
+  li.forEach (item)->
+    puts item
+  
+  puts licomb.length
+  puts licomb
+
+
+
+# console.log strsort li
+###
+
+
+
+###
+# Q3
+bi = require "big-integer"
+fib = ->
+  a = bi.zero
+  b = bi.one
+  while true
+    yield a
+    tmp = b
+    b = a.plus b
+    a = tmp
+
+gen = fib()
+[1..100].forEach (i)->
+  # console.log gen.next()
+  console.log i + "個目:" + gen.next().value.toString()
+###
+
+
+###
+# Q2
+li = ["パ","ト","カ","ー"]
+st = ["タ","ク","シ","ー"]
+
+
+patato = (p,t)->
+  result = ""
+  while p.length > 0
+    result += p.shift() + t.shift()
+  
+  result
+
+
+console.log patato li, st
+###
+
+
+
+
+###
+# Q1
+li = [1,2,3,4,5]
+
+forloop = (li)->
+  result = 0
+  for i in [0...li.length]
+    result += li[i]
+  result
+
+whileloop = (li)->
+  result = 0
+  i = 0
+  while i < li.length
+    result += li[i]
+    i++
+  result
+
+recursiveloop = (li, result=null)->
+  if li.length == 0
+    return result
+  else
+    result += li.shift()
+    return recursiveloop li, result
+
+console.log forloop li
+console.log whileloop li
+console.log recursiveloop li
+###
 
 
 ###
