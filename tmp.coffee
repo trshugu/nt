@@ -9,6 +9,37 @@ helper = require "./helper"
 
 
 
+
+###
+# A1 = ユーザ名 ":" realm ":" パスワード
+# A2 = HTTPのメソッド ":" コンテンツのURI
+# response = MD5( MD5(A1) ":" nonce ":" nc ":" cnonce ":" qop ":" MD5(A2) )
+
+user = "111"
+password = "222"
+A1 = user + ":" + "ID/PASS" + ":" + password
+puts A1
+
+method = "GET"
+uri = "/digest"
+A2 = method + ":" + uri
+puts A2
+
+nonce = "cafebebe"
+cnonce = "fa30973ef152ed30"
+nc = "00000001"
+qop = "auth"
+
+crypto = require "crypto"
+md5 = (val)->
+  hash = crypto.createHash 'md5'
+  hash.update val
+  hash.digest().toString("hex")
+
+puts md5( md5(A1) + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + md5(A2))
+###
+
+
 ###
 # Q5
 # 1～3の配列を8個つくる処理
