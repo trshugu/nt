@@ -8,7 +8,268 @@ helper = require "./helper"
 
 
 
+###
+q = Promise.resolve()
+.then -> throw new Error("error1")
+.catch (error)->
+  console.log "1-1", q # pending
+  console.log "1-2", error # よく見るエラー
 
+
+setTimeout ->
+  console.log "2-1", q # undefined
+  q.catch (error)->
+    # qがundefinedなのでここは実行されない
+    console.log "2-2", q
+    console.log "2-3", error
+,1
+
+
+p = Promise.resolve()
+.then -> throw new Error("error2") # UPRW発生
+
+console.log "3-1", p # pending
+
+setTimeout ->
+  p.catch (error)->
+    console.log "4-1", error # エラー2をキャッチ
+    console.log "4-2", p # rejectedが入ってる
+  
+  # よって何度もcatchを実行できる
+  p.catch (error)->
+    console.log "4-3", error # エラー2をキャッチ
+    console.log "4-4", p # rejectedが入ってる
+,1
+###
+
+
+
+
+###
+tmpRejections = new Map()
+
+process.on "unhandledRejection", (error, promise)->
+  tmpRejections.set(promise, error)
+  
+  setTimeout ->
+    return if (!tmpRejections.has(promise))
+    
+    console.error("unhandled", error);
+    
+    tmpRejections.delete(promise);
+  , 5000
+
+process.on "rejectionHandled", (promise)->
+  tmpRejections.delete(promise)
+
+
+
+# file = readline.createInterface(
+#   input: fs.createReadStream(path)
+#   terminal: false
+# )
+
+callback = {}
+file = {}
+file.on = (eve, cb)->
+  callback[eve] = cb
+
+
+file.emit = (eve) ->
+  callback[eve]()
+
+p = Promise.resolve()
+
+file.on "line", ->
+  console.log "aaa"
+  p = p.then ->
+    console.log "aaathhan"
+    # 順番が重要かつ非同期処理・・・
+    throw new Error("hidoki");
+
+file.on "close", ->
+  console.log "bbb"
+  p.then ->
+    # 終了処理
+  .catch (error)->
+    # エラーハンドラ
+
+file.emit "line"
+file.emit "line"
+file.emit "close"
+###
+
+
+
+
+###
+Promise.resolve()
+.then ->
+  return Promise.resolve()
+  .then ->
+    throw new Error("errrereor");
+
+.catch (error)->
+  console.log "1-1"
+  console.log(error)
+
+# 最上部にcatchがあるからOK
+###
+
+
+
+###
+console.log "1-1"
+
+p = Promise.resolve()
+.then ->
+  console.log "2-1"
+  throw new Error("errrror")
+  console.log "2-2"
+# .catch (error)->
+#     console.log "4-1"
+#     console.log(error)
+#     console.log "4-2"
+
+console.log "1-2"
+
+setTimeout ->
+  console.log "3-1"
+  console.log p
+  p.catch (error)->
+    console.log "3-2"
+    console.log(error)
+    console.log "3-3"
+  
+  p.catch (error)->
+    console.log "3-4"
+    console.log(error)
+    console.log "3-5"
+
+,100
+
+console.log "1-3"
+###
+
+
+
+###
+Promise.resolve()
+.then ->
+  throw new Error("errrrror")
+.catch (error)->
+  console.log(error)
+###
+
+
+
+###
+console.log require("fs").readFileSync("./sanjuu.png").toString("base64")
+###
+
+
+###
+# 実際はDBなどを参照で
+user = "yu-za-"
+password = "pasuwa-do"
+
+crypto = require "crypto"
+md5 = (val)->
+  hash = crypto.createHash 'md5'
+  hash.update val
+  hash.digest().toString("hex")
+
+
+realm = "realm"
+
+app = new (require 'koa')()
+app.use (ctx)->
+  auth = ctx.req.headers["authorization"] || ""
+  if auth != ""
+    method = ctx.req.method
+    A2 = method + ":" + ctx.req.url
+    
+    username = ""
+    realm = ""
+    nonce = ""
+    uri = ""
+    algorithm = ""
+    cresponse = ""
+    qop = ""
+    nc = ""
+    cnonce = ""
+    
+    auth.split(" ").forEach (i)->
+      # 末尾のカンマけし
+      item = i.split(",")[0]
+      key = item.split("=")[0]
+      value = item.split("=")[1]
+      
+      switch key
+        when "username"
+          username = value.replace(/\"/g, "")
+        when "realm"
+          realm = value.replace(/\"/g, "")
+        when "nonce"
+          nonce = value.replace(/\"/g, "")
+        when "uri"
+          uri = value.replace(/\"/g, "")
+        when "algorithm"
+          algorithm = value
+        when "response"
+          cresponse = value.replace(/\"/g, "")
+        when "qop"
+          qop = value
+        when "nc"
+          nc = value
+        when "cnonce"
+          cnonce = value.replace(/\"/g, "")
+    
+    # 自分(サーバー)の情報でA1を作る
+    A1 = username + ":" + realm + ":" + password
+    
+    hash = md5( md5(A1) + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + md5(A2))
+    if hash == cresponse
+      ctx.body = "認証OK"
+    else
+      ctx.set 'WWW-Authenticate', 'Digest realm=' + realm.toString() + ', nonce="' + helper.getHash() + '", algorithm=MD5, qop="auth"'
+      ctx.status = 401
+  else
+    ctx.set 'WWW-Authenticate', 'Digest realm=' + realm.toString() + ', nonce="' + helper.getHash() + '", algorithm=MD5, qop="auth"'
+    ctx.status = 401
+
+
+app.listen 3000
+###
+
+
+
+
+###
+# 実際はDBなどを参照で
+user = "yu-za-"
+password = "pasuwa-do"
+
+
+realm = "realm"
+
+app = new (require 'koa')()
+app.use (ctx)->
+  auth = ctx.req.headers["authorization"] || ""
+  if auth != ""
+    input = Buffer.from(auth.split("Basic ")[1], "base64").toString().split(":")
+    
+    if input[0] == user && input[1] == password
+      ctx.body = "認証OK"
+    else
+      ctx.set 'WWW-Authenticate', 'Basic realm="' + realm + '"'
+      ctx.status = 401
+  else
+    ctx.set 'WWW-Authenticate', 'Basic realm="' + realm + '"'
+    ctx.status = 401
+
+app.listen 3000
+###
 
 ###
 # A1 = ユーザ名 ":" realm ":" パスワード
