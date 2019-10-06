@@ -8,6 +8,26 @@ helper = require "./helper"
 
 
 ###
+# 順番に負荷をあげさすソート関数
+RepsPlanner = (startCount, startSet, goalCount, goalSet, interval) ->
+  [startCount..goalCount]
+    .filter( (i,x)-> x%interval==0 )
+    .map (i)->
+      [startSet..goalSet].map (s)->
+        obj = {}
+        obj.count = i
+        obj.set = s
+        obj.load = i * s
+        obj
+    .flat()
+    .sort (a,b)->
+      a.load - b.load
+
+console.log RepsPlanner 10,1,50,3,4
+###
+
+
+###
 createMD5Hash = (src)-> 
   cry = require("crypto").createHash 'SHA256'
   cry.update src, "utf8"
