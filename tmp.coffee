@@ -7,6 +7,32 @@ helper = require "./helper"
 
 
 
+
+
+###
+# 二分探索
+check = (i)->
+  return false if i > 4444
+  true
+
+# puts check 1
+# puts check 4444
+
+s = 1
+e = 10000
+
+while s!=e and s+1!=e
+  m = Math.floor((s+e)/2)
+  if check m
+    puts m, "OK"
+    s = m
+  else
+    puts m, "NG"
+    e = m
+###
+
+
+
 ###
 # 順番に負荷をあげさすソート関数
 RepsPlanner = (startCount, startSet, goalCount, goalSet, interval) ->
@@ -23,7 +49,7 @@ RepsPlanner = (startCount, startSet, goalCount, goalSet, interval) ->
     .sort (a,b)->
       a.load - b.load
 
-console.log RepsPlanner 10,1,50,3,4
+console.log RepsPlanner 8,1,25,2,1
 ###
 
 
