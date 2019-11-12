@@ -11,6 +11,46 @@ helper = require "./helper"
 
 
 
+# 楕円曲線暗号による署名 再
+
+# ライブラリの利用
+secp256k1 = new require('elliptic').ec('secp256k1')
+
+value = "yamaya"
+secretkey = helper.dec2hex helper.gen_rand(64).toString()
+# puts secretkey
+
+# 秘密鍵の準備
+kp = secp256k1.keyFromPrivate secretkey
+puts "kp", kp
+
+# 署名
+sig = kp.sign value # 一時的な公開鍵のx座標Rとハッシュと鍵と一時的な秘密鍵で計算したSを計算
+# puts "sig",sig
+# puts kp.verify value, sig
+
+# kpじゃなくて公開鍵でやるべき
+# pub = kp.getPublic()
+# puts "pub", pub
+# kpub = secp256k1.keyFromPublic pub
+# puts kpub.verify value, sig
+
+# 公開鍵よりかはxだけ渡される感じでやるべき
+pub = kp.getPublic()
+x =  pub.getX().toString('hex')
+puts "x", x
+
+r = sig.r.toString('hex')
+s = sig.s.toString('hex')
+
+puts "r", r
+puts "s", s
+
+# 自力
+
+
+
+
 
 
 ###
