@@ -9,6 +9,135 @@ helper = require "./helper"
 
 
 
+
+
+
+
+###
+# Vigenere
+ven = (p, k)->
+  l = "abcdefghijklmnopqrstuvwxyz"
+  lp = p.toLowerCase()
+  lk = k.toLowerCase()
+  
+  if /^[A-Z]+$/g.test(p)
+    l[ (l.indexOf(lk)+l.indexOf(lp)) % 26 ].toUpperCase()
+  else
+    l[ (l.indexOf(lk)+l.indexOf(lp)) % 26 ]
+
+vde = (c, k)->
+  l = "abcdefghijklmnopqrstuvwxyz"
+  lc = c.toLowerCase()
+  lk = k.toLowerCase()
+  
+  pn = l.indexOf(lk)-l.indexOf(lc)
+  pn = pn + 26 if pn <= 0
+  if /^[A-Z]+$/g.test(c)
+    l[26 - pn].toUpperCase()
+  else
+    l[26 - pn]
+
+vigenereEncript = (str, key)->
+  idx = 0
+  str
+    .split("")
+    .map (i)->
+      if /^[A-z]+$/g.test(i)
+        cry = ven(i, key[idx % key.length])
+        idx++
+        return cry
+      else
+        return i
+    .join("")
+
+
+vigenereDecript = (str, key)->
+  idx = 0
+  str
+    .split("")
+    .map (i)->
+      if /^[A-z]+$/g.test(i)
+        pla = vde(i, key[idx % key.length])
+        idx++
+        return pla
+      else
+        return i
+    .join("")
+
+
+puts vigenereEncript "AJIl1k ja ds12fA jidklja", "wasdf"
+puts vigenereDecript "WFEh1g fw zo12bW fezghfw", "wsdf"
+
+puts vigenereEncript "aaa", "r"
+puts vigenereEncript "aaa", "rec"
+
+puts vigenereDecript "aaa", "r"
+
+# ビューフォート(鍵と平文が逆)
+puts vigenereDecript "recrecrecrecre", "anokutaranmyak"
+
+# バリアントビューフォート(複合で暗号化する)
+puts vigenereDecript "aaa", "rec"
+
+# トリテミウス(abcから繰り返す)
+puts vigenereEncript "aaa", "abcdefghijklmnopqrstuvwxyz"
+###
+
+
+###
+# 暗号化
+text = "anoku tara"
+puts text
+b64 = Buffer.from(text).toString("base64")
+puts b64
+cry = vigenereEncript b64, "wahu"
+puts cry
+
+# 複合化
+dec = vigenereDecript cry, "wahu"
+puts dec
+
+puts Buffer.from(dec, "base64").toString()
+###
+
+
+###
+puts "e@", ven("a", "a")
+puts "e@", ven("n", "r")
+puts "e@", ven("o", "m")
+puts "e@", ven("k", "a")
+puts "e@", ven("u", "r")
+puts "e@", ven("t", "m")
+puts "e@", ven("a", "a")
+puts "e@", ven("r", "r")
+puts "e@", ven("a", "m")
+
+# puts "@", vde("a", "m")
+
+puts "@", vde(ven("a", "a"), "a")
+puts "@", vde(ven("n", "r"), "r")
+puts "@", vde(ven("o", "m"), "m")
+puts "@", vde(ven("k", "a"), "a")
+puts "@", vde(ven("u", "r"), "r")
+puts "@", vde(ven("t", "m"), "m")
+puts "@", vde(ven("a", "a"), "a")
+puts "@", vde(ven("r", "r"), "r")
+puts "@", vde(ven("a", "m"), "m")
+
+puts "@", vde(ven("A", "a"), "a")
+puts "@", vde(ven("N", "r"), "r")
+puts "@", vde(ven("O", "m"), "m")
+puts "@", vde(ven("K", "a"), "a")
+puts "@", vde(ven("U", "r"), "r")
+puts "@", vde(ven("T", "m"), "m")
+puts "@", vde(ven("Z", "a"), "a")
+puts "@", vde(ven("Z", "r"), "r")
+puts "@", vde(ven("Z", "m"), "m")
+###
+
+
+
+
 ###
 # 二分探索
 check = (i)->
