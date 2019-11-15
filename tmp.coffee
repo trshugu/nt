@@ -39,7 +39,8 @@ kp = secp256k1.keyFromPrivate secretkey
 
 # 署名
 sig = kp.sign value # 一時的な公開鍵のx座標Rとハッシュと鍵と一時的な秘密鍵で計算したSを計算
-# puts "sig",sig
+puts "sig",sig.r.toString()
+puts "sig",sig.s.toString()
 # puts kp.verify value, sig
 
 # kpじゃなくて公開鍵でやるべき
@@ -294,19 +295,79 @@ puts "06gsig", secp256k1.keyFromPublic(libpub).verify value, gsig # false
 bikfp = {}
 bikfp.x = bi helper.hex2dec(kfp.x)
 bikfp.y = bi helper.hex2dec(kfp.y)
-puts "07gver",  verify value, gsig, bikfp
-puts "08gver",  verify value, sig,  bikfp # false
-puts "09gver",  verify value, tsig, bikfp # false
+# puts "07gver",  verify value, gsig, bikfp
+# puts "08gver",  verify value, sig,  bikfp # false
+# puts "09gver",  verify value, tsig, bikfp # false
 
 bilibpub = {}
 bilibpub.x = bi helper.hex2dec(libpub.x)
 bilibpub.y = bi helper.hex2dec(libpub.x)
-puts "10gver",  verify value, gsig, bilibpub # false
-puts "11gver",  verify value, sig,  bilibpub # false
-puts "12gver",  verify value, tsig, bilibpub # false
+# puts "10gver",  verify value, gsig, bilibpub # false
+# puts "11gver",  verify value, sig,  bilibpub # false
+# puts "12gver",  verify value, tsig, bilibpub # false
+
+crypto = require "crypto"
+createHashAlgo = (src, algo)-> 
+  cry = crypto.createHash algo
+  cry.update src, "utf8"
+  cry.digest 'hex'
+
+
+hsign = (value, pri, algo)->
+  res = {}
+  dech = bi helper.hex2dec createHashAlgo(value, algo)
+  nonce = helper.gen_rand(64)
+  r = ccv(g,nonce,p).x.mod(n)
+  s = helper.modular_exp(nonce, n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(helper.hex2dec(pri)))) ).mod(n)
+  res.r = ("00" + (helper.dec2hex(r.toString()))).slice(-64)
+  res.s = ("00" + (helper.dec2hex(s.toString()))).slice(-64)
+  res
+
+# crypto.getHashes().forEach (i,idx)->
+#   puts idx, "hsig", secp256k1.keyFromPublic(libpub).verify(value, hsign(value, secretkey, i)), i.toString()
+
+createHashdig = (src)-> 
+  cry = crypto.createHash 'SHA256'
+  cry.update src, "utf8"
+  cry.digest()
 
 
 
+bsign = (value, pri)->
+  res = {}
+  # dech = bi createHashdig(value).readBigInt64BE()
+  # dech = bi createHashdig(value).readBigInt64LE()
+  # dech = bi createHashdig(value).readBigUInt64BE()
+  # dech = bi createHashdig(value).readBigUInt64LE()
+
+  # dech = bi helper.hex2dec require("keccak")("keccak256").update(Buffer.from(value)).digest("hex")
+  # dech = bi require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest().readBigUInt64BE()
+  # dech = bi require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest().readBigUInt64LE()
+  # dech = bi require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest().readBigInt64BE()
+  # dech = bi require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest().readBigInt64LE()
+  shash = secp256k1.hash().update(value).digest("hex")
+  puts shash
+  dech = bi helper.hex2dec shash
+  
+  nonce = helper.gen_rand(64)
+  r = ccv(g,nonce,p).x.mod(n)
+  s = helper.modular_exp(nonce, n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(helper.hex2dec(pri)))) ).mod(n)
+  res.r = ("00" + (helper.dec2hex(r.toString()))).slice(-64)
+  res.s = ("00" + (helper.dec2hex(s.toString()))).slice(-64)
+  res
+
+puts helper.createHash(value)
+puts bi helper.hex2dec helper.createHash(value)
+puts createHashdig(value)
+puts createHashdig(value).readBigInt64BE()
+puts createHashdig(value).readBigInt64LE()
+puts createHashdig(value).readBigUInt64BE()
+puts createHashdig(value).readBigUInt64LE()
+puts require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest("hex")
+puts require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest().readBigUInt64BE()
+puts require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest().readBigUInt64LE()
+bsig = bsign value, secretkey
+puts "13bsig", secp256k1.keyFromPublic(libpub).verify value, bsig # false
 
 
 
