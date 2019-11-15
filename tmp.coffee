@@ -11,6 +11,313 @@ helper = require "./helper"
 
 
 
+
+
+
+
+
+###
+# 楕円曲線暗号による署名 再 清書 スニペットへ移動版
+bi = require "big-integer"
+
+value = "yamaya"
+secretkey = helper.dec2hex helper.gen_rand(64).toString()
+puts "secretkey", secretkey
+
+# ライブラリ版 =========================
+secp256k1 = new require('elliptic').ec('secp256k1')
+
+kp = secp256k1.keyFromPrivate secretkey # # 秘密鍵からKeyPair
+
+# 送信用公開鍵生成
+pub = kp.getPublic()
+pubkey = {}
+pubkey.x =  ("00" + (helper.dec2hex(pub.x.toString()))).slice(-64)
+pubkey.y =  ("00" + (helper.dec2hex(pub.y.toString()))).slice(-64)
+# puts "pubkey", pubkey
+
+# 無圧縮：0x04 偶数：0x02 奇数：0x03
+compressPub = "0x" + (if bi(helper.hex2dec(pubkey.y)).mod(2).eq(0) then "02" else "03") + pubkey.x
+# puts "compressPub", compressPub
+
+# 署名側
+sig = kp.sign value # 一時的な公開鍵のx座標Rとハッシュと鍵と一時的な秘密鍵で計算したSを計算
+
+# 署名はhexにする
+lsig = {}
+lsig.r = sig.r.toString("hex")
+lsig.s = sig.s.toString("hex")
+puts "lsig", lsig
+
+# compressPubとssigを送る
+
+# 検証側
+# puts kp.verify value, sig # x座標のみ送るべし
+# puby = ccvuncompress compressPub.substr(4),compressPub.substr(2,2) == "02"
+# puts "puby", puby
+
+lpub = {}
+lpub.x = compressPub.substr(4)
+# lpub.y = puby
+lpub.y = helper.ccvuncompress compressPub.substr(4),compressPub.substr(2,2) == "02"
+# puts "lpub", lpub
+
+puts "ライブラリでライブラリ署名の検証", secp256k1.keyFromPublic(lpub).verify value, lsig
+
+# 自力版 =========================
+
+# 署名側
+gsig = helper.sign value, secretkey
+puts "gsig", gsig
+
+# 秘密鍵から公開鍵作成 なんと署名時には鍵ペアがいらない
+kfp = helper.keyFromPrivate secretkey
+# puts "kfp", kfp
+
+# 無圧縮：0x04 偶数：0x02 奇数：0x03
+compressGPub = "0x" + (if bi(helper.hex2dec(kfp.y)).mod(2).eq(0) then "02" else "03") + kfp.x
+# puts "compressGPub", compressGPub
+
+# compressGPubとgsigを送る
+
+# 検証側
+gpub = {}
+gpub.x = compressGPub.substr(4)
+gpub.y = helper.ccvuncompress compressGPub.substr(4),compressGPub.substr(2,2) == "02"
+# puts "gpub", gpub
+
+puts "ライブラリで自作署名の検証", secp256k1.keyFromPublic(gpub).verify value, gsig
+puts "自力でライブラリ署名の検証", helper.verify value, lsig, lpub
+puts "自力で自作署名の検証", helper.verify value, gsig, gpub
+
+###
+
+
+###
+# 楕円曲線暗号による署名 再 清書
+bi = require "big-integer"
+
+value = "yamaya"
+secretkey = helper.dec2hex helper.gen_rand(64).toString()
+puts "secretkey", secretkey
+
+# 前提条件など =========================
+p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F" # y座標計算用
+g = {} # ポイントG(x,y)
+g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+
+# compress形式からyを算出
+ccvuncompress = (val, bleo)-> 
+  x = bi helper.hex2dec(val)
+  a = helper.modular_exp(x, bi(3), p).plus(7).mod(p)
+  y = helper.modular_exp(a, p.plus(1).divide(4), p)
+  # y座標プレフィックスの偶奇を判断
+  y = y.multiply(-1).plus(p) if y.mod(2).eq(0) != bleo
+  ("00" + (helper.dec2hex(y))).slice(-64)
+
+
+
+# ライブラリ版 =========================
+secp256k1 = new require('elliptic').ec('secp256k1')
+
+kp = secp256k1.keyFromPrivate secretkey # # 秘密鍵からKeyPair
+
+# 送信用公開鍵生成
+pub = kp.getPublic()
+pubkey = {}
+pubkey.x =  ("00" + (helper.dec2hex(pub.x.toString()))).slice(-64)
+pubkey.y =  ("00" + (helper.dec2hex(pub.y.toString()))).slice(-64)
+puts "pubkey", pubkey
+
+# 無圧縮：0x04 偶数：0x02 奇数：0x03
+compressPub = "0x" + (if bi(helper.hex2dec(pubkey.y)).mod(2).eq(0) then "02" else "03") + pubkey.x
+puts "compressPub", compressPub
+
+# 署名側
+sig = kp.sign value # 一時的な公開鍵のx座標Rとハッシュと鍵と一時的な秘密鍵で計算したSを計算
+
+# 署名はhexにする
+lsig = {}
+lsig.r = sig.r.toString("hex")
+lsig.s = sig.s.toString("hex")
+puts "lsig", lsig
+
+# compressPubとssigを送る
+
+# 検証側
+# puts kp.verify value, sig # x座標のみ送るべし
+# puby = ccvuncompress compressPub.substr(4),compressPub.substr(2,2) == "02"
+# puts "puby", puby
+
+lpub = {}
+lpub.x = compressPub.substr(4)
+# lpub.y = puby
+lpub.y = ccvuncompress compressPub.substr(4),compressPub.substr(2,2) == "02"
+puts "lpub", lpub
+
+puts "ライブラリでの検証", secp256k1.keyFromPublic(lpub).verify value, lsig
+
+
+
+# 自力版 =========================
+# 2倍(2G=G+G)
+doublePt = (g,p)->
+  res = {}
+  if g.y.eq(bi.zero)
+    res.x = 0
+    res.y = 0
+    return res
+  else
+    nu = bi(3).multiply( helper.modular_exp(g.x,bi(2),p) ).multiply(  helper.modular_exp( bi(2).multiply(g.y), p.minus(bi(2)), p ))
+    x3 = helper.modular_exp(nu, bi(2), p).minus(bi(2).multiply(g.x))
+    y3 = nu.multiply( g.x.minus(x3) ).minus(g.y)
+    res.x = x3.mod(p)
+    res.y = y3.mod(p)
+    return res
+
+# たし算(G+G)
+addPt = (g1,g2,p)->
+  res = {}
+  
+  return g2 if g1.x.eq(0) && g1.y.eq(0)
+  return g1 if g2.x.eq(0) && g2.y.eq(0)
+  
+  if g1.x.eq(g2.x)
+    if (g1.y.plus(g2.y)).mod(p).eq(0)
+      res.x = bi(0)
+      res.y = bi(0)
+      return res
+    else
+      return doublePt(g1,p)
+  
+  # lm = (g1y-g2y) * ( (g1x-g2x)**p-2 % p )
+  lm = (g1.y.minus(g2.y)).multiply( helper.modular_exp(g1.x.minus(g2.x), p.minus(bi(2)), p) )
+  
+  # x3 = (lm**2%p) - (g1x+g2x)
+  x3 = helper.modular_exp(lm,bi(2),p).minus(g1.x.plus(g2.x))
+  
+  # y3 = lm*(g1x-x3)-g1y
+  y3 = lm.multiply(g1.x.minus(x3)).minus(g1.y)
+  
+  res.x = x3.mod(p)
+  res.y = y3.mod(p)
+  return res
+
+# スカラーかけ算(n-1G)
+scalarmult = (g,e,p)->
+  res = {}
+  if e.eq(0)
+    res.x = bi(0)
+    res.y = bi(0)
+    return res
+  
+  res = scalarmult(g, e.divide(2),p)
+  res = addPt(res, res, p)
+  res = addPt(res, g, p) if e.and(1).eq(1)
+  
+  return res
+
+
+ccv = (g,e,p)->
+  res = scalarmult g, e, p
+  
+  # biライブラリがBIGNUM化されて符号(sign)が消えたので書き直し
+  res.x = res.x.plus(p) if res.x.lt(0)
+  res.y = res.y.plus(p) if res.y.lt(0)
+  
+  res
+
+keyFromPrivate = (pri)->
+  e = bi helper.hex2dec pri
+  
+  # ポイントG(x,y)
+  g = {}
+  g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+  
+  # 素数 p(modする)
+  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  
+  res = ccv g, e, p
+  res.x = ("00" + (helper.dec2hex(res.x.toString()))).slice(-64)
+  res.y = ("00" + (helper.dec2hex(res.y.toString()))).slice(-64)
+  res
+
+# 著名用
+n = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+BN = require "BN.js"
+
+sign = (value, pri)->
+  res = {}
+  dech = bi new BN(value, 16).toString()
+  
+  nonce = helper.gen_rand(64)
+  r = ccv(g,nonce,p).x.mod(n)
+  s = helper.modular_exp(nonce, n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(helper.hex2dec(pri)))) ).mod(n)
+  
+  res.r = ("00" + (helper.dec2hex(r.toString()))).slice(-64)
+  res.s = ("00" + (helper.dec2hex(s.toString()))).slice(-64)
+  
+  res
+
+verify = (value, sig, pub)->
+  dech = bi new BN(value, 16).toString()
+  
+  # 公開鍵も署名もhexでくるのでキャストが必要だった
+  bipub = {}
+  bipub.x = bi helper.hex2dec pub.x
+  bipub.y = bi helper.hex2dec pub.y
+  
+  bir = bi helper.hex2dec sig.r.toString()
+  bis = bi helper.hex2dec sig.s.toString()
+  
+  si = helper.modular_exp(bis, n.minus(2), n)
+  u1 = dech.multiply(si).mod(n)
+  u2 = bir.multiply(si).mod(n)
+  p1 = scalarmult(g, u1, p)
+  p2 = scalarmult(bipub, u2, p)
+  v = addPt(p1, p2, p)
+  v.x = v.x.plus(p) if v.x.lt(0)
+  v.y = v.y.plus(p) if v.y.lt(0)
+  v.x.minus(bir).mod(n).eq(0)
+
+
+# 署名側
+gsig = sign value, secretkey
+puts "gsig", gsig
+
+# 秘密鍵から公開鍵作成 なんと署名時には鍵ペアがいらない
+kfp = keyFromPrivate secretkey
+puts "kfp", kfp
+
+# 無圧縮：0x04 偶数：0x02 奇数：0x03
+compressGPub = "0x" + (if bi(helper.hex2dec(kfp.y)).mod(2).eq(0) then "02" else "03") + kfp.x
+puts "compressGPub", compressGPub
+
+# compressGPubとgsigを送る
+
+# 検証側
+gpub = {}
+gpub.x = compressGPub.substr(4)
+gpub.y = ccvuncompress compressGPub.substr(4),compressGPub.substr(2,2) == "02"
+puts "gpub", gpub
+
+# puts "ライブラリでの検証", secp256k1.keyFromPublic(gpub).verify value, gsig
+puts "自力での検証", verify value, lsig, lpub
+# puts "自力での検証", verify value, gsig, gpub
+###
+
+
+
+
+
+
+
+
+
+
+###
 # 楕円曲線暗号による署名 再
 bi = require "big-integer"
 
@@ -38,9 +345,30 @@ kp = secp256k1.keyFromPrivate secretkey
 # puts "kp", kp
 
 # 署名
+
 sig = kp.sign value # 一時的な公開鍵のx座標Rとハッシュと鍵と一時的な秘密鍵で計算したSを計算
-puts "sig",sig.r.toString()
-puts "sig",sig.s.toString()
+
+
+# puts Buffer.from(value)
+# puts Buffer.from(value,16)
+# puts Buffer.from(value).readInt16BE()
+# puts Buffer.from(value).readInt16LE()
+# puts Buffer.from(value).readUInt16BE()
+# puts Buffer.from(value).readInt16LE()
+# puts Buffer.from(value).readInt32BE()
+# puts Buffer.from(value).readInt32LE()
+# puts Buffer.from(value).readUInt32BE()
+# puts Buffer.from(value).readUInt32LE()
+# puts Buffer.from(value).readBigInt64BE()
+# puts Buffer.from(value).readBigInt64LE()
+# puts Buffer.from(value).readBigUInt64BE()
+# puts Buffer.from(value).readBigUInt64LE()
+
+
+puts "sigr",sig.r.toString()
+puts "sigr",sig.r.toString("hex")
+puts "sigs",sig.s.toString()
+puts "sigs",sig.s.toString("hex")
 # puts kp.verify value, sig
 
 # kpじゃなくて公開鍵でやるべき
@@ -77,7 +405,6 @@ s = sig.s.toString('hex')
 
 
 
-###
 
 
 # 検証
@@ -123,6 +450,9 @@ puts secp256k1.keyFromPublic(pub).verify value, {r:r,s:s}
 ###
 
 
+
+
+###
 # 自力
 # 2倍(2G=G+G)
 doublePt = (g,p)->
@@ -212,12 +542,14 @@ keyFromPrivate = (pri)->
 # 著名
 n = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
 
-keccak = require("keccak")("keccak256")
-pubhash =  keccak.update(Buffer.from(pub.x + pub.y, "hex")).digest("hex")
-puts pubhash
+
+# keccak = require("keccak")("keccak256")
+# pubhash =  keccak.update(Buffer.from(pub.x + pub.y, "hex")).digest("hex")
+# puts "pubhash", pubhash
 
 
 # 署名を自力でv6
+BN = require "BN.js"
 sign = (value, pri)->
   res = {}
   # dech = bi helper.hex2dec helper.createHash(value)
@@ -225,7 +557,8 @@ sign = (value, pri)->
   # dech = bi(helper.hex2dec require("crypto").createHmac('sha256', value).digest("hex")).mod(n)
   # keccak = require("keccak")("keccak256")
   # dech = bi helper.hex2dec keccak.update(value).digest("hex")
-  dech = bi 1
+  # dech = bi 1
+  dech = bi new BN(value, 16).toString()
   
   nonce = helper.gen_rand(64)
   r = ccv(g,nonce,p).x.mod(n)
@@ -242,9 +575,11 @@ verify = (value, sig, pub)->
   # dech = bi(helper.hex2dec require("crypto").createHmac('sha256', value).digest("hex")).mod(n)
   # keccak = require("keccak")("keccak256")
   # dech = bi helper.hex2dec keccak.update(value).digest("hex")
-  dech = bi 1
+  # dech = bi 1
+  dech = bi new BN(value, 16).toString()
   
   bir = bi helper.hex2dec sig.r.toString()
+  puts "birbirbirbirbirbir",bir
   bis = bi helper.hex2dec sig.s.toString()
   
   si = helper.modular_exp(bis, n.minus(2), n)
@@ -259,7 +594,11 @@ verify = (value, sig, pub)->
 
 
 
+
 # 自力署名
+
+# BN.jsという文字列を入れると強制的にBNにするライブラリが使われている
+
 gsig = sign value, secretkey
 puts "gsig", gsig
 
@@ -273,7 +612,6 @@ puts "tsig", tsig
 
 # 秘密鍵から公開鍵作成
 kfp = keyFromPrivate secretkey
-# puts "kfp", kfp
 
 # ライブラリ鍵
 libpub = {}
@@ -289,30 +627,45 @@ puts "01lib",  secp256k1.keyFromPublic(pub).verify    value, sig
 puts "02lib",  secp256k1.keyFromPublic(libpub).verify value, sig
 puts "03lib",  secp256k1.keyFromPublic(pub).verify    value, tsig
 puts "04lib",  secp256k1.keyFromPublic(libpub).verify value, tsig
-puts "05gsig", secp256k1.keyFromPublic(pub).verify    value, gsig # false
-puts "06gsig", secp256k1.keyFromPublic(libpub).verify value, gsig # false
+puts "05gsig", secp256k1.keyFromPublic(pub).verify    value, gsig # false→OK
+puts "06gsig", secp256k1.keyFromPublic(libpub).verify value, gsig # false→OK
 
+puts "kfp", kfp
 bikfp = {}
 bikfp.x = bi helper.hex2dec(kfp.x)
 bikfp.y = bi helper.hex2dec(kfp.y)
-# puts "07gver",  verify value, gsig, bikfp
-# puts "08gver",  verify value, sig,  bikfp # false
-# puts "09gver",  verify value, tsig, bikfp # false
+puts "bikfp", bikfp
+
+puts "@@@@@@@@@@", sig.s
+puts "@@@@@@@@@@", tsig.s
+puts "07gver",  verify value, gsig, bikfp
+puts "08gver",  verify value, sig,  bikfp # false
+puts "09gver",  verify value, tsig, bikfp # false→OK
 
 bilibpub = {}
 bilibpub.x = bi helper.hex2dec(libpub.x)
-bilibpub.y = bi helper.hex2dec(libpub.x)
-# puts "10gver",  verify value, gsig, bilibpub # false
-# puts "11gver",  verify value, sig,  bilibpub # false
-# puts "12gver",  verify value, tsig, bilibpub # false
+bilibpub.y = bi helper.hex2dec(libpub.y)
+puts "bilibpub", bilibpub
+puts "10gver",  verify value, gsig, bilibpub # false→OK
+puts "11gver",  verify value, sig,  bilibpub # false
+puts "12gver",  verify value, tsig, bilibpub # false→OK
 
+# sigはhexじゃないからうまくいかない
+###
+
+
+
+
+
+
+###
 crypto = require "crypto"
 createHashAlgo = (src, algo)-> 
   cry = crypto.createHash algo
   cry.update src, "utf8"
   cry.digest 'hex'
 
-
+# ハッシュアルゴリズムは関係なかった
 hsign = (value, pri, algo)->
   res = {}
   dech = bi helper.hex2dec createHashAlgo(value, algo)
@@ -332,7 +685,7 @@ createHashdig = (src)->
   cry.digest()
 
 
-
+# ハッシュ値をバッファーでエンディアンでやるのは関係なかった
 bsign = (value, pri)->
   res = {}
   # dech = bi createHashdig(value).readBigInt64BE()
@@ -367,8 +720,8 @@ puts require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest("he
 puts require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest().readBigUInt64BE()
 puts require("keccak")("keccak256").update(Buffer.from(value, "hex")).digest().readBigUInt64LE()
 bsig = bsign value, secretkey
-puts "13bsig", secp256k1.keyFromPublic(libpub).verify value, bsig # false
-
+# puts "13bsig", secp256k1.keyFromPublic(libpub).verify value, bsig # false
+###
 
 
 

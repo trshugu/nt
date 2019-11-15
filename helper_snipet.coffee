@@ -211,3 +211,157 @@ module.exports.gen_prime = (bit)->
   return ret
 
 
+# 楕円曲線計算
+# 2倍(2G=G+G)
+doublePt = (g,p)->
+  res = {}
+  if g.y.eq(bi.zero)
+    res.x = 0
+    res.y = 0
+    return res
+  else
+    nu = bi(3).multiply( helper.modular_exp(g.x,bi(2),p) ).multiply(  helper.modular_exp( bi(2).multiply(g.y), p.minus(bi(2)), p ))
+    x3 = helper.modular_exp(nu, bi(2), p).minus(bi(2).multiply(g.x))
+    y3 = nu.multiply( g.x.minus(x3) ).minus(g.y)
+    res.x = x3.mod(p)
+    res.y = y3.mod(p)
+    return res
+
+# たし算(G+G)
+addPt = (g1,g2,p)->
+  res = {}
+  
+  return g2 if g1.x.eq(0) && g1.y.eq(0)
+  return g1 if g2.x.eq(0) && g2.y.eq(0)
+  
+  if g1.x.eq(g2.x)
+    if (g1.y.plus(g2.y)).mod(p).eq(0)
+      res.x = bi(0)
+      res.y = bi(0)
+      return res
+    else
+      return doublePt(g1,p)
+  
+  # lm = (g1y-g2y) * ( (g1x-g2x)**p-2 % p )
+  lm = (g1.y.minus(g2.y)).multiply( helper.modular_exp(g1.x.minus(g2.x), p.minus(bi(2)), p) )
+  
+  # x3 = (lm**2%p) - (g1x+g2x)
+  x3 = helper.modular_exp(lm,bi(2),p).minus(g1.x.plus(g2.x))
+  
+  # y3 = lm*(g1x-x3)-g1y
+  y3 = lm.multiply(g1.x.minus(x3)).minus(g1.y)
+  
+  res.x = x3.mod(p)
+  res.y = y3.mod(p)
+  return res
+
+# スカラーかけ算(n-1G)
+scalarmult = (g,e,p)->
+  res = {}
+  if e.eq(0)
+    res.x = bi(0)
+    res.y = bi(0)
+    return res
+  
+  res = scalarmult(g, e.divide(2),p)
+  res = addPt(res, res, p)
+  res = addPt(res, g, p) if e.and(1).eq(1)
+  
+  return res
+
+
+ccv = (g,e,p)->
+  res = scalarmult g, e, p
+  
+  # biライブラリがBIGNUM化されて符号(sign)が消えたので書き直し
+  res.x = res.x.plus(p) if res.x.lt(0)
+  res.y = res.y.plus(p) if res.y.lt(0)
+  
+  res
+
+module.exports.keyFromPrivate = (pri)->
+  e = bi helper.hex2dec pri
+  
+  # ポイントG(x,y)
+  g = {}
+  g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+  
+  # 素数 p(modする)
+  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  
+  res = ccv g, e, p
+  res.x = ("00" + (helper.dec2hex(res.x.toString()))).slice(-64)
+  res.y = ("00" + (helper.dec2hex(res.y.toString()))).slice(-64)
+  res
+
+module.exports.sign = (value, pri)->
+  res = {}
+  BN = require "BN.js"
+  dech = bi new BN(value, 16).toString()
+  
+  # ポイントG(x,y)
+  g = {}
+  g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+  
+  # 素数 p(modする)
+  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  
+  # 著名用
+  n = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+  
+  # nonce = helper.gen_rand(64)
+  nonce = bi(4)
+  r = ccv(g,nonce,p).x.mod(n)
+  s = helper.modular_exp(nonce, n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(helper.hex2dec(pri)))) ).mod(n)
+  
+  res.r = ("00" + (helper.dec2hex(r.toString()))).slice(-64)
+  res.s = ("00" + (helper.dec2hex(s.toString()))).slice(-64)
+  
+  res
+
+module.exports.verify = (value, sig, pub)->
+  BN = require "BN.js"
+  dech = bi new BN(value, 16).toString()
+  
+  # 公開鍵も署名もhexでくるのでキャストが必要だった
+  bipub = {}
+  bipub.x = bi helper.hex2dec pub.x
+  bipub.y = bi helper.hex2dec pub.y
+  
+  bir = bi helper.hex2dec sig.r.toString()
+  bis = bi helper.hex2dec sig.s.toString()
+  
+  # ポイントG(x,y)
+  g = {}
+  g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+  
+  # 素数 p(modする)
+  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  
+  # 著名用
+  n = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+  
+  si = helper.modular_exp(bis, n.minus(2), n)
+  u1 = dech.multiply(si).mod(n)
+  u2 = bir.multiply(si).mod(n)
+  p1 = scalarmult(g, u1, p)
+  p2 = scalarmult(bipub, u2, p)
+  v = addPt(p1, p2, p)
+  v.x = v.x.plus(p) if v.x.lt(0)
+  v.y = v.y.plus(p) if v.y.lt(0)
+  v.x.minus(bir).mod(n).eq(0)
+
+# compress形式からyを算出
+module.exports.ccvuncompress = (val, bleo)-> 
+  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  x = bi helper.hex2dec(val)
+  a = helper.modular_exp(x, bi(3), p).plus(7).mod(p)
+  y = helper.modular_exp(a, p.plus(1).divide(4), p)
+  # y座標プレフィックスの偶奇を判断
+  y = y.multiply(-1).plus(p) if y.mod(2).eq(0) != bleo
+  ("00" + (helper.dec2hex(y))).slice(-64)
+
+
