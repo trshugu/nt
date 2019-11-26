@@ -9,10 +9,102 @@ helper = require "./helper"
 
 
 
+###
+# shift-jisの場合
+request = require "request" 
+cheerio = require "cheerio"
+
+Iconv = require('iconv').Iconv
+sjis_utf8 = new Iconv('utf-8', 'shift-jis')
+
+iconvl = require("iconv-lite");
+
+wget = (url)-> new Promise (f,re)->
+  request url
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      res = {}
+      res.headers = r.headers
+      res.body = cheerio.load b
+      res.raw = b
+      f res
+
+url = "https://eiga.com/now/all/rank/"
+url = "http://www.kent-web.com/pubc/garble.html"
+
+
+wget url
+.then (v)->
+  v.body("a").each (i,elm)->
+    # console.log deco.decode v.body(elm)[0].children[0].data
+    # console.log Buffer.from(v.body(elm)[0].children[0].data)
+    # console.log sjis_utf8.convert(Buffer.from(v.body(elm)[0].children[0].data))
+    # console.log sjis_utf8.decode(Buffer.from(v.body(elm)[0].children[0].data))
+    # console.log iconvl.encode(Buffer.from(v.body(elm)[0].children[0].data), "sjis");
+    # console.log iconvl.decode(Buffer.from(v.body(elm)[0].children[0].data), "sjis");
+    console.log iconvl.encode(v.body(elm)[0].children[0].data, "sjis");
+    console.log iconvl.decode(v.body(elm)[0].children[0].data, "sjis");
+  
+  # console.log v
+  
+  v.body("meta")
+    .filter (i,elm)-> v.body(elm)[0].attribs.charset?
+    .map (i, elm)-> console.log v.body(elm)[0].attribs.charset
+
+  #   .filter((i,elm)->v.body(elm)[0].attribs.charset?)
+  #   .each((i,elm)->v.body(elm)[0].attribs.charset)
+  # v.body("meta").each (i,elm)->
+  #   console.log v.body(elm)[0].attribs.charset
+  
+.catch (e)->
+  console.log e
+
+###
 
 
 
+###
+request = require "request" 
+cheerio = require "cheerio"
 
+wget = (url)-> new Promise (f,re)->
+  request url
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      res = {}
+      res.headers = r.headers
+      res.body = cheerio.load b
+      res.raw = b
+      f res
+
+url = "https://eiga.com/now/all/rank/"
+
+wget url
+.then (v)->
+  v.body("img").each (i,elm)->
+    console.log v.body(elm)[0].attribs.src
+    
+.catch (e)->
+  console.log e
+###
+
+
+
+###
+func = (x)-> x**2
+ecc = (x)-> Math.sqrt x**3+7
+
+
+puts [0..10].map (i)-> func i
+puts [0..10].map (i)-> ecc i
+
+puts [0..10].map (x)->  x**2
+puts [0..10].map (x)-> Math.sqrt x**3+7
+###
 
 
 

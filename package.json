@@ -24,6 +24,8 @@
     "ethereumjs-wallet": "^0.6.3",
     "geth": "^0.4.0",
     "gpu.js": "^1.10.4",
+    "iconv": "^2.3.5",
+    "iconv-lite": "^0.5.0",
     "js-sha3": "^0.8.0",
     "keccak": "^2.0.0",
     "koa": "^2.5.1",
