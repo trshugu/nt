@@ -234,6 +234,7 @@ puts yjd_create_nonce 5
 
 
 ###
+###
 # shift-jisの場合
 request = require "request" 
 cheerio = require "cheerio"
@@ -244,15 +245,19 @@ sjis_utf8 = new Iconv('utf-8', 'shift-jis')
 iconvl = require("iconv-lite");
 
 wget = (url)-> new Promise (f,re)->
-  request url
+  request
+    url: url
+    encoding: null
   , (e,r,b)->
     if e?
       re e
     else
       res = {}
       res.headers = r.headers
-      res.body = cheerio.load b
-      res.raw = b
+      # res.body = cheerio.load b
+      enb = iconvl.decode(b, "sjis");
+      res.body = cheerio.load enb
+      res.raw = iconvl.decode(b, "sjis")
       f res
 
 url = "https://eiga.com/now/all/rank/"
@@ -261,6 +266,37 @@ url = "http://www.kent-web.com/pubc/garble.html"
 
 wget url
 .then (v)->
+  # puts v.body("a")
+  puts v.raw
+  v.body("a").each (i,elm)->
+    console.log "p1:", v.body(elm)[0].children[0].data
+  
+  v.body("meta")
+    .filter (i,elm)-> v.body(elm)[0].attribs.charset?
+    .map (i, elm)-> console.log v.body(elm)[0].attribs.charset
+
+  #   .filter((i,elm)->v.body(elm)[0].attribs.charset?)
+  #   .each((i,elm)->v.body(elm)[0].attribs.charset)
+  # v.body("meta").each (i,elm)->
+  #   console.log v.body(elm)[0].attribs.charset
+  
+.catch (e)->
+  console.log e
+
+
+
+
+###
+wget url
+.then (v)->
+  puts v.body("a")
+  puts v.raw
+  # puts iconvl.decode(v.raw, "Shift-JIS")
+  # c = new Iconv('shift_jis', 'utf-8').convert(v.raw.toString())
+  # puts c
+  # puts new Iconv('shift_jis', 'utf-8').convert(v.raw).toString()
+  # puts iconvl.encode(v, "sjis");
+  # puts iconvl.decode(v, "sjis");
   v.body("a").each (i,elm)->
     # console.log deco.decode v.body(elm)[0].children[0].data
     # console.log Buffer.from(v.body(elm)[0].children[0].data)
@@ -268,8 +304,18 @@ wget url
     # console.log sjis_utf8.decode(Buffer.from(v.body(elm)[0].children[0].data))
     # console.log iconvl.encode(Buffer.from(v.body(elm)[0].children[0].data), "sjis");
     # console.log iconvl.decode(Buffer.from(v.body(elm)[0].children[0].data), "sjis");
-    console.log iconvl.encode(v.body(elm)[0].children[0].data, "sjis");
-    console.log iconvl.decode(v.body(elm)[0].children[0].data, "sjis");
+    console.log "p1:", v.body(elm)[0].children[0].data
+    # console.log "p2:", Buffer.from v.body(elm)[0].children[0].data
+    # console.log "p3:", Buffer.from(v.body(elm)[0].children[0].data, "binary")
+    # console.log "p4:", Buffer.from(v.body(elm)[0].children[0].data, "binary").filter((i)-> i!=253)
+    # console.log "p5:", iconvl.decode Buffer.from(v.body(elm)[0].children[0].data, "binary"), "sjis"
+    # console.log "p6:", iconvl.decode(Buffer.from(v.body(elm)[0].children[0].data , "binary"), "sjis")
+    # console.log "p7:", iconvl.decode(Buffer.from(v.body(elm)[0].children[0].data, "binary").filter((i)-> i!=253), "sjis")
+    # console.log "e:", iconvl.encode(v.body(elm)[0].children[0].data, "sjis").toString();
+    # console.log "u:", iconvl.encode(v.body(elm)[0].children[0].data, "utf8");
+    # console.log "u:", iconvl.encode(v.body(elm)[0].children[0].data, "utf8").toString();
+    # console.log "d:", iconvl.decode(v.body(elm)[0].children[0].data, "utf8");
+    # console.log "ed", iconvl.encode(iconvl.decode(v.body(elm)[0].children[0].data, "sjis"),"utf8");
   
   # console.log v
   
