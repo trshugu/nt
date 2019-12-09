@@ -264,17 +264,44 @@ url = "https://eiga.com/now/all/rank/"
 url = "http://www.kent-web.com/pubc/garble.html"
 
 
+# res.body("h2").map (i,elm)-> puts "=====", elm.children.filter((ty)->ty.type=="text").map((tx)-> tx.data) 
+
+
+# title
+# mes.children[2].children[0].children[1].children[1].children.filter((i)->i.type=="text")[0].data
+
+# date
+# mes.children[2].children[0].children[3].children[1].children[0].data
+
+# pro
+# mes.children[2].children[2].children[1].children[0].data
+# mes.children[2].children[2].children[3].children[0].data
+# mes.children[2].children[2].children[5].children[0].data
+# mes.children[2].children[2].children[7].children[0].data
+# mes.children[2].children[2].children[9].children[0].data
+
+
+
+# res = null
 wget url
 .then (v)->
-  # puts v.body("a")
-  puts v.raw
-  v.body("a").each (i,elm)->
-    console.log "p1:", v.body(elm)[0].children[0].data
   
-  v.body("meta")
-    .filter (i,elm)-> v.body(elm)[0].attribs.charset?
-    .map (i, elm)-> console.log v.body(elm)[0].attribs.charset
-
+  mes = v.body(".mes")[7]
+  
+  puts mes
+  
+  # res = v
+  # puts v.raw
+  # v.body("table").each (i,elm)->
+  #   puts v.body(elm)[0]
+  
+  # puts v.body("table").length
+  
+  # v.body("a").each (i,elm)->
+  #   console.log "p1:", v.body(elm)[0].children[0].data
+  # v.body("meta")
+  #   .filter (i,elm)-> v.body(elm)[0].attribs.charset?
+  #   .map (i, elm)-> console.log v.body(elm)[0].attribs.charset
   #   .filter((i,elm)->v.body(elm)[0].attribs.charset?)
   #   .each((i,elm)->v.body(elm)[0].attribs.charset)
   # v.body("meta").each (i,elm)->
