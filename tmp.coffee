@@ -1376,7 +1376,9 @@ Promise.resolve()
 
 ###
 console.log require("fs").readFileSync("./sanjuu.png").toString("base64")
+console.log require("fs").readFileSync("./pen.png").toString("base64")
 ###
+
 
 
 ###
