@@ -6,6 +6,108 @@ helper = require "./helper"
 
 
 
+# 組み合わせの中で
+# 全部が入っている
+# 割合
+# arr.every((i)-> [1,2,3,4,5].includes(i))
+# arr.every((i)-> [1,2,3,4,5].some((j)->i==j))
+
+expect = ["1","2","3","4","5"]
+expect = [1,2,3]
+
+
+
+itera = (arr)->
+  i = 0
+  while arr.length > 0
+    yield arr.shift()
+  # while true
+  #   yield arr[i % arr.length]
+  #   i++
+
+
+
+gen = itera expect
+
+
+fn = (target, cnt, res=[])->
+  if cnt <= 0
+    return res
+  else
+    if res.length == 0
+      target.forEach (i)-> res.push [i]
+      fn target, cnt-1, res
+    else
+      res = res.map((i)-> target.map((j)->[i,j])).flat()
+      res = res.map (i)-> i.flat()
+      fn target, cnt-1, res
+
+
+
+# puts fn([1,2,3], 3).map (a)-> [1,2,3].every((i)-> a.includes(i))
+# [1,1],[1,2],[2,1],[2,2]
+
+puts fn([1,2,3], 3).map((a)-> [1,2,3].every((i)-> a.includes(i))).length
+puts fn([1,2,3], 3).map((a)-> [1,2,3].every((i)-> a.includes(i))).filter((i)-> i).length
+
+# \puts 6/27
+
+
+###
+# 順列→ではなくて全通りだった
+junretsu = (balls, nukitorisu)->
+  arrs = []
+  zensu = balls.length
+  
+  if zensu < nukitorisu
+    return
+  else if nukitorisu == 1 
+    [0...zensu].forEach (i)-> arrs[i] = [balls[i]]
+  else
+    [0...zensu].forEach (i)->
+      parts = balls.slice(0)
+      parts.splice(i, 1)[0]
+      results = junretsu(parts, nukitorisu - 1)
+      [0...results.length].forEach (j)->
+        arrs.push([balls[i]].concat(results[j]))
+  
+  return arrs
+
+# puts junretsu([1,2,3,4], 3)
+
+all = junretsu(expect, 3)
+puts all
+puts all.length
+scan = all.map (a)-> expect.every((i)-> a.includes(i))
+puts scan.filter((i)-> i).length
+###
+
+
+
+###
+# 組み合わせ→ではなくて順列だった
+kumiawase = (balls, nukitorisu)->
+  arrs = []
+  zensu = balls.length
+  puts "sens", zensu
+  puts "nuki", nukitorisu
+  if zensu < nukitorisu
+    return
+  else if nukitorisu == 1
+    puts "nukiitus1"
+    [0...zensu].forEach (i)-> arrs[i] = [balls[i]]
+  else
+    puts "======"
+    [0...(zensu - nukitorisu + 1)].forEach (i)->
+      kumis = kumiawase(balls.slice(i + 1), nukitorisu - 1)
+      puts kumis
+      [0...kumis.length].forEach (j)->
+        arrs.push([balls[i]].concat(kumis[j]))
+  
+  return arrs
+
+puts kumiawase([1,2,3,4], 3)
+###
 
 
 ###
@@ -234,7 +336,6 @@ puts yjd_create_nonce 5
 
 
 ###
-###
 # shift-jisの場合
 request = require "request" 
 cheerio = require "cheerio"
@@ -310,6 +411,7 @@ wget url
 .catch (e)->
   console.log e
 
+###
 
 
 
