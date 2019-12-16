@@ -6,17 +6,237 @@ helper = require "./helper"
 
 
 
+
+
+
+
+
+
+###
+# genは廃止
+# 現状これがいちばん高速だけどぜんぜん足りないので
+# そもそもロジックを変えないとダメ
+kind = 6
+
+expect = [0...kind].map (i)-> i.toString()
+puts kind, "種類"
+
+
+buy = 20
+[kind..buy].forEach (b)->
+  ind = 0
+  fullfill = 0
+  flg = true
+  while flg
+    ret = ind.toString(kind).padStart(b, 0)
+    if ret.length > b
+      flg = false
+    else
+      # puts ret, expect.every (i)-> ret.split("").includes(i)
+      fullfill++ if expect.every (i)-> ret.split("").includes(i)
+      ind++
+
+  puts b, "個->", fullfill, "/", kind**b, ":", Math.floor(fullfill/(kind**b) * 100), "%"
+###
+
+
+
+
+###
+# n進数を配列で返却、item数の指定
+itera = (n, i)->
+  cnt = 0
+  while true
+    ret = cnt.toString(n).split("")
+    if (i - ret.length) > 0
+      [0...(i - ret.length)].forEach ->
+        ret.unshift "0"
+    
+    if ret.length == i+1
+      return "end"
+    else
+      yield ret
+      cnt++
+
+kind = 6
+
+expect = [0...kind].map (i)-> i.toString()
+puts kind, "種類"
+
+
+buy = 30
+[kind..buy].forEach (b)->
+  gen = itera(kind, b)
+  fullfill = 0
+  flg = true
+  while flg
+    ret = gen.next()
+    if ret.done
+      flg = false
+    else
+      # puts ret, expect.every (i)-> ret.value.includes(i)
+      fullfill++ if expect.every (i)-> ret.value.includes(i)
+
+  puts b, "個->", fullfill, "/", kind**b, ":", Math.floor(fullfill/(kind**b) * 100), "%"
+###
+
+
+
+
+
+
+###
+gen = itera 3
+
+[0..10].forEach ->
+  puts gen.next().value
+
+# puts check.map (a)->
+#   expect.every (i)-> a.includes(i)
+  arr = [0...n]
+  ret = []
+  ret.push 0
+  # puts "a", arr
+  # puts "r", ret
+  while true
+    p = 0
+    while p != arr.length
+      # puts "1", ret, p, arr.length-1
+      ret[ret.length-1] = arr[p]
+      # puts "2", ret, p
+      yield ret.join("")
+      p++
+    
+    
+    
+    # [0..(ret.length-1)].forEach (i)-> ret[i] = arr[0]
+    ret.unshift arr[1]
+
+  # while true
+  #   yield 1
+  
+  # 0
+  ret = []
+  ret.push arr[0]
+  yield ret.join("")
+  
+  # 1
+  puts "a", ret[ret.length-1]
+  puts "b", arr[arr.length-1]
+  if ret[ret.length-1] == arr[arr.length-1]
+    ret.unshift[ret[1]]
+    yield ret.join("")
+  else
+    ret[ret.length-1] = arr[arr.length-1]
+    yield ret.join("")
+
+  # 10
+  puts "a", ret[ret.length-1]
+  puts "b", arr[arr.length-1]
+  if ret[ret.length-1] == arr[arr.length-1]
+    ret[ret.length-1] = arr[0]
+    ret.unshift arr[1]
+    yield ret.join("")
+  else
+    ret[ret.length-1] = arr[arr.length-1]
+    yield ret.join("")
+
+  # 11
+  puts "a", ret[ret.length-1]
+  puts "b", arr[arr.length-1]
+  if ret[ret.length-1] == arr[arr.length-1]
+    ret[ret.length-1] = arr[0]
+    ret.unshift arr[1]
+    yield ret.join("")
+  else
+    ret[ret.length-1] = arr[arr.length-1]
+    yield ret.join("")
+
+###
+
+
+###
+# 6種類9個でおちる。
+# →都度都度検査する用にしないとダメぽい
+fn = (target, cnt, res=[])->
+  if cnt <= 0
+    return res
+  else
+    if res.length == 0
+      target.forEach (i)-> res.push [i]
+      fn target, cnt-1, res
+    else
+      res = res.map((i)-> target.map((j)->[i,j])).flat().map (i)-> i.flat()
+      # res = res.map (i)-> i.flat()
+      fn target, cnt-1, res
+
+
+expect = [1..4]
+puts expect.length, "種類"
+[expect.length..10].forEach (buy)->
+  res = fn(expect, buy).map((a)-> expect.every((i)-> a.includes(i)))
+  fil = res.filter((i)-> i).length
+  puts buy, "個->", fil, "/", res.length, ":", Math.floor((fil / res.length) * 100), "%"
+
+# 4 種類
+# 4 個-> 24 / 256 : 9 %
+# 5 個-> 240 / 1024 : 23 %
+# 6 個-> 1560 / 4096 : 38 %
+# 7 個-> 8400 / 16384 : 51 %
+# 8 個-> 40824 / 65536 : 62 %
+# 9 個-> 186480 / 262144 : 71 %
+# 10 個-> 818520 / 1048576 : 78 %
+###
+
+
+
+
+
+###
 # 組み合わせの中で
 # 全部が入っている
 # 割合
 # arr.every((i)-> [1,2,3,4,5].includes(i))
 # arr.every((i)-> [1,2,3,4,5].some((j)->i==j))
 
-expect = ["1","2","3","4","5"]
-expect = [1,2,3]
+
+
+fn = (target, cnt, res=[])->
+  if cnt <= 0
+    return res
+  else
+    if res.length == 0
+      target.forEach (i)-> res.push [i]
+      fn target, cnt-1, res
+    else
+      res = res.map((i)-> target.map((j)->[i,j])).flat().map (i)-> i.flat()
+      # res = res.map (i)-> i.flat()
+      fn target, cnt-1, res
 
 
 
+# puts fn([1,2,3], 3).map (a)-> [1,2,3].every((i)-> a.includes(i))
+# [1,1],[1,2],[2,1],[2,2]
+
+# puts fn([1,2,3], 3).map((a)-> [1,2,3].every((i)-> a.includes(i))).length
+# puts fn([1,2,3], 3).map((a)-> [1,2,3].every((i)-> a.includes(i))).filter((i)-> i).length
+# \puts 6/27
+
+# expect = ["1","2","3","4","5"]
+# puts fn(["1","2","3"], 3).map((a)-> ["1","2","3"].every((i)-> a.includes(i)))
+
+# buy = 5
+
+expect = [1..6]
+puts expect.length, "種類"
+[expect.length..10].forEach (buy)->
+  res = fn(expect, buy).map((a)-> expect.every((i)-> a.includes(i)))
+  fil = res.filter((i)-> i).length
+  puts buy, "個->", fil, "/", res.length, ":", Math.floor((fil / res.length) * 100), "%"
+###
+
+
+###
 itera = (arr)->
   i = 0
   while arr.length > 0
@@ -28,29 +248,8 @@ itera = (arr)->
 
 
 gen = itera expect
+###
 
-
-fn = (target, cnt, res=[])->
-  if cnt <= 0
-    return res
-  else
-    if res.length == 0
-      target.forEach (i)-> res.push [i]
-      fn target, cnt-1, res
-    else
-      res = res.map((i)-> target.map((j)->[i,j])).flat()
-      res = res.map (i)-> i.flat()
-      fn target, cnt-1, res
-
-
-
-# puts fn([1,2,3], 3).map (a)-> [1,2,3].every((i)-> a.includes(i))
-# [1,1],[1,2],[2,1],[2,2]
-
-puts fn([1,2,3], 3).map((a)-> [1,2,3].every((i)-> a.includes(i))).length
-puts fn([1,2,3], 3).map((a)-> [1,2,3].every((i)-> a.includes(i))).filter((i)-> i).length
-
-# \puts 6/27
 
 
 ###
@@ -112,176 +311,321 @@ puts kumiawase([1,2,3,4], 3)
 
 ###
 createMD5Hash = (src)-> 
-  cry = require("crypto").createHash 'SHA256'
-  cry.update src, "utf8"
-  cry.digest 'hex'
+  cry = require("crypto").createHash 'MD5'
+  cry.update src
+  cry.digest()
 
 
-puts createMD5Hash "a"
-###
+puts createMD5Hash("a").toString()
 
-###
-yjdMd5 = ->() 
-  @au32_state = new Uint32Array(4)  #  レジスタ
-  @au32_buffer = null        #  バッファ
-  @n_blocks = 0            #  バッファ内のブロック数. 1block = 16dword = 64byte
+
+# 変換したけどよくわからなかった
+yjdMd5 = ->
+  au32_state = new Uint32Array(4) # レジスタ
+  au32_buffer = null              # バッファ
+  n_blocks = 0                    # バッファ内のブロック数. 1block = 16dword = 64byte
   
-  @Init = ->() 
-    @au32_state[0] = 0x67452301
-    @au32_state[1] = 0xefcdab89
-    @au32_state[2] = 0x98badcfe
-    @au32_state[3] = 0x10325476
+  Init: ->
+    au32_state[0] = 0x67452301
+    au32_state[1] = 0xefcdab89
+    au32_state[2] = 0x98badcfe
+    au32_state[3] = 0x10325476
   
   
-  @Transform = ->() 
-    a, b, c, d
-    x00, x01, x02, x03, x04, x05, x06, x07, x08, x09, x10, x11, x12, x13, x14, x15
+  Transform: ->
     n_idx = 0
-    for( i=0 i<@n_blocks i++) 
-      a = @au32_state[0]
-      b = @au32_state[1]
-      c = @au32_state[2]
-      d = @au32_state[3]
+    # for( i=0 i<@n_blocks i++) 
+    [0...n_blocks].forEach (i)->
+      a = au32_state[0]
+      b = au32_state[1]
+      c = au32_state[2]
+      d = au32_state[3]
       
-      x00 = @au32_buffer[n_idx++]
-      x01 = @au32_buffer[n_idx++]
-      x02 = @au32_buffer[n_idx++]
-      x03 = @au32_buffer[n_idx++]
-      x04 = @au32_buffer[n_idx++]
-      x05 = @au32_buffer[n_idx++]
-      x06 = @au32_buffer[n_idx++]
-      x07 = @au32_buffer[n_idx++]
-      x08 = @au32_buffer[n_idx++]
-      x09 = @au32_buffer[n_idx++]
-      x10 = @au32_buffer[n_idx++]
-      x11 = @au32_buffer[n_idx++]
-      x12 = @au32_buffer[n_idx++]
-      x13 = @au32_buffer[n_idx++]
-      x14 = @au32_buffer[n_idx++]
-      x15 = @au32_buffer[n_idx++]
+      x00 = au32_buffer[n_idx++]
+      x01 = au32_buffer[n_idx++]
+      x02 = au32_buffer[n_idx++]
+      x03 = au32_buffer[n_idx++]
+      x04 = au32_buffer[n_idx++]
+      x05 = au32_buffer[n_idx++]
+      x06 = au32_buffer[n_idx++]
+      x07 = au32_buffer[n_idx++]
+      x08 = au32_buffer[n_idx++]
+      x09 = au32_buffer[n_idx++]
+      x10 = au32_buffer[n_idx++]
+      x11 = au32_buffer[n_idx++]
+      x12 = au32_buffer[n_idx++]
+      x13 = au32_buffer[n_idx++]
+      x14 = au32_buffer[n_idx++]
+      x15 = au32_buffer[n_idx++]
       
       # Round 1
-      a += ((b & c) | (~b & d)) + x00 + 0xd76aa478  a = ((a << 7) | (a >>> 25)) + b
-      d += ((a & b) | (~a & c)) + x01 + 0xe8c7b756  d = ((d << 12) | (d >>> 20)) + a
-      c += ((d & a) | (~d & b)) + x02 + 0x242070db  c = ((c << 17) | (c >>> 15)) + d
-      b += ((c & d) | (~c & a)) + x03 + 0xc1bdceee  b = ((b << 22) | (b >>> 10)) + c
-      a += ((b & c) | (~b & d)) + x04 + 0xf57c0faf  a = ((a << 7) | (a >>> 25)) + b
-      d += ((a & b) | (~a & c)) + x05 + 0x4787c62a  d = ((d << 12) | (d >>> 20)) + a
-      c += ((d & a) | (~d & b)) + x06 + 0xa8304613  c = ((c << 17) | (c >>> 15)) + d
-      b += ((c & d) | (~c & a)) + x07 + 0xfd469501  b = ((b << 22) | (b >>> 10)) + c
-      a += ((b & c) | (~b & d)) + x08 + 0x698098d8  a = ((a << 7) | (a >>> 25)) + b
-      d += ((a & b) | (~a & c)) + x09 + 0x8b44f7af  d = ((d << 12) | (d >>> 20)) + a
-      c += ((d & a) | (~d & b)) + x10 + 0xffff5bb1  c = ((c << 17) | (c >>> 15)) + d
-      b += ((c & d) | (~c & a)) + x11 + 0x895cd7be  b = ((b << 22) | (b >>> 10)) + c
-      a += ((b & c) | (~b & d)) + x12 + 0x6b901122  a = ((a << 7) | (a >>> 25)) + b
-      d += ((a & b) | (~a & c)) + x13 + 0xfd987193  d = ((d << 12) | (d >>> 20)) + a
-      c += ((d & a) | (~d & b)) + x14 + 0xa679438e  c = ((c << 17) | (c >>> 15)) + d
-      b += ((c & d) | (~c & a)) + x15 + 0x49b40821  b = ((b << 22) | (b >>> 10)) + c
-      # Round 2
-      a += ((b & d) | (c & ~d)) + x01 + 0xf61e2562  a = ((a << 5) | (a >>> 27)) + b
-      d += ((a & c) | (b & ~c)) + x06 + 0xc040b340  d = ((d << 9) | (d >>> 23)) + a
-      c += ((d & b) | (a & ~b)) + x11 + 0x265e5a51  c = ((c << 14) | (c >>> 18)) + d
-      b += ((c & a) | (d & ~a)) + x00 + 0xe9b6c7aa  b = ((b << 20) | (b >>> 12)) + c
-      a += ((b & d) | (c & ~d)) + x05 + 0xd62f105d  a = ((a << 5) | (a >>> 27)) + b
-      d += ((a & c) | (b & ~c)) + x10 + 0x2441453  d = ((d << 9) | (d >>> 23)) + a
-      c += ((d & b) | (a & ~b)) + x15 + 0xd8a1e681  c = ((c << 14) | (c >>> 18)) + d
-      b += ((c & a) | (d & ~a)) + x04 + 0xe7d3fbc8  b = ((b << 20) | (b >>> 12)) + c
-      a += ((b & d) | (c & ~d)) + x09 + 0x21e1cde6  a = ((a << 5) | (a >>> 27)) + b
-      d += ((a & c) | (b & ~c)) + x14 + 0xc33707d6  d = ((d << 9) | (d >>> 23)) + a
-      c += ((d & b) | (a & ~b)) + x03 + 0xf4d50d87  c = ((c << 14) | (c >>> 18)) + d
-      b += ((c & a) | (d & ~a)) + x08 + 0x455a14ed  b = ((b << 20) | (b >>> 12)) + c
-      a += ((b & d) | (c & ~d)) + x13 + 0xa9e3e905  a = ((a << 5) | (a >>> 27)) + b
-      d += ((a & c) | (b & ~c)) + x02 + 0xfcefa3f8  d = ((d << 9) | (d >>> 23)) + a
-      c += ((d & b) | (a & ~b)) + x07 + 0x676f02d9  c = ((c << 14) | (c >>> 18)) + d
-      b += ((c & a) | (d & ~a)) + x12 + 0x8d2a4c8a  b = ((b << 20) | (b >>> 12)) + c
-      # Round 3
-      a += (b ^ c ^ d) + x05 + 0xfffa3942  a = ((a << 4) | (a >>> 28)) + b
-      d += (a ^ b ^ c) + x08 + 0x8771f681  d = ((d << 11) | (d >>> 21)) + a
-      c += (d ^ a ^ b) + x11 + 0x6d9d6122  c = ((c << 16) | (c >>> 16)) + d
-      b += (c ^ d ^ a) + x14 + 0xfde5380c  b = ((b << 23) | (b >>> 9)) + c
-      a += (b ^ c ^ d) + x01 + 0xa4beea44  a = ((a << 4) | (a >>> 28)) + b
-      d += (a ^ b ^ c) + x04 + 0x4bdecfa9  d = ((d << 11) | (d >>> 21)) + a
-      c += (d ^ a ^ b) + x07 + 0xf6bb4b60  c = ((c << 16) | (c >>> 16)) + d
-      b += (c ^ d ^ a) + x10 + 0xbebfbc70  b = ((b << 23) | (b >>> 9)) + c
-      a += (b ^ c ^ d) + x13 + 0x289b7ec6  a = ((a << 4) | (a >>> 28)) + b
-      d += (a ^ b ^ c) + x00 + 0xeaa127fa  d = ((d << 11) | (d >>> 21)) + a
-      c += (d ^ a ^ b) + x03 + 0xd4ef3085  c = ((c << 16) | (c >>> 16)) + d
-      b += (c ^ d ^ a) + x06 + 0x4881d05  b = ((b << 23) | (b >>> 9)) + c
-      a += (b ^ c ^ d) + x09 + 0xd9d4d039  a = ((a << 4) | (a >>> 28)) + b
-      d += (a ^ b ^ c) + x12 + 0xe6db99e5  d = ((d << 11) | (d >>> 21)) + a
-      c += (d ^ a ^ b) + x15 + 0x1fa27cf8  c = ((c << 16) | (c >>> 16)) + d
-      b += (c ^ d ^ a) + x02 + 0xc4ac5665  b = ((b << 23) | (b >>> 9)) + c
-      # Round 4
-      a += (c ^ (b | ~d)) + x00 + 0xf4292244  a = ((a << 6) | (a >>> 26)) + b
-      d += (b ^ (a | ~c)) + x07 + 0x432aff97  d = ((d << 10) | (d >>> 22)) + a
-      c += (a ^ (d | ~b)) + x14 + 0xab9423a7  c = ((c << 15) | (c >>> 17)) + d
-      b += (d ^ (c | ~a)) + x05 + 0xfc93a039  b = ((b << 21) | (b >>> 11)) + c
-      a += (c ^ (b | ~d)) + x12 + 0x655b59c3  a = ((a << 6) | (a >>> 26)) + b
-      d += (b ^ (a | ~c)) + x03 + 0x8f0ccc92  d = ((d << 10) | (d >>> 22)) + a
-      c += (a ^ (d | ~b)) + x10 + 0xffeff47d  c = ((c << 15) | (c >>> 17)) + d
-      b += (d ^ (c | ~a)) + x01 + 0x85845dd1  b = ((b << 21) | (b >>> 11)) + c
-      a += (c ^ (b | ~d)) + x08 + 0x6fa87e4f  a = ((a << 6) | (a >>> 26)) + b
-      d += (b ^ (a | ~c)) + x15 + 0xfe2ce6e0  d = ((d << 10) | (d >>> 22)) + a
-      c += (a ^ (d | ~b)) + x06 + 0xa3014314  c = ((c << 15) | (c >>> 17)) + d
-      b += (d ^ (c | ~a)) + x13 + 0x4e0811a1  b = ((b << 21) | (b >>> 11)) + c
-      a += (c ^ (b | ~d)) + x04 + 0xf7537e82  a = ((a << 6) | (a >>> 26)) + b
-      d += (b ^ (a | ~c)) + x11 + 0xbd3af235  d = ((d << 10) | (d >>> 22)) + a
-      c += (a ^ (d | ~b)) + x02 + 0x2ad7d2bb  c = ((c << 15) | (c >>> 17)) + d
-      b += (d ^ (c | ~a)) + x09 + 0xeb86d391  b = ((b << 21) | (b >>> 11)) + c
+      a += ((b & c) | (~b & d)) + x00 + 0xd76aa478
+      a = ((a << 7) | (a >>> 25)) + b
+      d += ((a & b) | (~a & c)) + x01 + 0xe8c7b756
+      d = ((d << 12) | (d >>> 20)) + a
+      c += ((d & a) | (~d & b)) + x02 + 0x242070db
+      c = ((c << 17) | (c >>> 15)) + d
+      b += ((c & d) | (~c & a)) + x03 + 0xc1bdceee
+      b = ((b << 22) | (b >>> 10)) + c
       
-      @au32_state[0] += a
-      @au32_state[1] += b
-      @au32_state[2] += c
-      @au32_state[3] += d
+      a += ((b & c) | (~b & d)) + x04 + 0xf57c0faf
+      a = ((a << 7) | (a >>> 25)) + b
+      d += ((a & b) | (~a & c)) + x05 + 0x4787c62a
+      d = ((d << 12) | (d >>> 20)) + a
+      c += ((d & a) | (~d & b)) + x06 + 0xa8304613
+      c = ((c << 17) | (c >>> 15)) + d
+      b += ((c & d) | (~c & a)) + x07 + 0xfd469501
+      b = ((b << 22) | (b >>> 10)) + c
+      
+      a += ((b & c) | (~b & d)) + x08 + 0x698098d8
+      a = ((a << 7) | (a >>> 25)) + b
+      d += ((a & b) | (~a & c)) + x09 + 0x8b44f7af
+      d = ((d << 12) | (d >>> 20)) + a
+      c += ((d & a) | (~d & b)) + x10 + 0xffff5bb1
+      c = ((c << 17) | (c >>> 15)) + d
+      b += ((c & d) | (~c & a)) + x11 + 0x895cd7be
+      b = ((b << 22) | (b >>> 10)) + c
+      
+      a += ((b & c) | (~b & d)) + x12 + 0x6b901122
+      a = ((a << 7) | (a >>> 25)) + b
+      d += ((a & b) | (~a & c)) + x13 + 0xfd987193
+      d = ((d << 12) | (d >>> 20)) + a
+      c += ((d & a) | (~d & b)) + x14 + 0xa679438e
+      c = ((c << 17) | (c >>> 15)) + d
+      b += ((c & d) | (~c & a)) + x15 + 0x49b40821
+      b = ((b << 22) | (b >>> 10)) + c
+      
+      # Round 2
+      a += ((b & d) | (c & ~d)) + x01 + 0xf61e2562
+      a = ((a << 5) | (a >>> 27)) + b
+      d += ((a & c) | (b & ~c)) + x06 + 0xc040b340
+      d = ((d << 9) | (d >>> 23)) + a
+      c += ((d & b) | (a & ~b)) + x11 + 0x265e5a51
+      c = ((c << 14) | (c >>> 18)) + d
+      b += ((c & a) | (d & ~a)) + x00 + 0xe9b6c7aa
+      b = ((b << 20) | (b >>> 12)) + c
+      
+      a += ((b & d) | (c & ~d)) + x05 + 0xd62f105d
+      a = ((a << 5) | (a >>> 27)) + b
+      d += ((a & c) | (b & ~c)) + x10 + 0x2441453
+      d = ((d << 9) | (d >>> 23)) + a
+      c += ((d & b) | (a & ~b)) + x15 + 0xd8a1e681
+      c = ((c << 14) | (c >>> 18)) + d
+      b += ((c & a) | (d & ~a)) + x04 + 0xe7d3fbc8
+      b = ((b << 20) | (b >>> 12)) + c
+      
+      a += ((b & d) | (c & ~d)) + x09 + 0x21e1cde6
+      a = ((a << 5) | (a >>> 27)) + b
+      d += ((a & c) | (b & ~c)) + x14 + 0xc33707d6
+      d = ((d << 9) | (d >>> 23)) + a
+      c += ((d & b) | (a & ~b)) + x03 + 0xf4d50d87
+      c = ((c << 14) | (c >>> 18)) + d
+      b += ((c & a) | (d & ~a)) + x08 + 0x455a14ed
+      b = ((b << 20) | (b >>> 12)) + c
+      
+      a += ((b & d) | (c & ~d)) + x13 + 0xa9e3e905
+      a = ((a << 5) | (a >>> 27)) + b
+      d += ((a & c) | (b & ~c)) + x02 + 0xfcefa3f8
+      d = ((d << 9) | (d >>> 23)) + a
+      c += ((d & b) | (a & ~b)) + x07 + 0x676f02d9
+      c = ((c << 14) | (c >>> 18)) + d
+      b += ((c & a) | (d & ~a)) + x12 + 0x8d2a4c8a
+      b = ((b << 20) | (b >>> 12)) + c
+      
+      # Round 3
+      a += (b ^ c ^ d) + x05 + 0xfffa3942
+      a = ((a << 4) | (a >>> 28)) + b
+      d += (a ^ b ^ c) + x08 + 0x8771f681
+      d = ((d << 11) | (d >>> 21)) + a
+      c += (d ^ a ^ b) + x11 + 0x6d9d6122
+      c = ((c << 16) | (c >>> 16)) + d
+      b += (c ^ d ^ a) + x14 + 0xfde5380c
+      b = ((b << 23) | (b >>> 9)) + c
+      
+      a += (b ^ c ^ d) + x01 + 0xa4beea44
+      a = ((a << 4) | (a >>> 28)) + b
+      d += (a ^ b ^ c) + x04 + 0x4bdecfa9
+      d = ((d << 11) | (d >>> 21)) + a
+      c += (d ^ a ^ b) + x07 + 0xf6bb4b60
+      c = ((c << 16) | (c >>> 16)) + d
+      b += (c ^ d ^ a) + x10 + 0xbebfbc70
+      b = ((b << 23) | (b >>> 9)) + c
+      
+      a += (b ^ c ^ d) + x13 + 0x289b7ec6 
+      a = ((a << 4) | (a >>> 28)) + b
+      d += (a ^ b ^ c) + x00 + 0xeaa127fa
+      d = ((d << 11) | (d >>> 21)) + a
+      c += (d ^ a ^ b) + x03 + 0xd4ef3085
+      c = ((c << 16) | (c >>> 16)) + d
+      b += (c ^ d ^ a) + x06 + 0x4881d05
+      b = ((b << 23) | (b >>> 9)) + c
+      
+      a += (b ^ c ^ d) + x09 + 0xd9d4d039
+      a = ((a << 4) | (a >>> 28)) + b
+      d += (a ^ b ^ c) + x12 + 0xe6db99e5
+      d = ((d << 11) | (d >>> 21)) + a
+      c += (d ^ a ^ b) + x15 + 0x1fa27cf8
+      c = ((c << 16) | (c >>> 16)) + d
+      b += (c ^ d ^ a) + x02 + 0xc4ac5665
+      b = ((b << 23) | (b >>> 9)) + c
+      
+      # Round 4
+      a += (c ^ (b | ~d)) + x00 + 0xf4292244
+      a = ((a << 6) | (a >>> 26)) + b
+      d += (b ^ (a | ~c)) + x07 + 0x432aff97
+      d = ((d << 10) | (d >>> 22)) + a
+      c += (a ^ (d | ~b)) + x14 + 0xab9423a7
+      c = ((c << 15) | (c >>> 17)) + d
+      b += (d ^ (c | ~a)) + x05 + 0xfc93a039
+      b = ((b << 21) | (b >>> 11)) + c
+      
+      a += (c ^ (b | ~d)) + x12 + 0x655b59c3
+      a = ((a << 6) | (a >>> 26)) + b
+      d += (b ^ (a | ~c)) + x03 + 0x8f0ccc92
+      d = ((d << 10) | (d >>> 22)) + a
+      c += (a ^ (d | ~b)) + x10 + 0xffeff47d
+      c = ((c << 15) | (c >>> 17)) + d
+      b += (d ^ (c | ~a)) + x01 + 0x85845dd1
+      b = ((b << 21) | (b >>> 11)) + c
+      
+      a += (c ^ (b | ~d)) + x08 + 0x6fa87e4f
+      a = ((a << 6) | (a >>> 26)) + b
+      d += (b ^ (a | ~c)) + x15 + 0xfe2ce6e0
+      d = ((d << 10) | (d >>> 22)) + a
+      c += (a ^ (d | ~b)) + x06 + 0xa3014314
+      c = ((c << 15) | (c >>> 17)) + d
+      b += (d ^ (c | ~a)) + x13 + 0x4e0811a1
+      b = ((b << 21) | (b >>> 11)) + c
+      
+      a += (c ^ (b | ~d)) + x04 + 0xf7537e82
+      a = ((a << 6) | (a >>> 26)) + b
+      d += (b ^ (a | ~c)) + x11 + 0xbd3af235
+      d = ((d << 10) | (d >>> 22)) + a
+      c += (a ^ (d | ~b)) + x02 + 0x2ad7d2bb
+      c = ((c << 15) | (c >>> 17)) + d
+      b += (d ^ (c | ~a)) + x09 + 0xeb86d391
+      b = ((b << 21) | (b >>> 11)) + c
+      
+      au32_state[0] += a
+      au32_state[1] += b
+      au32_state[2] += c
+      au32_state[3] += d
     
   
   
-  @Padding = ->(n_length) 
+  Padding: (n_length)->
     n_mod = n_length % 4
     n_idx = (n_length - n_mod) / 4
-    @au32_buffer[n_idx++] |= (0x80 << (n_mod * 8))
+    au32_buffer[n_idx++] |= (0x80 << (n_mod * 8))
     while(n_idx % 16!=14) 
-      @au32_buffer[n_idx++] = 0
+      au32_buffer[n_idx++] = 0
     
     n_bit_len = n_length * 8
-    @au32_buffer[n_idx++] = n_bit_len
-    @au32_buffer[n_idx++] = Math.floor(n_bit_len / 4294967296)
-    @n_blocks = n_idx / 16
+    au32_buffer[n_idx++] = n_bit_len
+    au32_buffer[n_idx++] = Math.floor(n_bit_len / 4294967296)
+    n_blocks = n_idx / 16
   
   
-  @SetString = ->(s_str) 
+  SetString: (s_str)->
     n_max_bytes = s_str.length * 4
     n_buff_size = (Math.floor((n_max_bytes + 8) / 64) + 1) * 16
-    @au32_buffer = new Uint32Array(n_buff_size)
+    au32_buffer = new Uint32Array(n_buff_size)
     n_len = s_str.length
-    n_idx = 0, n_shift = 0, n_code
-    for(i=0 i<n_len i++) 
+    n_idx = 0
+    n_shift = 0
+    
+    # for(i=0 i<n_len i++) 
+    [0...n_len].forEach (i)->
       n_code = s_str.charCodeAt(i)
       if(n_code < 0x80) 
-        @au32_buffer[n_idx] |= (n_code << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
-       else if(n_code < 0x800) 
-        @au32_buffer[n_idx] |= ((0xc0 | (n_code >>> 6)) << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
-        @au32_buffer[n_idx] |= ((0x80 | (n_code & 0x3f)) << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
-       else if(n_code < 0xd800 || n_code >= 0xe000) 
-        @au32_buffer[n_idx] |= ((0xe0 | (n_code >>> 12)) << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
-        @au32_buffer[n_idx] |= ((0x80 | ((n_code>>>6) & 0x3f)) << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
-        @au32_buffer[n_idx] |= ((0x80 | (n_code & 0x3f)) << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
-       else 
-        @au32_buffer[n_idx] |= ((0xf0 | (n_code >>>18)) << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
-        @au32_buffer[n_idx] |= ((0x80 | ((n_code>>>12) & 0x3f)) << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
-        @au32_buffer[n_idx] |= ((0x80 | ((n_code>>>6) & 0x3f)) << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
-        @au32_buffer[n_idx] |= ((0x80 | (n_code & 0x3f)) << n_shift)  (n_shift==24)? (n_idx++, n_shift=0): n_shift += 8
+        au32_buffer[n_idx] |= (n_code << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
+      else if(n_code < 0x800) 
+        au32_buffer[n_idx] |= ((0xc0 | (n_code >>> 6)) << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
+        
+        au32_buffer[n_idx] |= ((0x80 | (n_code & 0x3f)) << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
+      else if(n_code < 0xd800 || n_code >= 0xe000) 
+        au32_buffer[n_idx] |= ((0xe0 | (n_code >>> 12)) << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
+        
+        au32_buffer[n_idx] |= ((0x80 | ((n_code>>>6) & 0x3f)) << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
+        
+        au32_buffer[n_idx] |= ((0x80 | (n_code & 0x3f)) << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
+      else
+        au32_buffer[n_idx] |= ((0xf0 | (n_code >>>18)) << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
+        
+        au32_buffer[n_idx] |= ((0x80 | ((n_code>>>12) & 0x3f)) << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
+        
+        au32_buffer[n_idx] |= ((0x80 | ((n_code>>>6) & 0x3f)) << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
+        
+        au32_buffer[n_idx] |= ((0x80 | (n_code & 0x3f)) << n_shift)
+        if (n_shift==24)
+          n_idx++
+          n_shift=0
+        else
+          n_shift += 8
       
     
     return n_idx * 4 + n_shift / 8
   
-
   
-  @GetValueByStr = ->() 
-    n_reg, c0, c1, c2, c3, c4, c5, c6, c7
+  GetValueByStr: ->
     s_str = ''
-    for(i=0 i<4 i++) 
-      n_reg = @au32_state[i]
+    c0 = null
+    c1 = null
+    c2 = null
+    c3 = null
+    c4 = null
+    c5 = null
+    c6 = null
+    c7 = null
+    
+    # for(i=0 i<4 i++) 
+    [0...4].forEach (i)->
+      n_reg = au32_state[i]
       c0 = (n_reg >>> 4) & 0xF
       c1 = n_reg & 0xF
       c2 = (n_reg >>> 12) & 0xF
@@ -290,32 +634,28 @@ yjdMd5 = ->()
       c5 = (n_reg >>> 16) & 0xF
       c6 = (n_reg >>> 28) & 0xF
       c7 = (n_reg >>> 24) & 0xF
-       s_str += c0.toString(16) + c1.toString(16) + c2.toString(16) + c3.toString(16)
-           + c4.toString(16) + c5.toString(16) + c6.toString(16) + c7.toString(16)
+    s_str += c0.toString(16) + c1.toString(16) + c2.toString(16) + c3.toString(16) + c4.toString(16) + c5.toString(16) + c6.toString(16) + c7.toString(16)
     
     return s_str
   
-  
-  @GetOfString = ->(s_str) 
+  GetOfString: (s_str)->
     @Init()
     n_bytes = @SetString(s_str)
     @Padding(n_bytes)
     @Transform()
     return @GetValueByStr()
-  
 
--> yjd_md5(m_arg) 
+
+yjd_md5 = (m_arg)->
   md5 = new yjdMd5()
   return md5.GetOfString(m_arg)
 
--> yjd_get_digest(s_user, s_realm, s_passwd, s_method, s_uri, s_nonce, s_cnonce, s_nc, s_qgp) 
-  md5 = new yjdMd5()
+yjd_get_digest = (s_user, s_realm, s_passwd, s_method, s_uri, s_nonce, s_cnonce, s_nc, s_qgp)->
+  md5 = yjdMd5()
   s_a1 = md5.GetOfString(s_user + ':' + s_realm + ':'+ s_passwd)
   s_a2 = md5.GetOfString(s_method + ':' + s_uri)
   return md5.GetOfString(s_a1 + ':' + s_nonce + ':' + s_nc + ':' + s_cnonce + ':' + s_qgp + ':' + s_a2)
-###
 
-###
 yjd_create_nonce = (i_length)->
   i_length = 52 if(i_length==undefined)
   
@@ -327,7 +667,37 @@ yjd_create_nonce = (i_length)->
   
   s_nonce
 
-puts yjd_create_nonce 5
+puts yjd_md5("a")
+puts helper.dec2hex parseInt(yjd_md5("a"))
+###
+
+
+
+
+###
+
+aa = ->
+  init: ->
+    puts "ini"
+    
+  tmp: ->
+    puts "tmp"
+
+  temp: ->
+    puts "temp"
+    @tmp()
+
+q = aa()
+puts q.temp()
+
+w = aa()
+puts w.init()
+puts w.tmp()
+puts w.temp()
+###
+
+
+###
 ###
 
 
