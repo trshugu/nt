@@ -6,6 +6,108 @@ helper = require "./helper"
 
 
 
+# 組み合わせの中で
+# 全部が入っている
+# 割合
+# arr.every((i)-> [1,2,3,4,5].includes(i))
+# arr.every((i)-> [1,2,3,4,5].some((j)->i==j))
+
+expect = ["1","2","3","4","5"]
+expect = [1,2,3]
+
+
+
+itera = (arr)->
+  i = 0
+  while arr.length > 0
+    yield arr.shift()
+  # while true
+  #   yield arr[i % arr.length]
+  #   i++
+
+
+
+gen = itera expect
+
+
+fn = (target, cnt, res=[])->
+  if cnt <= 0
+    return res
+  else
+    if res.length == 0
+      target.forEach (i)-> res.push [i]
+      fn target, cnt-1, res
+    else
+      res = res.map((i)-> target.map((j)->[i,j])).flat()
+      res = res.map (i)-> i.flat()
+      fn target, cnt-1, res
+
+
+
+# puts fn([1,2,3], 3).map (a)-> [1,2,3].every((i)-> a.includes(i))
+# [1,1],[1,2],[2,1],[2,2]
+
+puts fn([1,2,3], 3).map((a)-> [1,2,3].every((i)-> a.includes(i))).length
+puts fn([1,2,3], 3).map((a)-> [1,2,3].every((i)-> a.includes(i))).filter((i)-> i).length
+
+# \puts 6/27
+
+
+###
+# 順列→ではなくて全通りだった
+junretsu = (balls, nukitorisu)->
+  arrs = []
+  zensu = balls.length
+  
+  if zensu < nukitorisu
+    return
+  else if nukitorisu == 1 
+    [0...zensu].forEach (i)-> arrs[i] = [balls[i]]
+  else
+    [0...zensu].forEach (i)->
+      parts = balls.slice(0)
+      parts.splice(i, 1)[0]
+      results = junretsu(parts, nukitorisu - 1)
+      [0...results.length].forEach (j)->
+        arrs.push([balls[i]].concat(results[j]))
+  
+  return arrs
+
+# puts junretsu([1,2,3,4], 3)
+
+all = junretsu(expect, 3)
+puts all
+puts all.length
+scan = all.map (a)-> expect.every((i)-> a.includes(i))
+puts scan.filter((i)-> i).length
+###
+
+
+
+###
+# 組み合わせ→ではなくて順列だった
+kumiawase = (balls, nukitorisu)->
+  arrs = []
+  zensu = balls.length
+  puts "sens", zensu
+  puts "nuki", nukitorisu
+  if zensu < nukitorisu
+    return
+  else if nukitorisu == 1
+    puts "nukiitus1"
+    [0...zensu].forEach (i)-> arrs[i] = [balls[i]]
+  else
+    puts "======"
+    [0...(zensu - nukitorisu + 1)].forEach (i)->
+      kumis = kumiawase(balls.slice(i + 1), nukitorisu - 1)
+      puts kumis
+      [0...kumis.length].forEach (j)->
+        arrs.push([balls[i]].concat(kumis[j]))
+  
+  return arrs
+
+puts kumiawase([1,2,3,4], 3)
+###
 
 
 ###
@@ -244,23 +346,86 @@ sjis_utf8 = new Iconv('utf-8', 'shift-jis')
 iconvl = require("iconv-lite");
 
 wget = (url)-> new Promise (f,re)->
-  request url
+  request
+    url: url
+    encoding: null
   , (e,r,b)->
     if e?
       re e
     else
       res = {}
       res.headers = r.headers
-      res.body = cheerio.load b
-      res.raw = b
+      # res.body = cheerio.load b
+      enb = iconvl.decode(b, "sjis");
+      res.body = cheerio.load enb
+      res.raw = iconvl.decode(b, "sjis")
       f res
 
 url = "https://eiga.com/now/all/rank/"
 url = "http://www.kent-web.com/pubc/garble.html"
 
 
+# res.body("h2").map (i,elm)-> puts "=====", elm.children.filter((ty)->ty.type=="text").map((tx)-> tx.data) 
+
+
+# title
+# mes.children[2].children[0].children[1].children[1].children.filter((i)->i.type=="text")[0].data
+
+# date
+# mes.children[2].children[0].children[3].children[1].children[0].data
+
+# pro
+# mes.children[2].children[2].children[1].children[0].data
+# mes.children[2].children[2].children[3].children[0].data
+# mes.children[2].children[2].children[5].children[0].data
+# mes.children[2].children[2].children[7].children[0].data
+# mes.children[2].children[2].children[9].children[0].data
+
+
+
+# res = null
 wget url
 .then (v)->
+  
+  mes = v.body(".mes")[7]
+  
+  puts mes
+  
+  # res = v
+  # puts v.raw
+  # v.body("table").each (i,elm)->
+  #   puts v.body(elm)[0]
+  
+  # puts v.body("table").length
+  
+  # v.body("a").each (i,elm)->
+  #   console.log "p1:", v.body(elm)[0].children[0].data
+  # v.body("meta")
+  #   .filter (i,elm)-> v.body(elm)[0].attribs.charset?
+  #   .map (i, elm)-> console.log v.body(elm)[0].attribs.charset
+  #   .filter((i,elm)->v.body(elm)[0].attribs.charset?)
+  #   .each((i,elm)->v.body(elm)[0].attribs.charset)
+  # v.body("meta").each (i,elm)->
+  #   console.log v.body(elm)[0].attribs.charset
+  
+.catch (e)->
+  console.log e
+
+###
+
+
+
+###
+wget url
+.then (v)->
+  puts v.body("a")
+  puts v.raw
+  # puts iconvl.decode(v.raw, "Shift-JIS")
+  # c = new Iconv('shift_jis', 'utf-8').convert(v.raw.toString())
+  # puts c
+  # puts new Iconv('shift_jis', 'utf-8').convert(v.raw).toString()
+  # puts iconvl.encode(v, "sjis");
+  # puts iconvl.decode(v, "sjis");
   v.body("a").each (i,elm)->
     # console.log deco.decode v.body(elm)[0].children[0].data
     # console.log Buffer.from(v.body(elm)[0].children[0].data)
@@ -268,8 +433,18 @@ wget url
     # console.log sjis_utf8.decode(Buffer.from(v.body(elm)[0].children[0].data))
     # console.log iconvl.encode(Buffer.from(v.body(elm)[0].children[0].data), "sjis");
     # console.log iconvl.decode(Buffer.from(v.body(elm)[0].children[0].data), "sjis");
-    console.log iconvl.encode(v.body(elm)[0].children[0].data, "sjis");
-    console.log iconvl.decode(v.body(elm)[0].children[0].data, "sjis");
+    console.log "p1:", v.body(elm)[0].children[0].data
+    # console.log "p2:", Buffer.from v.body(elm)[0].children[0].data
+    # console.log "p3:", Buffer.from(v.body(elm)[0].children[0].data, "binary")
+    # console.log "p4:", Buffer.from(v.body(elm)[0].children[0].data, "binary").filter((i)-> i!=253)
+    # console.log "p5:", iconvl.decode Buffer.from(v.body(elm)[0].children[0].data, "binary"), "sjis"
+    # console.log "p6:", iconvl.decode(Buffer.from(v.body(elm)[0].children[0].data , "binary"), "sjis")
+    # console.log "p7:", iconvl.decode(Buffer.from(v.body(elm)[0].children[0].data, "binary").filter((i)-> i!=253), "sjis")
+    # console.log "e:", iconvl.encode(v.body(elm)[0].children[0].data, "sjis").toString();
+    # console.log "u:", iconvl.encode(v.body(elm)[0].children[0].data, "utf8");
+    # console.log "u:", iconvl.encode(v.body(elm)[0].children[0].data, "utf8").toString();
+    # console.log "d:", iconvl.decode(v.body(elm)[0].children[0].data, "utf8");
+    # console.log "ed", iconvl.encode(iconvl.decode(v.body(elm)[0].children[0].data, "sjis"),"utf8");
   
   # console.log v
   
