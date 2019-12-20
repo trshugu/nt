@@ -9,6 +9,36 @@ helper = require "./helper"
 
 
 
+###
+lisp = require "lisp"
+
+scm = "(+ 4 5)"
+scm = """
+(+ 3 5)
+
+"noinoi"
+head '(1 2 3 4)
+"""
+
+# puts lisp(scm)
+scm.split("\n").filter((i)->i!="").forEach (l)-> puts lisp(l)
+###
+
+
+
+
+###
+biwas = require "biwascheme"
+
+scm = """
+(+ 3 5)
+
+'noinoi
+"""
+
+# puts scm.split("\n").filter((i)->i!="").map (l)-> biwas.run(l)
+scm.split("\n").filter((i)->i!="").forEach (l)-> puts biwas.run(l)
+###
 
 
 
