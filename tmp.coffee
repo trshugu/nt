@@ -9,6 +9,31 @@ helper = require "./helper"
 
 
 
+
+###
+# 画面サイズの比率を求める
+gcd = (x, y)->
+  while(y) 
+    t = y
+    y = x % y
+    x = t
+  
+  x
+
+displayRatio = (x,y)->
+  g = gcd x,y
+  (x / g) + ":" + (y / g)
+
+
+puts displayRatio 800, 600
+puts displayRatio 2048, 1080
+puts displayRatio 720, 480
+puts displayRatio 1440, 1080
+puts displayRatio 1920, 1080
+###
+
+
+
 ###
 lisp = require "lisp"
 
