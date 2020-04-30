@@ -25,6 +25,7 @@ displayRatio = (x,y)->
   (x / g) + ":" + (y / g)
 
 
+puts displayRatio 1200, 630
 puts displayRatio 800, 600
 puts displayRatio 2048, 1080
 puts displayRatio 720, 480
