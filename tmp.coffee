@@ -9,7 +9,6 @@ helper = require "./helper"
 
 
 
-
 ###
 # 画面サイズの比率を求める
 gcd = (x, y)->
@@ -23,6 +22,28 @@ gcd = (x, y)->
 displayRatio = (x,y)->
   g = gcd x,y
   (x / g) + ":" + (y / g)
+
+
+puts displayRatio 2436, 1125
+puts displayRatio 2688, 1242
+puts displayRatio 1792, 828
+puts displayRatio 2688, 1242
+puts displayRatio 2436, 1125
+puts displayRatio 1792, 828
+puts displayRatio 2436, 1125
+puts displayRatio 1920, 1080
+puts displayRatio 1334, 750
+puts displayRatio 1920, 1080
+puts displayRatio 1334, 750
+puts displayRatio 1920, 1080
+puts displayRatio 1334, 750
+puts displayRatio 1920, 1080
+puts displayRatio 1334, 750
+puts displayRatio 1136, 640
+puts displayRatio 1136, 640
+puts displayRatio 1136, 640
+puts displayRatio 960, 640
+puts displayRatio 960, 640
 
 
 puts displayRatio 1200, 630
