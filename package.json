@@ -50,7 +50,8 @@
     "socket.io": "^2.2.0",
     "through2": "^3.0.0",
     "uuid": "^3.3.2",
-    "web3": "*"
+    "web3": "*",
+    "ws": "^7.3.0"
   },
   "devDependencies": {},
   "scripts": {

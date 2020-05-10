@@ -9,6 +9,179 @@ helper = require "./helper"
 
 
 
+
+
+###
+# wsトレ3
+WebSocket = require "ws"
+
+# server
+wss = new WebSocket.Server port: 8080
+
+conn = []
+wss.on "connection", (ws)->
+  conn.push ws
+  
+  ws.on "message", (msg)->
+    msg = JSON.parse msg
+    
+    switch msg.type
+      # 全配信
+      when "cast"
+        conn.forEach (cli)->
+          if cli.readyState == WebSocket.OPEN
+            cli.send msg.data
+      # 自分以外に配信
+      when "broadcast"
+        conn.forEach (cli)->
+          if  cli != ws and cli.readyState == WebSocket.OPEN
+            cli.send msg.data
+      # 自分のみに配信
+      when "emit"
+        if ws.readyState == WebSocket.OPEN
+          ws.send msg.data
+
+# client
+sender = (type, data, ws)->
+  obj = {}
+  obj.type = type
+  obj.data = data
+  ws.send JSON.stringify obj
+
+setTimeout ->
+  ws = new WebSocket "ws://localhost:8080"
+  ws.on "message", (data)-> console.log "cli:", data
+  
+  ws.on "open", ->
+    # cast/broadcast/emit
+    sender "cast", "a01:cast", ws
+    sender "broadcast", "a02:broadcast", ws
+    sender "emit", "a03:emit", ws
+, 3000
+###
+
+
+###
+WebSocket = require "ws"
+sender = (type, data, ws)->
+  obj = {}
+  obj.type = type
+  obj.data = data
+  ws.send JSON.stringify obj
+
+ws = new WebSocket "ws://localhost:8080"
+ws.on "message", (data)-> console.log "cli1:", data
+###
+
+
+###
+# wsトレ2
+WebSocket = require "ws"
+wss = new WebSocket.Server port: 8080
+
+
+conn = []
+wss.on "connection", (ws)->
+  conn.push ws
+  
+  ws.on "message", (msg)->
+    console.log msg
+    msg = JSON.parse msg
+    
+    switch msg.type
+      # 
+      when "cast"
+        conn.forEach (cli)->
+          if cli.readyState == WebSocket.OPEN
+            cli.send msg.data
+      # 
+      when "broadcact"
+        conn.forEach (cli)->
+          if  cli != ws and cli.readyState == WebSocket.OPEN
+            client.send msg.data
+      # 
+      when "emit"
+        if ws.readyState == WebSocket.OPEN
+          ws.send msg.data
+          
+
+setTimeout ->
+  ws = new WebSocket "ws://localhost:8080"
+  
+  ws.on "open", ->
+    console.log "open1"
+    
+    obj = {}
+    obj.type = "cast"
+    obj.data = "castdata1"
+    
+    ws.send JSON.stringify obj
+  
+  ws.on "message", (data)->
+    console.log "cli1:", data
+  
+, 3000
+
+setTimeout ->
+  ws = new WebSocket "ws://localhost:8080"
+  
+  ws.on "open", ->
+    console.log "open2"
+    obj = {}
+    obj.type = "broadcast"
+    obj.data = "broadcastdata2"
+    
+    ws.send JSON.stringify obj
+  
+  ws.on "message", (data)->
+    console.log "cli2:", data
+, 5000
+###
+
+
+
+
+
+###
+# wsトレ1
+WebSocket = require "ws"
+wss = new WebSocket.Server port: 8080
+
+wss.on "connection", (ws)->
+  console.log "conn", ws
+  
+  ws.on "message", (data)->
+    console.log "sonmessage", data
+    
+    wss.clients.forEach (client)->
+      console.log client != ws
+      console.log client.readyState
+      console.log WebSocket.OPEN
+      client.send(data)
+      
+      if client != ws && client.readyState == WebSocket.OPEN
+        client.send(data)
+
+setTimeout ->
+  ws = new WebSocket "ws://localhost:8080"
+  
+  ws.on "open", ->
+    console.log "open"
+    ws.send "bbb" + Date.now()
+  
+  ws.on "close", -> console.log "close"
+  
+  ws.on "message", (data)->
+    console.log "conmessage:" + data
+    setTimeout ->
+      ws.send "aaa" + Date.now()
+    , 1000
+,1000
+###
+
+
+
+
 ###
 # 画面サイズの比率を求める
 gcd = (x, y)->
