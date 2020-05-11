@@ -8,6 +8,179 @@ helper = require "./helper"
 
 
 
+###
+# wsトレ5 socio風にする
+WebSocket = require "ws"
+
+# server
+wss = new WebSocket.Server port: 8080
+
+conn = []
+wss.on "connection", (ws)->
+  # pub用emitを定義(オーバーロードするとエラーに)
+  ws.socemit = (msg, data)->
+    obj = {}
+    obj.ev = msg
+    obj.data = data
+    ws.send JSON.stringify obj
+  
+  conn.push ws
+  
+  ws.on "message", (msg)->
+    msgjson = JSON.parse msg
+    ws.emit msgjson.ev, msgjson.data
+  
+  # io全体(自分も含めた)に対してemit
+  ws.on "ioemit", (data)->
+    conn.forEach (cli)->
+      if cli.readyState == WebSocket.OPEN
+        cli.socemit "cast",("cast:" + data)
+  
+  # 自分以外のsocへbroadcast
+  ws.on 'broadcast', (data) ->
+    conn.forEach (cli)->
+      if  cli != ws and cli.readyState == WebSocket.OPEN
+        cli.socemit "cast",("cast:" + data)
+  
+  # 自分のみ
+  ws.on 'socemit', (data) ->
+    if ws.readyState == WebSocket.OPEN
+      ws.socemit "cast",("cast:" + data)
+
+# client
+WebSocket = require "ws"
+sockConnect = (url)->
+  ws = new WebSocket url
+  
+  ws.on "message", (msg)->
+    console.log "mes", msg
+    msgjson = JSON.parse msg
+    ws.emit msgjson.ev, msgjson.data
+  
+  ws.socemit = (msg, data)->
+    obj = {}
+    obj.ev = msg
+    obj.data = data
+    ws.send JSON.stringify obj
+  
+  ws
+
+sock = sockConnect "ws://localhost:8080"
+
+sock.on "cast", (data)->
+  console.log "goal:", data
+###
+
+
+
+
+###
+# wsトレ4 socio風にする
+WebSocket = require "ws"
+
+# server
+wss = new WebSocket.Server port: 8080
+
+wss.on "open", (ws)->
+  console.log "penn", ws
+
+conn = []
+wss.on "connection", (ws)->
+  ws.socemit = (msg, data)->
+    obj = {}
+    obj.ev = msg
+    obj.data = data
+    ws.send JSON.stringify obj
+  
+  conn.push ws
+  
+  ws.on "message", (msg)->
+    console.log "mes", msg
+    msgjson = JSON.parse msg
+    ws.emit msgjson.ev, msgjson.data
+    
+    # emitする仕組み
+    
+    # switch msg.type
+    #   # 全配信
+    #   when "cast"
+    #     conn.forEach (cli)->
+    #       if cli.readyState == WebSocket.OPEN
+    #         cli.send msg.data
+    #   # 自分以外に配信
+    #   when "broadcast"
+    #     conn.forEach (cli)->
+    #       if  cli != ws and cli.readyState == WebSocket.OPEN
+    #         cli.send msg.data
+    #   # 自分のみに配信
+    #   when "emit"
+    #     if ws.readyState == WebSocket.OPEN
+    #       ws.send msg.data
+    
+
+  # io全体(自分も含めた)に対してemit
+  ws.on "ioemit", (data)->
+    console.log "全"
+    # wss.emit "cast",("cast:" + data)
+    conn.forEach (cli)->
+      if cli.readyState == WebSocket.OPEN
+        cli.socemit "cast",("cast:" + data)
+  
+  # 自分以外のsocへbroadcast
+  ws.on 'broadcast', (data) ->
+    console.log "他"
+    # wss.broadcast.emit "cast",("broadcast:" + data)
+    conn.forEach (cli)->
+      if  cli != ws and cli.readyState == WebSocket.OPEN
+        cli.socemit "cast",("cast:" + data)
+  
+  # 自分のみ
+  ws.on 'socemit', (data) ->
+    console.log "自"
+    # ws.emit "cast",("socemit" + data)
+    console.log ws.readyState
+    if ws.readyState == WebSocket.OPEN
+      ws.socemit "cast",("cast:" + data)
+###
+
+
+###
+ctsock = (msg)->
+  msg = JSON.parse msg
+  
+
+sender = (ev, data)->
+  obj = {}
+  obj.type = type
+  obj.data = data
+  ws.send JSON.stringify obj
+###
+
+###
+# cli側にもイベントリスナーを
+WebSocket = require "ws"
+sockConnect = (url)->
+  ws = new WebSocket url
+  
+  ws.on "message", (msg)->
+    console.log "mes", msg
+    msgjson = JSON.parse msg
+    ws.emit msgjson.ev, msgjson.data
+
+  
+  ws.socemit = (msg, data)->
+    obj = {}
+    obj.ev = msg
+    obj.data = data
+    ws.send JSON.stringify obj
+  
+  ws
+
+sock = sockConnect "ws://localhost:8080"
+
+sock.on "cast", (data)->
+  console.log "goal:", data
+###
 
 
 
@@ -23,6 +196,7 @@ wss.on "connection", (ws)->
   conn.push ws
   
   ws.on "message", (msg)->
+    console.log "mes", msg
     msg = JSON.parse msg
     
     switch msg.type
