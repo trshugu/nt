@@ -7,6 +7,75 @@ helper = require "./helper"
 
 
 
+###
+request = require "request" 
+cheerio = require "cheerio"
+
+wget = (url)-> new Promise (f,re)->
+  request
+    method: "POST"
+    url: url
+    encoding: null
+    form:
+      q: ["Hello world", "My name is Jeff"]
+      target: "de"
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      puts b.toString()
+      res = {}
+      res.headers = r.headers
+      res.body = cheerio.load b
+      # enb = iconvl.decode(b, "sjis");
+      # res.body = cheerio.load enb
+      # res.raw = iconvl.decode(b, "sjis")
+      f res
+
+url = ""
+
+wget url
+.then (v)->
+  puts v.body(".")
+.catch (e)-> puts "e",e
+###
+
+
+###
+request = require "request" 
+cheerio = require "cheerio"
+iconvl = require "iconv-lite"
+
+wget = (url)-> new Promise (f,re)->
+  request
+    url: url
+    encoding: null
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      res = {}
+      res.headers = r.headers
+      # res.body = cheerio.load b
+      enb = iconvl.decode(b, "sjis")
+      res.body = cheerio.load enb
+      res.raw = iconvl.decode(b, "sjis")
+      f res
+
+url = ""
+
+wget url
+.then (v)->
+  v.body("body").map (i,elm)->
+    elm.children.map (elm)->
+      if elm.name == "div"
+        elm.children.map (elm)->
+          puts "====", elm 
+   
+.catch (e)-> puts "e",e
+###
+
+
 
 ###
 # wsトレ5 socio風にする
