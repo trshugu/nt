@@ -20,7 +20,7 @@
     "ecdsa": "^0.7.0",
     "edge": "^7.10.1",
     "edge.js": "^1.1.4",
-    "elliptic": "^6.4.1",
+    "elliptic": "^6.5.3",
     "enigma": "^1.1.2",
     "ethereumjs-wallet": "^0.6.3",
     "geth": "^0.4.0",
