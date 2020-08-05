@@ -7,6 +7,382 @@ helper = require "./helper"
 
 
 
+
+
+###
+console.log "==sta=="
+lines = []
+
+lines.push "5"
+
+
+console.log "==end=="
+###
+
+
+
+
+
+
+###
+lines.push [0..10000].join(" ")
+
+
+
+arr = lines[1].split(" ").map (i)-> i
+
+obj = {}
+
+
+arr.forEach (i)->
+  obj[i] = 0 if obj[i]? == false
+  obj[i] = obj[i] + 1
+
+console.log obj
+console.log Object.keys(obj).sort((a,b)-> obj[b] - obj[a])
+sorted = Object.keys(obj).sort((a,b)-> obj[b] - obj[a])
+maxp = obj[sorted.shift()]
+console.log maxp
+
+res = Object.keys(obj).filter (i)-> obj[i] == maxp
+console.log res.join(" ")
+
+
+###
+
+
+
+###
+
+lines.push "OIMZE"
+# lines.push "10"
+# lines.push "4"
+# lines.push "14"
+
+
+arr = lines[0].split("")
+
+conv = (c)->
+  switch c
+    when "O" then "0"
+    when "I" then "1"
+    when "Z" then "2"
+    when "E" then "3"
+    when "A" then "4"
+    when "S" then "5"
+    when "G" then "6"
+    when "T" then "7"
+    when "B" then "8"
+    when "P" then "9"
+    else c
+
+console.log arr.map((i)-> conv i).join("")
+###
+
+
+###
+
+console.log "==sta=="
+lines = []
+
+# lines.push "3"
+# lines.push "10"
+# lines.push "4"
+# lines.push "14"
+lines.push "10"
+lines.push "1"
+lines.push "2"
+lines.push "3"
+lines.push "4"
+lines.push "5"
+lines.push "6"
+lines.push "7"
+lines.push "8"
+lines.push "9"
+lines.push "10"
+
+
+counts = [0,0,0,0,0,0,0]
+
+i = 1
+while i <= parseInt(lines[0])
+  counts[parseInt( lines[i] ) % 7] += 1
+  i++
+
+total = 0
+
+[0..6].forEach (i)->
+  [i..6].forEach (j)->
+    [j..6].forEach (k)->
+      if (i+j+k)%7 == 0
+        c1 = counts[i]
+        c2 = counts[j]
+        c3 = counts[k]
+        
+        c2 -= 1 if i == j
+        c3 -= 1 if k == i
+        c3 -= 1 if k == j
+        
+        pat = c1*c2*c3
+        if i==j && j==k
+          pat/=6
+        else if i==j || i==k || j==k
+          pat/=2
+        
+        total += pat
+
+
+console.log total
+
+console.log "==end=="
+###
+
+
+
+
+
+
+###
+a = 1
+switch a
+  when 1 then console.log "January"
+  when 2 then console.log "February"
+  when 3 then console.log "March"
+  when 4 then console.log "April"
+  when 5 then console.log "May"
+  when 6 then console.log "June"
+  when 7 then console.log "July"
+  when 8 then console.log "August"
+  when 9 then console.log "September"
+  when 10 then console.log "October"
+  when 11 then console.log "November"
+  when 12 then console.log "December"
+###
+
+
+
+###
+# ポインタでやるしか。
+cnt = 0
+i = 1
+while i <= lines[0]
+  j = 2
+  while j <= lines[0]
+    k = 3
+    while k <= lines[0]
+      if k>j && k>i && j>i
+        if (parseInt(lines[i])+parseInt(lines[j])+parseInt(lines[k]))%7==0
+          cnt++
+      k++
+    j++
+  i++
+
+console.log cnt
+###
+
+
+
+###
+[1..lines[0]].forEach (i)->
+  [2..lines[0]].forEach (j)->
+    [3..lines[0]].forEach (k)->
+      if k>j && k>i && j>i
+        puts i,j,k
+        if (parseInt(lines[i])+parseInt(lines[j])+parseInt(lines[k]))%7==0
+          cnt++
+
+console.log cnt
+###
+
+
+
+
+
+
+###
+process.stdin.resume()
+process.stdin.setEncoding('utf8')
+
+lines = []
+reader = require('readline').createInterface
+  input: process.stdin
+  output: process.stdout
+
+
+reader.on 'line', (line) -> lines.push(line)
+
+reader.on 'close', ->
+  arr = lines[0].split(" ").map (i)-> parseInt(i)
+  lines.shift()
+  
+  tab = Array.from(Array(arr[0]).keys()).map((i)-> i+1)  
+
+console.log "==sta=="
+lines = []
+lines.push "4 7"
+lines.push "CGPC"
+
+arr = lines[0].split(" ").map (i)-> parseInt(i)
+console.log arr[0] # 回数
+console.log arr[1] # 本数
+jan = [0,2,5]
+
+console.log [0...arr[0]].reduce (a,b)->
+  ta = []
+  a.forEach (i)-> 
+    jan.map (j)-> i.push j
+  
+  ta.push  a
+  a
+, [[0],[2],[5]]
+
+
+console.log "==end=="
+###
+
+
+
+###
+lines = []
+# lines.push "245 1214"
+# lines.push "CCGGPCCPGCCCPCCCPPCPPCGGCGCGCCPGGPCGGGCPCPGGPCCPPCCGPPGGGPPCPGGPPGCPGCCCGCCPCPCPCPCGPCGGCGPGCGGGCGCCGPCCGPGCCCPCCPPPPPPGGCGPCGGGCGGGGPPPCPGGCCCGCGCPGGCPCCGCCCPPPPPCGCCCPPCPPPCCPGCCPGGCPCCCPGCPGGGPCGGPPGPGCPPPGCCCGCGPPCPCPPPPCPCCPPPPPCCCCPPPPPCGP"
+# lines.push "4 7"
+# lines.push "CGPC"
+lines.push "8 8"
+lines.push "GGGGGGGG"
+
+
+mon = lines[0].split(" ").map (i)-> parseInt(i)
+n = mon[0]
+m = mon[1]
+s = lines[1].split("")
+
+gMax = s.filter((i)->i=='C').length
+pMax = s.filter((i)->i=='G').length
+cMax = s.filter((i)->i=='P').length
+
+win = 0
+[0..n].forEach (g)->
+  [0..n-g].forEach (p)->
+    c = n - g - p
+    
+    win = Math.max(  win, Math.min(g, gMax) + Math.min(p, pMax) + Math.min(c, cMax)  ) if (p * 5 + c * 2 == m)
+    
+
+console.log win
+###
+
+
+###
+cc = s.split("").filter((i)-> i == "C").length
+n = n - cc
+s = s.split("").filter((i)-> i != "C").join("")
+
+sa= s.split("").map (i)->
+  switch i
+    when "G" then 5
+    when "P" then 2
+
+
+# すすみすうスタイルでないとダメそう
+###
+
+
+
+###
+arr = s.split("")
+
+bf = true
+while arr.length != 0 && bf
+  puts arr
+  puts arr.shift()
+
+
+jan = [2,5]
+arr = jan.map (i)-> [i]
+
+[1...n].forEach ->
+  arr = jan.map((ja)-> arr.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+
+###
+
+
+
+###
+jan = [2,5]
+arr = jan.map (i)-> [i]
+
+[1...n].forEach ->
+  arr = jan.map((ja)-> arr.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+
+
+kumi = arr.filter((i)-> i.reduce((a,b)->a+b) == m)
+res = kumi.map (i)->
+  sat = sa.filter (j,idx)->
+    j == i[idx]
+  sat.length
+
+console.log( res.sort().pop() + cc )
+###
+
+###
+mon = lines[0].split(" ").map (i)-> parseInt(i)
+n = mon[0]
+m = mon[1]
+s = lines[1]
+
+sa= s.split("").map (i)->
+  switch i
+    when "G" then 5
+    when "C" then 0
+    when "P" then 2  
+
+jan = [0,2,5]
+arr = jan.map (i)-> [i]
+
+[1...n].forEach ->
+  arr = jan.map((ja)-> arr.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+
+kumi = arr.filter((i)-> i.reduce((a,b)->a+b) == m)
+res = kumi.map (i)->
+  sat = sa.filter (j,idx)->
+    j == i[idx]
+  sat.length
+
+console.log(res.sort().pop())
+
+###
+
+
+
+
+###
+# 組み合わせの作成
+jan = [0,2,5]
+arr = jan.map (i)-> [i]
+tmp1 = jan.map((ja)-> arr.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+tmp2 = jan.map((ja)-> tmp1.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+tmp3 = jan.map((ja)-> tmp2.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+###
+
+
+
+###
+process.stdin.resume()
+process.stdin.setEncoding('utf8')
+
+lines = require("fs").readFileSync("/dev/stdin", "utf8").split("\n")
+N = lines[0]
+[0..N].forEach (i)->
+  line = lines[i+1].split(" ")
+  console.log("hello = " + line[0] + ", world = " + line[1]);
+###
+
+
+
+
+
+
 ###
 request = require "request" 
 cheerio = require "cheerio"
