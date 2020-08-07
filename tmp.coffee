@@ -10,6 +10,262 @@ helper = require "./helper"
 
 
 ###
+convert_base32 = (i)->
+  switch i
+    when "A" then "00000"
+    when "B" then "00001"
+    when "C" then "00010"
+    when "D" then "00011"
+    when "E" then "00100"
+    when "F" then "00101"
+    when "G" then "00110"
+    when "H" then "00111"
+    when "I" then "01000"
+    when "J" then "01001"
+    when "K" then "01010"
+    when "L" then "01011"
+    when "M" then "01100"
+    when "N" then "01101"
+    when "O" then "01110"
+    when "P" then "01111"
+    when "Q" then "10000"
+    when "R" then "10001"
+    when "S" then "10010"
+    when "T" then "10011"
+    when "U" then "10100"
+    when "V" then "10101"
+    when "W" then "10110"
+    when "X" then "10111"
+    when "Y" then "11000"
+    when "Z" then "11001"
+    when "2" then "11010"
+    when "3" then "11011"
+    when "4" then "11100"
+    when "5" then "11101"
+    when "6" then "11110"
+    when "7" then "11111"
+
+secret = "AAA"
+decodesecret = Buffer.from(  secret.split("").map((i)-> convert_base32(i)).join("").match(/\d{8}/g).map((i)-> parseInt(i, 2))  )
+
+
+counter = Math.floor(Date.now() / 30000)
+buf = Buffer.from(("0000000000000000" + helper.dec2hex(counter)).slice(-16).match(/.{2}/g).map( (i)-> parseInt(i,16)))
+
+hmac = require("crypto").createHmac 'sha1', decodesecret
+hmac.update buf
+dig = hmac.digest()
+
+offset = dig[dig.length - 1] & 0xf
+code = helper.hex2dec (dig[offset] & 0x7f).toString(16) + dig[offset+1].toString(16) + dig[offset+2].toString(16) + dig[offset+3].toString(16)
+totp = code.toString().substr(-6)
+
+console.log totp
+###
+
+
+
+###
+convert_base32 = (i)->
+  switch i
+    when "A" then "00000"
+    when "B" then "00001"
+    when "C" then "00010"
+    when "D" then "00011"
+    when "E" then "00100"
+    when "F" then "00101"
+    when "G" then "00110"
+    when "H" then "00111"
+    when "I" then "01000"
+    when "J" then "01001"
+    when "K" then "01010"
+    when "L" then "01011"
+    when "M" then "01100"
+    when "N" then "01101"
+    when "O" then "01110"
+    when "P" then "01111"
+    when "Q" then "10000"
+    when "R" then "10001"
+    when "S" then "10010"
+    when "T" then "10011"
+    when "U" then "10100"
+    when "V" then "10101"
+    when "W" then "10110"
+    when "X" then "10111"
+    when "Y" then "11000"
+    when "Z" then "11001"
+    when "2" then "11010"
+    when "3" then "11011"
+    when "4" then "11100"
+    when "5" then "11101"
+    when "6" then "11110"
+    when "7" then "11111"
+
+
+secret = "AAA"
+decodesecret = Buffer.from(  secret.split("").map((i)-> convert_base32(i)).join("").match(/\d{8}/g).map((i)-> parseInt(i, 2))  )
+
+counter = Math.floor(Date.now() / 30000)
+buf = Buffer.from(("0000000000000000" + helper.dec2hex(counter)).slice(-16).match(/.{2}/g).map( (i)-> parseInt(i,16)))
+
+hmac = require("crypto").createHmac 'sha1', decodesecret
+hmac.update buf
+dig = hmac.digest()
+
+offset = dig[dig.length - 1] & 0xf
+code = helper.hex2dec (dig[offset] & 0x7f).toString(16) + (dig[offset+1] & 0xff).toString(16) + (dig[offset+2] & 0xff).toString(16) + (dig[offset+3] & 0xff).toString(16)
+totp = code.toString().substr(-6)
+
+console.log totp
+###
+
+
+
+
+###
+convert_base32 = (i)->
+  switch i
+    when "A" then "00000"
+    when "B" then "00001"
+    when "C" then "00010"
+    when "D" then "00011"
+    when "E" then "00100"
+    when "F" then "00101"
+    when "G" then "00110"
+    when "H" then "00111"
+    when "I" then "01000"
+    when "J" then "01001"
+    when "K" then "01010"
+    when "L" then "01011"
+    when "M" then "01100"
+    when "N" then "01101"
+    when "O" then "01110"
+    when "P" then "01111"
+    when "Q" then "10000"
+    when "R" then "10001"
+    when "S" then "10010"
+    when "T" then "10011"
+    when "U" then "10100"
+    when "V" then "10101"
+    when "W" then "10110"
+    when "X" then "10111"
+    when "Y" then "11000"
+    when "Z" then "11001"
+    when "2" then "11010"
+    when "3" then "11011"
+    when "4" then "11100"
+    when "5" then "11101"
+    when "6" then "11110"
+    when "7" then "11111"
+
+
+decodesec = Buffer.from(  "AA".split("").map((i)-> convert_base32(i)).join("").match(/\d{8}/g).map((i)-> parseInt(i, 2))  )
+puts "decodesec:", decodesec
+
+counter = Math.floor(Date.now() / 30000)
+puts "counter1:", counter
+puts "counter1:", helper.dec2hex(counter)
+
+cnt =  ("0000000000000000" + helper.dec2hex(counter)).slice(-16)
+puts cnt
+buf = Buffer.from(cnt.match(/.{2}/g).map( (i)-> parseInt(i,16)))
+puts buf
+
+
+buffer = Buffer.alloc(8)
+[0...8].forEach (i)->
+  buffer[7 - i] = counter & 0xff
+  counter = counter >> 8
+
+puts "buffer:", buffer
+
+
+hmac = require("crypto").createHmac 'sha1', decodesec
+hmac.update buf
+hmacResult = hmac.digest()
+
+puts "hmacres:",hmacResult
+
+
+offset = hmacResult[hmacResult.length - 1] & 0xf
+code = ((hmacResult[offset] & 0x7f) << 24) |
+       ((hmacResult[offset + 1] & 0xff) << 16) |
+       ((hmacResult[offset + 2] & 0xff) << 8) |
+       (hmacResult[offset + 3] & 0xff);
+
+puts "==="
+puts "offset:", offset
+puts "code:", code
+hotp = code % (10 ** 6);
+
+puts "hot:", hotp
+###
+
+
+
+
+
+
+###
+base32dec = require "base32-decode"
+
+base32table = {
+  'A': 0, 'J': 9,  'S': 18, '3': 27,
+  'B': 1, 'K': 10, 'T': 19, '4': 28,
+  'C': 2, 'L': 11, 'U': 20, '5': 29,
+  'D': 3, 'M': 12, 'V': 21, '6': 30,
+  'E': 4, 'N': 13, 'W': 22, '7': 31,
+  'F': 5, 'O': 14, 'X': 23,
+  'G': 6, 'P': 15, 'Y': 24,
+  'H': 7, 'Q': 16, 'Z': 25,
+  'I': 8, 'R': 17, '2': 26,
+}
+
+
+base32decode = (str)->
+  str = str.toUpperCase().replace(/[^A-Z234567]/g, '')
+  str = str.padEnd(Math.ceil(str.length / 8) * 8, 'A')
+  
+  data = Array.from(str).map((value) => base32table[value])
+  buf = Buffer.alloc(data.length / 8 * 5)
+  
+  i = 0
+  j = 0
+  while i < data.length
+    buf[j] = data[i + 0] << 3 | data[i + 1] >> 2
+    tmp = 0
+    shift = 30
+    k = 1
+    while shift >= 0
+      tmp |= data[i + k] << shift
+      shift -= 5
+      k++
+    buf.writeUInt32BE tmp >>> 0, j + 1
+    i += 8
+    j += 5
+  
+  buf
+
+decodedSecret = base32dec "AAAA".toUpperCase(), 'RFC4648'
+puts "dec sec:", decodedSecret
+puts "dec secb:", Buffer.from(decodedSecret)
+
+
+
+wdecodedSecret = base32decode "AAAA"
+puts "wdec sec:", wdecodedSecret
+puts "wdec secb:", Buffer.from(wdecodedSecret)
+
+
+
+
+
+###
+
+
+
+
+###
 console.log "==sta=="
 lines = []
 
