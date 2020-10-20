@@ -10,6 +10,1101 @@ helper = require "./helper"
 
 
 ###
+convert_base32 = (i)->
+  switch i
+    when "A" then "00000"
+    when "B" then "00001"
+    when "C" then "00010"
+    when "D" then "00011"
+    when "E" then "00100"
+    when "F" then "00101"
+    when "G" then "00110"
+    when "H" then "00111"
+    when "I" then "01000"
+    when "J" then "01001"
+    when "K" then "01010"
+    when "L" then "01011"
+    when "M" then "01100"
+    when "N" then "01101"
+    when "O" then "01110"
+    when "P" then "01111"
+    when "Q" then "10000"
+    when "R" then "10001"
+    when "S" then "10010"
+    when "T" then "10011"
+    when "U" then "10100"
+    when "V" then "10101"
+    when "W" then "10110"
+    when "X" then "10111"
+    when "Y" then "11000"
+    when "Z" then "11001"
+    when "2" then "11010"
+    when "3" then "11011"
+    when "4" then "11100"
+    when "5" then "11101"
+    when "6" then "11110"
+    when "7" then "11111"
+
+secret = "AAA"
+decodesecret = Buffer.from(  secret.split("").map((i)-> convert_base32(i)).join("").match(/\d{8}/g).map((i)-> parseInt(i, 2))  )
+
+
+counter = Math.floor(Date.now() / 30000)
+buf = Buffer.from(("0000000000000000" + helper.dec2hex(counter)).slice(-16).match(/.{2}/g).map( (i)-> parseInt(i,16)))
+
+hmac = require("crypto").createHmac 'sha1', decodesecret
+hmac.update buf
+dig = hmac.digest()
+
+offset = dig[dig.length - 1] & 0xf
+code = helper.hex2dec (dig[offset] & 0x7f).toString(16) + dig[offset+1].toString(16) + dig[offset+2].toString(16) + dig[offset+3].toString(16)
+totp = code.toString().substr(-6)
+
+console.log totp
+###
+
+
+
+###
+convert_base32 = (i)->
+  switch i
+    when "A" then "00000"
+    when "B" then "00001"
+    when "C" then "00010"
+    when "D" then "00011"
+    when "E" then "00100"
+    when "F" then "00101"
+    when "G" then "00110"
+    when "H" then "00111"
+    when "I" then "01000"
+    when "J" then "01001"
+    when "K" then "01010"
+    when "L" then "01011"
+    when "M" then "01100"
+    when "N" then "01101"
+    when "O" then "01110"
+    when "P" then "01111"
+    when "Q" then "10000"
+    when "R" then "10001"
+    when "S" then "10010"
+    when "T" then "10011"
+    when "U" then "10100"
+    when "V" then "10101"
+    when "W" then "10110"
+    when "X" then "10111"
+    when "Y" then "11000"
+    when "Z" then "11001"
+    when "2" then "11010"
+    when "3" then "11011"
+    when "4" then "11100"
+    when "5" then "11101"
+    when "6" then "11110"
+    when "7" then "11111"
+
+
+secret = "AAA"
+decodesecret = Buffer.from(  secret.split("").map((i)-> convert_base32(i)).join("").match(/\d{8}/g).map((i)-> parseInt(i, 2))  )
+
+counter = Math.floor(Date.now() / 30000)
+buf = Buffer.from(("0000000000000000" + helper.dec2hex(counter)).slice(-16).match(/.{2}/g).map( (i)-> parseInt(i,16)))
+
+hmac = require("crypto").createHmac 'sha1', decodesecret
+hmac.update buf
+dig = hmac.digest()
+
+offset = dig[dig.length - 1] & 0xf
+code = helper.hex2dec (dig[offset] & 0x7f).toString(16) + (dig[offset+1] & 0xff).toString(16) + (dig[offset+2] & 0xff).toString(16) + (dig[offset+3] & 0xff).toString(16)
+totp = code.toString().substr(-6)
+
+console.log totp
+###
+
+
+
+
+###
+convert_base32 = (i)->
+  switch i
+    when "A" then "00000"
+    when "B" then "00001"
+    when "C" then "00010"
+    when "D" then "00011"
+    when "E" then "00100"
+    when "F" then "00101"
+    when "G" then "00110"
+    when "H" then "00111"
+    when "I" then "01000"
+    when "J" then "01001"
+    when "K" then "01010"
+    when "L" then "01011"
+    when "M" then "01100"
+    when "N" then "01101"
+    when "O" then "01110"
+    when "P" then "01111"
+    when "Q" then "10000"
+    when "R" then "10001"
+    when "S" then "10010"
+    when "T" then "10011"
+    when "U" then "10100"
+    when "V" then "10101"
+    when "W" then "10110"
+    when "X" then "10111"
+    when "Y" then "11000"
+    when "Z" then "11001"
+    when "2" then "11010"
+    when "3" then "11011"
+    when "4" then "11100"
+    when "5" then "11101"
+    when "6" then "11110"
+    when "7" then "11111"
+
+
+decodesec = Buffer.from(  "AA".split("").map((i)-> convert_base32(i)).join("").match(/\d{8}/g).map((i)-> parseInt(i, 2))  )
+puts "decodesec:", decodesec
+
+counter = Math.floor(Date.now() / 30000)
+puts "counter1:", counter
+puts "counter1:", helper.dec2hex(counter)
+
+cnt =  ("0000000000000000" + helper.dec2hex(counter)).slice(-16)
+puts cnt
+buf = Buffer.from(cnt.match(/.{2}/g).map( (i)-> parseInt(i,16)))
+puts buf
+
+
+buffer = Buffer.alloc(8)
+[0...8].forEach (i)->
+  buffer[7 - i] = counter & 0xff
+  counter = counter >> 8
+
+puts "buffer:", buffer
+
+
+hmac = require("crypto").createHmac 'sha1', decodesec
+hmac.update buf
+hmacResult = hmac.digest()
+
+puts "hmacres:",hmacResult
+
+
+offset = hmacResult[hmacResult.length - 1] & 0xf
+code = ((hmacResult[offset] & 0x7f) << 24) |
+       ((hmacResult[offset + 1] & 0xff) << 16) |
+       ((hmacResult[offset + 2] & 0xff) << 8) |
+       (hmacResult[offset + 3] & 0xff);
+
+puts "==="
+puts "offset:", offset
+puts "code:", code
+hotp = code % (10 ** 6);
+
+puts "hot:", hotp
+###
+
+
+
+
+
+
+###
+base32dec = require "base32-decode"
+
+base32table = {
+  'A': 0, 'J': 9,  'S': 18, '3': 27,
+  'B': 1, 'K': 10, 'T': 19, '4': 28,
+  'C': 2, 'L': 11, 'U': 20, '5': 29,
+  'D': 3, 'M': 12, 'V': 21, '6': 30,
+  'E': 4, 'N': 13, 'W': 22, '7': 31,
+  'F': 5, 'O': 14, 'X': 23,
+  'G': 6, 'P': 15, 'Y': 24,
+  'H': 7, 'Q': 16, 'Z': 25,
+  'I': 8, 'R': 17, '2': 26,
+}
+
+
+base32decode = (str)->
+  str = str.toUpperCase().replace(/[^A-Z234567]/g, '')
+  str = str.padEnd(Math.ceil(str.length / 8) * 8, 'A')
+  
+  data = Array.from(str).map((value) => base32table[value])
+  buf = Buffer.alloc(data.length / 8 * 5)
+  
+  i = 0
+  j = 0
+  while i < data.length
+    buf[j] = data[i + 0] << 3 | data[i + 1] >> 2
+    tmp = 0
+    shift = 30
+    k = 1
+    while shift >= 0
+      tmp |= data[i + k] << shift
+      shift -= 5
+      k++
+    buf.writeUInt32BE tmp >>> 0, j + 1
+    i += 8
+    j += 5
+  
+  buf
+
+decodedSecret = base32dec "AAAA".toUpperCase(), 'RFC4648'
+puts "dec sec:", decodedSecret
+puts "dec secb:", Buffer.from(decodedSecret)
+
+
+
+wdecodedSecret = base32decode "AAAA"
+puts "wdec sec:", wdecodedSecret
+puts "wdec secb:", Buffer.from(wdecodedSecret)
+
+
+
+
+
+###
+
+
+
+
+###
+console.log "==sta=="
+lines = []
+
+lines.push "5"
+
+
+console.log "==end=="
+###
+
+
+
+
+
+
+###
+lines.push [0..10000].join(" ")
+
+
+
+arr = lines[1].split(" ").map (i)-> i
+
+obj = {}
+
+
+arr.forEach (i)->
+  obj[i] = 0 if obj[i]? == false
+  obj[i] = obj[i] + 1
+
+console.log obj
+console.log Object.keys(obj).sort((a,b)-> obj[b] - obj[a])
+sorted = Object.keys(obj).sort((a,b)-> obj[b] - obj[a])
+maxp = obj[sorted.shift()]
+console.log maxp
+
+res = Object.keys(obj).filter (i)-> obj[i] == maxp
+console.log res.join(" ")
+
+
+###
+
+
+
+###
+
+lines.push "OIMZE"
+# lines.push "10"
+# lines.push "4"
+# lines.push "14"
+
+
+arr = lines[0].split("")
+
+conv = (c)->
+  switch c
+    when "O" then "0"
+    when "I" then "1"
+    when "Z" then "2"
+    when "E" then "3"
+    when "A" then "4"
+    when "S" then "5"
+    when "G" then "6"
+    when "T" then "7"
+    when "B" then "8"
+    when "P" then "9"
+    else c
+
+console.log arr.map((i)-> conv i).join("")
+###
+
+
+###
+
+console.log "==sta=="
+lines = []
+
+# lines.push "3"
+# lines.push "10"
+# lines.push "4"
+# lines.push "14"
+lines.push "10"
+lines.push "1"
+lines.push "2"
+lines.push "3"
+lines.push "4"
+lines.push "5"
+lines.push "6"
+lines.push "7"
+lines.push "8"
+lines.push "9"
+lines.push "10"
+
+
+counts = [0,0,0,0,0,0,0]
+
+i = 1
+while i <= parseInt(lines[0])
+  counts[parseInt( lines[i] ) % 7] += 1
+  i++
+
+total = 0
+
+[0..6].forEach (i)->
+  [i..6].forEach (j)->
+    [j..6].forEach (k)->
+      if (i+j+k)%7 == 0
+        c1 = counts[i]
+        c2 = counts[j]
+        c3 = counts[k]
+        
+        c2 -= 1 if i == j
+        c3 -= 1 if k == i
+        c3 -= 1 if k == j
+        
+        pat = c1*c2*c3
+        if i==j && j==k
+          pat/=6
+        else if i==j || i==k || j==k
+          pat/=2
+        
+        total += pat
+
+
+console.log total
+
+console.log "==end=="
+###
+
+
+
+
+
+
+###
+a = 1
+switch a
+  when 1 then console.log "January"
+  when 2 then console.log "February"
+  when 3 then console.log "March"
+  when 4 then console.log "April"
+  when 5 then console.log "May"
+  when 6 then console.log "June"
+  when 7 then console.log "July"
+  when 8 then console.log "August"
+  when 9 then console.log "September"
+  when 10 then console.log "October"
+  when 11 then console.log "November"
+  when 12 then console.log "December"
+###
+
+
+
+###
+# ポインタでやるしか。
+cnt = 0
+i = 1
+while i <= lines[0]
+  j = 2
+  while j <= lines[0]
+    k = 3
+    while k <= lines[0]
+      if k>j && k>i && j>i
+        if (parseInt(lines[i])+parseInt(lines[j])+parseInt(lines[k]))%7==0
+          cnt++
+      k++
+    j++
+  i++
+
+console.log cnt
+###
+
+
+
+###
+[1..lines[0]].forEach (i)->
+  [2..lines[0]].forEach (j)->
+    [3..lines[0]].forEach (k)->
+      if k>j && k>i && j>i
+        puts i,j,k
+        if (parseInt(lines[i])+parseInt(lines[j])+parseInt(lines[k]))%7==0
+          cnt++
+
+console.log cnt
+###
+
+
+
+
+
+
+###
+process.stdin.resume()
+process.stdin.setEncoding('utf8')
+
+lines = []
+reader = require('readline').createInterface
+  input: process.stdin
+  output: process.stdout
+
+
+reader.on 'line', (line) -> lines.push(line)
+
+reader.on 'close', ->
+  arr = lines[0].split(" ").map (i)-> parseInt(i)
+  lines.shift()
+  
+  tab = Array.from(Array(arr[0]).keys()).map((i)-> i+1)  
+
+console.log "==sta=="
+lines = []
+lines.push "4 7"
+lines.push "CGPC"
+
+arr = lines[0].split(" ").map (i)-> parseInt(i)
+console.log arr[0] # 回数
+console.log arr[1] # 本数
+jan = [0,2,5]
+
+console.log [0...arr[0]].reduce (a,b)->
+  ta = []
+  a.forEach (i)-> 
+    jan.map (j)-> i.push j
+  
+  ta.push  a
+  a
+, [[0],[2],[5]]
+
+
+console.log "==end=="
+###
+
+
+
+###
+lines = []
+# lines.push "245 1214"
+# lines.push "CCGGPCCPGCCCPCCCPPCPPCGGCGCGCCPGGPCGGGCPCPGGPCCPPCCGPPGGGPPCPGGPPGCPGCCCGCCPCPCPCPCGPCGGCGPGCGGGCGCCGPCCGPGCCCPCCPPPPPPGGCGPCGGGCGGGGPPPCPGGCCCGCGCPGGCPCCGCCCPPPPPCGCCCPPCPPPCCPGCCPGGCPCCCPGCPGGGPCGGPPGPGCPPPGCCCGCGPPCPCPPPPCPCCPPPPPCCCCPPPPPCGP"
+# lines.push "4 7"
+# lines.push "CGPC"
+lines.push "8 8"
+lines.push "GGGGGGGG"
+
+
+mon = lines[0].split(" ").map (i)-> parseInt(i)
+n = mon[0]
+m = mon[1]
+s = lines[1].split("")
+
+gMax = s.filter((i)->i=='C').length
+pMax = s.filter((i)->i=='G').length
+cMax = s.filter((i)->i=='P').length
+
+win = 0
+[0..n].forEach (g)->
+  [0..n-g].forEach (p)->
+    c = n - g - p
+    
+    win = Math.max(  win, Math.min(g, gMax) + Math.min(p, pMax) + Math.min(c, cMax)  ) if (p * 5 + c * 2 == m)
+    
+
+console.log win
+###
+
+
+###
+cc = s.split("").filter((i)-> i == "C").length
+n = n - cc
+s = s.split("").filter((i)-> i != "C").join("")
+
+sa= s.split("").map (i)->
+  switch i
+    when "G" then 5
+    when "P" then 2
+
+
+# すすみすうスタイルでないとダメそう
+###
+
+
+
+###
+arr = s.split("")
+
+bf = true
+while arr.length != 0 && bf
+  puts arr
+  puts arr.shift()
+
+
+jan = [2,5]
+arr = jan.map (i)-> [i]
+
+[1...n].forEach ->
+  arr = jan.map((ja)-> arr.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+
+###
+
+
+
+###
+jan = [2,5]
+arr = jan.map (i)-> [i]
+
+[1...n].forEach ->
+  arr = jan.map((ja)-> arr.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+
+
+kumi = arr.filter((i)-> i.reduce((a,b)->a+b) == m)
+res = kumi.map (i)->
+  sat = sa.filter (j,idx)->
+    j == i[idx]
+  sat.length
+
+console.log( res.sort().pop() + cc )
+###
+
+###
+mon = lines[0].split(" ").map (i)-> parseInt(i)
+n = mon[0]
+m = mon[1]
+s = lines[1]
+
+sa= s.split("").map (i)->
+  switch i
+    when "G" then 5
+    when "C" then 0
+    when "P" then 2  
+
+jan = [0,2,5]
+arr = jan.map (i)-> [i]
+
+[1...n].forEach ->
+  arr = jan.map((ja)-> arr.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+
+kumi = arr.filter((i)-> i.reduce((a,b)->a+b) == m)
+res = kumi.map (i)->
+  sat = sa.filter (j,idx)->
+    j == i[idx]
+  sat.length
+
+console.log(res.sort().pop())
+
+###
+
+
+
+
+###
+# 組み合わせの作成
+jan = [0,2,5]
+arr = jan.map (i)-> [i]
+tmp1 = jan.map((ja)-> arr.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+tmp2 = jan.map((ja)-> tmp1.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+tmp3 = jan.map((ja)-> tmp2.map (i)-> t=[];  t = i.slice(); t.push(ja); t).flat()
+###
+
+
+
+###
+process.stdin.resume()
+process.stdin.setEncoding('utf8')
+
+lines = require("fs").readFileSync("/dev/stdin", "utf8").split("\n")
+N = lines[0]
+[0..N].forEach (i)->
+  line = lines[i+1].split(" ")
+  console.log("hello = " + line[0] + ", world = " + line[1]);
+###
+
+
+
+
+
+
+###
+request = require "request" 
+cheerio = require "cheerio"
+
+wget = (url)-> new Promise (f,re)->
+  request
+    method: "POST"
+    url: url
+    encoding: null
+    form:
+      q: ["Hello world", "My name is Jeff"]
+      target: "de"
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      puts b.toString()
+      res = {}
+      res.headers = r.headers
+      res.body = cheerio.load b
+      # enb = iconvl.decode(b, "sjis");
+      # res.body = cheerio.load enb
+      # res.raw = iconvl.decode(b, "sjis")
+      f res
+
+url = ""
+
+wget url
+.then (v)->
+  puts v.body(".")
+.catch (e)-> puts "e",e
+###
+
+
+###
+request = require "request" 
+cheerio = require "cheerio"
+iconvl = require "iconv-lite"
+
+wget = (url)-> new Promise (f,re)->
+  request
+    url: url
+    encoding: null
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      res = {}
+      res.headers = r.headers
+      # res.body = cheerio.load b
+      enb = iconvl.decode(b, "sjis")
+      res.body = cheerio.load enb
+      res.raw = iconvl.decode(b, "sjis")
+      f res
+
+url = ""
+
+wget url
+.then (v)->
+  v.body("body").map (i,elm)->
+    elm.children.map (elm)->
+      if elm.name == "div"
+        elm.children.map (elm)->
+          puts "====", elm 
+   
+.catch (e)-> puts "e",e
+###
+
+
+
+###
+# wsトレ5 socio風にする
+WebSocket = require "ws"
+
+# server
+wss = new WebSocket.Server port: 8080
+
+conn = []
+wss.on "connection", (ws)->
+  # pub用emitを定義(オーバーロードするとエラーに)
+  ws.socemit = (msg, data)->
+    obj = {}
+    obj.ev = msg
+    obj.data = data
+    ws.send JSON.stringify obj
+  
+  conn.push ws
+  
+  ws.on "message", (msg)->
+    msgjson = JSON.parse msg
+    ws.emit msgjson.ev, msgjson.data
+  
+  # io全体(自分も含めた)に対してemit
+  ws.on "ioemit", (data)->
+    conn.forEach (cli)->
+      if cli.readyState == WebSocket.OPEN
+        cli.socemit "cast",("cast:" + data)
+  
+  # 自分以外のsocへbroadcast
+  ws.on 'broadcast', (data) ->
+    conn.forEach (cli)->
+      if  cli != ws and cli.readyState == WebSocket.OPEN
+        cli.socemit "cast",("cast:" + data)
+  
+  # 自分のみ
+  ws.on 'socemit', (data) ->
+    if ws.readyState == WebSocket.OPEN
+      ws.socemit "cast",("cast:" + data)
+
+# client
+WebSocket = require "ws"
+sockConnect = (url)->
+  ws = new WebSocket url
+  
+  ws.on "message", (msg)->
+    console.log "mes", msg
+    msgjson = JSON.parse msg
+    ws.emit msgjson.ev, msgjson.data
+  
+  ws.socemit = (msg, data)->
+    obj = {}
+    obj.ev = msg
+    obj.data = data
+    ws.send JSON.stringify obj
+  
+  ws
+
+sock = sockConnect "ws://localhost:8080"
+
+sock.on "cast", (data)->
+  console.log "goal:", data
+###
+
+
+
+
+###
+# wsトレ4 socio風にする
+WebSocket = require "ws"
+
+# server
+wss = new WebSocket.Server port: 8080
+
+wss.on "open", (ws)->
+  console.log "penn", ws
+
+conn = []
+wss.on "connection", (ws)->
+  ws.socemit = (msg, data)->
+    obj = {}
+    obj.ev = msg
+    obj.data = data
+    ws.send JSON.stringify obj
+  
+  conn.push ws
+  
+  ws.on "message", (msg)->
+    console.log "mes", msg
+    msgjson = JSON.parse msg
+    ws.emit msgjson.ev, msgjson.data
+    
+    # emitする仕組み
+    
+    # switch msg.type
+    #   # 全配信
+    #   when "cast"
+    #     conn.forEach (cli)->
+    #       if cli.readyState == WebSocket.OPEN
+    #         cli.send msg.data
+    #   # 自分以外に配信
+    #   when "broadcast"
+    #     conn.forEach (cli)->
+    #       if  cli != ws and cli.readyState == WebSocket.OPEN
+    #         cli.send msg.data
+    #   # 自分のみに配信
+    #   when "emit"
+    #     if ws.readyState == WebSocket.OPEN
+    #       ws.send msg.data
+    
+
+  # io全体(自分も含めた)に対してemit
+  ws.on "ioemit", (data)->
+    console.log "全"
+    # wss.emit "cast",("cast:" + data)
+    conn.forEach (cli)->
+      if cli.readyState == WebSocket.OPEN
+        cli.socemit "cast",("cast:" + data)
+  
+  # 自分以外のsocへbroadcast
+  ws.on 'broadcast', (data) ->
+    console.log "他"
+    # wss.broadcast.emit "cast",("broadcast:" + data)
+    conn.forEach (cli)->
+      if  cli != ws and cli.readyState == WebSocket.OPEN
+        cli.socemit "cast",("cast:" + data)
+  
+  # 自分のみ
+  ws.on 'socemit', (data) ->
+    console.log "自"
+    # ws.emit "cast",("socemit" + data)
+    console.log ws.readyState
+    if ws.readyState == WebSocket.OPEN
+      ws.socemit "cast",("cast:" + data)
+###
+
+
+###
+ctsock = (msg)->
+  msg = JSON.parse msg
+  
+
+sender = (ev, data)->
+  obj = {}
+  obj.type = type
+  obj.data = data
+  ws.send JSON.stringify obj
+###
+
+###
+# cli側にもイベントリスナーを
+WebSocket = require "ws"
+sockConnect = (url)->
+  ws = new WebSocket url
+  
+  ws.on "message", (msg)->
+    console.log "mes", msg
+    msgjson = JSON.parse msg
+    ws.emit msgjson.ev, msgjson.data
+
+  
+  ws.socemit = (msg, data)->
+    obj = {}
+    obj.ev = msg
+    obj.data = data
+    ws.send JSON.stringify obj
+  
+  ws
+
+sock = sockConnect "ws://localhost:8080"
+
+sock.on "cast", (data)->
+  console.log "goal:", data
+###
+
+
+
+###
+# wsトレ3
+WebSocket = require "ws"
+
+# server
+wss = new WebSocket.Server port: 8080
+
+conn = []
+wss.on "connection", (ws)->
+  conn.push ws
+  
+  ws.on "message", (msg)->
+    console.log "mes", msg
+    msg = JSON.parse msg
+    
+    switch msg.type
+      # 全配信
+      when "cast"
+        conn.forEach (cli)->
+          if cli.readyState == WebSocket.OPEN
+            cli.send msg.data
+      # 自分以外に配信
+      when "broadcast"
+        conn.forEach (cli)->
+          if  cli != ws and cli.readyState == WebSocket.OPEN
+            cli.send msg.data
+      # 自分のみに配信
+      when "emit"
+        if ws.readyState == WebSocket.OPEN
+          ws.send msg.data
+
+# client
+sender = (type, data, ws)->
+  obj = {}
+  obj.type = type
+  obj.data = data
+  ws.send JSON.stringify obj
+
+setTimeout ->
+  ws = new WebSocket "ws://localhost:8080"
+  ws.on "message", (data)-> console.log "cli:", data
+  
+  ws.on "open", ->
+    # cast/broadcast/emit
+    sender "cast", "a01:cast", ws
+    sender "broadcast", "a02:broadcast", ws
+    sender "emit", "a03:emit", ws
+, 3000
+###
+
+
+###
+WebSocket = require "ws"
+sender = (type, data, ws)->
+  obj = {}
+  obj.type = type
+  obj.data = data
+  ws.send JSON.stringify obj
+
+ws = new WebSocket "ws://localhost:8080"
+ws.on "message", (data)-> console.log "cli1:", data
+###
+
+
+###
+# wsトレ2
+WebSocket = require "ws"
+wss = new WebSocket.Server port: 8080
+
+
+conn = []
+wss.on "connection", (ws)->
+  conn.push ws
+  
+  ws.on "message", (msg)->
+    console.log msg
+    msg = JSON.parse msg
+    
+    switch msg.type
+      # 
+      when "cast"
+        conn.forEach (cli)->
+          if cli.readyState == WebSocket.OPEN
+            cli.send msg.data
+      # 
+      when "broadcact"
+        conn.forEach (cli)->
+          if  cli != ws and cli.readyState == WebSocket.OPEN
+            client.send msg.data
+      # 
+      when "emit"
+        if ws.readyState == WebSocket.OPEN
+          ws.send msg.data
+          
+
+setTimeout ->
+  ws = new WebSocket "ws://localhost:8080"
+  
+  ws.on "open", ->
+    console.log "open1"
+    
+    obj = {}
+    obj.type = "cast"
+    obj.data = "castdata1"
+    
+    ws.send JSON.stringify obj
+  
+  ws.on "message", (data)->
+    console.log "cli1:", data
+  
+, 3000
+
+setTimeout ->
+  ws = new WebSocket "ws://localhost:8080"
+  
+  ws.on "open", ->
+    console.log "open2"
+    obj = {}
+    obj.type = "broadcast"
+    obj.data = "broadcastdata2"
+    
+    ws.send JSON.stringify obj
+  
+  ws.on "message", (data)->
+    console.log "cli2:", data
+, 5000
+###
+
+
+
+
+
+###
+# wsトレ1
+WebSocket = require "ws"
+wss = new WebSocket.Server port: 8080
+
+wss.on "connection", (ws)->
+  console.log "conn", ws
+  
+  ws.on "message", (data)->
+    console.log "sonmessage", data
+    
+    wss.clients.forEach (client)->
+      console.log client != ws
+      console.log client.readyState
+      console.log WebSocket.OPEN
+      client.send(data)
+      
+      if client != ws && client.readyState == WebSocket.OPEN
+        client.send(data)
+
+setTimeout ->
+  ws = new WebSocket "ws://localhost:8080"
+  
+  ws.on "open", ->
+    console.log "open"
+    ws.send "bbb" + Date.now()
+  
+  ws.on "close", -> console.log "close"
+  
+  ws.on "message", (data)->
+    console.log "conmessage:" + data
+    setTimeout ->
+      ws.send "aaa" + Date.now()
+    , 1000
+,1000
+###
+
+
+
+
+###
+# 画面サイズの比率を求める
+gcd = (x, y)->
+  while(y) 
+    t = y
+    y = x % y
+    x = t
+  
+  x
+
+displayRatio = (x,y)->
+  g = gcd x,y
+  (x / g) + ":" + (y / g)
+
+
+puts displayRatio 2436, 1125
+puts displayRatio 2688, 1242
+puts displayRatio 1792, 828
+puts displayRatio 2688, 1242
+puts displayRatio 2436, 1125
+puts displayRatio 1792, 828
+puts displayRatio 2436, 1125
+puts displayRatio 1920, 1080
+puts displayRatio 1334, 750
+puts displayRatio 1920, 1080
+puts displayRatio 1334, 750
+puts displayRatio 1920, 1080
+puts displayRatio 1334, 750
+puts displayRatio 1920, 1080
+puts displayRatio 1334, 750
+puts displayRatio 1136, 640
+puts displayRatio 1136, 640
+puts displayRatio 1136, 640
+puts displayRatio 960, 640
+puts displayRatio 960, 640
+
+
+puts displayRatio 1200, 630
+puts displayRatio 800, 600
+puts displayRatio 2048, 1080
+puts displayRatio 720, 480
+puts displayRatio 1440, 1080
+puts displayRatio 1920, 1080
+###
+
+
+
+###
 lisp = require "lisp"
 
 scm = "(+ 4 5)"
