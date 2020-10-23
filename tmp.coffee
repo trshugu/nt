@@ -40,6 +40,7 @@ puts decrypted.toString()
 
 
 ###
+
 crypto = require "crypto"
 
 publicKey = """-----BEGIN PUBLIC KEY-----
@@ -80,9 +81,8 @@ Px4iRaKJA7OA/Oo8tXf0nZxDaCvN3NMbkhiN1huqES+IqJeLlhRai3wRL7q0467c
 jep8Pnuz6UYJT+0oXZxScFmqSNdctLWfcF1tldxjWo/wF8fuaftVxA==
 -----END RSA PRIVATE KEY-----"""
 
-
-
-plain = 'hoge fuga'
+# 214桁
+plain = '1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234'
 encrypted = crypto.publicEncrypt publicKey, Buffer.from(plain)
 
 puts "b:", encrypted
@@ -91,7 +91,6 @@ puts "64:", encrypted.toString('base64')
 decrypted = crypto.privateDecrypt privateKey, encrypted
 puts "d:", decrypted
 puts decrypted.toString()
-
 ###
 
 ###
