@@ -32,6 +32,7 @@
     "iconv-lite": "^0.5.0",
     "js-sha3": "^0.8.0",
     "keccak": "^2.0.0",
+    "keypair": "^1.0.1",
     "koa": "^2.5.1",
     "koa-logger": "^3.2.0",
     "koa-route": "^3.2.0",

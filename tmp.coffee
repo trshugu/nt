@@ -9,6 +9,106 @@ helper = require "./helper"
 
 
 
+
+###
+crypto = require "crypto"
+
+publicKey = """-----BEGIN PUBLIC KEY-----
+MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE70ok0679FuAHIla+a6pyHsp3J+RYGcdt
+bpnCjWbGYxeOuUUnDErGETLjvnmF9nk4cmtnl655tQu2Cgv3Eteadw==
+-----END PUBLIC KEY-----"""
+
+privateKey = """-----BEGIN EC PRIVATE KEY-----
+MHQCAQEEIPf8A6hPfx0uLHvkURCIfF4crN4PnnIvDnWPXlpEESawoAcGBSuBBAAK
+oUQDQgAE70ok0679FuAHIla+a6pyHsp3J+RYGcdtbpnCjWbGYxeOuUUnDErGETLj
+vnmF9nk4cmtnl655tQu2Cgv3Eteadw==
+-----END EC PRIVATE KEY-----"""
+
+
+
+plain = 'hoge fuga'
+encrypted = crypto.publicEncrypt publicKey, Buffer.from(plain)
+
+puts "b:", encrypted
+puts "64:", encrypted.toString('base64')
+
+decrypted = crypto.privateDecrypt privateKey, encrypted
+puts "d:", decrypted
+puts decrypted.toString()
+###
+
+
+
+###
+crypto = require "crypto"
+
+publicKey = """-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnrmNlQKF8G+lKZxeFN1w
+BYI/fOgoCmJL0jJebunghs81oNRJWKxUFlgl1l1vsJYxiGTPJxGZ9xUvL1eq1aio
+ohleWQXgbV5aBhpxWyAhkQoC6e67QPzkwlnQmaTC6FLTMA13m5ctzjmtSAtbVt2F
+mGNSU/4aXxkjESR+j7yDzhOekKoag2KA51GAnYrO3BOu4LDpq0dIBliFsqbjmc+6
+CgMgsY8781vDGFxSvPaq/+MTXH7+YWyYnPtTtU4Mv6ja3iiv1+yH4jCO3Ug/4M4u
+QIsw3r6Lt+/rgEzMnj+H1aCjj8qcEeyVbSTvf7CqAHY+Sogc8K1JcNCHlDTUuvNW
+3QIDAQAB
+-----END PUBLIC KEY-----"""
+
+privateKey = """-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAnrmNlQKF8G+lKZxeFN1wBYI/fOgoCmJL0jJebunghs81oNRJ
+WKxUFlgl1l1vsJYxiGTPJxGZ9xUvL1eq1aioohleWQXgbV5aBhpxWyAhkQoC6e67
+QPzkwlnQmaTC6FLTMA13m5ctzjmtSAtbVt2FmGNSU/4aXxkjESR+j7yDzhOekKoa
+g2KA51GAnYrO3BOu4LDpq0dIBliFsqbjmc+6CgMgsY8781vDGFxSvPaq/+MTXH7+
+YWyYnPtTtU4Mv6ja3iiv1+yH4jCO3Ug/4M4uQIsw3r6Lt+/rgEzMnj+H1aCjj8qc
+EeyVbSTvf7CqAHY+Sogc8K1JcNCHlDTUuvNW3QIDAQABAoIBADMDQcy9VdzTlQqN
+lfMwxBsRJGR5nLzRoLq6s30EL8RD/mFlOPmF0TSpOefuecIQU3UZqTZOQuSVa2fU
+zjQDE8edTaRg7iNYaqiBgSMfbYpW5F7Y+lfFr6QDB7cJrBbM39EW0vUvnmokQVvh
+QoblhVVXvpL+HO2pf4q35vE9TkNBq2Y+7qao66hlXwtJuA8lNWKeKEwvmRXz5/G/
+KpRFfGr4PJbtdOjG0Xdlv1cVLCsOEX+b9Sj/sbUQMef9eq0HzUv6G7HKQYtAt4Rv
+LxG1xSjaCNqS4dy0wiAqT77ik5sg+wsighSPYguGiGeUDvGurWNOBeUJhPIT46p6
+BQW1WkUCgYEAywbG3HIV1XcR5nqo+8eWkKTGuJamw7QQD6112NCLIMPiObVXOIzi
+NTYmYtdkSh8jM/+gCgXYqqbzkC4s9VvY74KGsGwGV/DRm34kJ4DL7dNFoNAbGErm
+R5JGIv3LX1x+M7c7fSTCNIHiEmwcqE1sC+v6H7fwnOP4v4zvoVN9SBcCgYEAyCOh
+xSDAoJTCPYCkHUgtL9XNZl8rOjMVc63EMvAQEqaJ0jMqojnikvk6UNO8UaJPu5wN
+2PaOMkgepnDoM9YUEznNongEbz821UOqFkxI54+whYlcW1RbgwehFJeEQZZCtCZs
+Uj1mlQx1fGPTUpyeyncEA6y3vV0zf6ixDKkTfSsCgYAZ9EHTyJnV8iTNq/ySQ0+S
+Kh5lVoz3E7vB5VDdaLuAcsomynHd/tSkLMn3dMWTXCup6BHTdi/ekP0t/1kr/JPc
++nixcP3WnCiPki6ZBjQLsSiDiFcOYfTSTXa93mfzRuWzQsdOFjblc30tEbkQIuWf
+GImfKGqQA+y2wBOaMgwf/QKBgQCWzSpmY4BhPtWBC/4cxjauFXY4Dbt/leAzEpqE
+GxixROUSClW0eNM9FSeYoYIDLL7RSQuyEE0im+7kUKzV6hekSOil47LLtCD33o05
+Ue+Y8075v39knZJ6j3QTFPulg7ftEAqMiRFTe1jHCly/oZ2QRs8yiaDEwYY9SXlm
+Zbt2kwKBgQCN+c93zOe5zY1gab1SsDITpa7pZjxC7qkRPlv1ZHJ0DfAbJDfNhn+8
+Px4iRaKJA7OA/Oo8tXf0nZxDaCvN3NMbkhiN1huqES+IqJeLlhRai3wRL7q0467c
+jep8Pnuz6UYJT+0oXZxScFmqSNdctLWfcF1tldxjWo/wF8fuaftVxA==
+-----END RSA PRIVATE KEY-----"""
+
+
+
+plain = 'hoge fuga'
+encrypted = crypto.publicEncrypt publicKey, Buffer.from(plain)
+
+puts "b:", encrypted
+puts "64:", encrypted.toString('base64')
+
+decrypted = crypto.privateDecrypt privateKey, encrypted
+puts "d:", decrypted
+puts decrypted.toString()
+
+###
+
+###
+pk = crypto.createPrivateKey privateKey
+pk.padding = crypto.constants.RSA_PKCS1_OAEP_PADDING
+
+# pt = crypto.publicDecrypt pk, encrypted
+# console.log pt
+
+test = crypto.publicEncrypt pk, Buffer.from(plain)
+
+console.log test
+console.log test.toString('base64')
+
+puts crypto.publicDecrypt publicKey, test
+###
+
 ###
 convert_base32 = (i)->
   switch i
