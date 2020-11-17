@@ -36,6 +36,23 @@ module.exports.epoch2date = (d)->
    + ("0" + d.getMinutes()).slice(-2)  + ":" \
    + ("0" + d.getSeconds()).slice(-2)
 
+module.exports.epoch2utc = (d)->
+  d.getUTCFullYear() + "/" \
+   + ("0" + (d.getUTCMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getUTCDate()).slice(-2) + " " \
+   + ("0" + d.getUTCHours()).slice(-2) + ":" \
+   + ("0" + d.getUTCMinutes()).slice(-2)  + ":" \
+   + ("0" + d.getUTCSeconds()).slice(-2)
+
+module.exports.epoch2jst = (d)->
+  d = new Date(d.getTime() + (1000 * 60 * 60 * 9))
+  d.getUTCFullYear() + "/" \
+   + ("0" + (d.getUTCMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getUTCDate()).slice(-2) + " " \
+   + ("0" + d.getUTCHours()).slice(-2) + ":" \
+   + ("0" + d.getUTCMinutes()).slice(-2)  + ":" \
+   + ("0" + d.getUTCSeconds()).slice(-2)
+
 module.exports.makeDir = (path)-> new Promise (f, r)->
   path = path[0...-1] if path.match("/$")
   fs.mkdir path, (e)->

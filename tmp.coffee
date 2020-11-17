@@ -8,6 +8,11 @@ helper = require "./helper"
 
 
 
+###
+puts helper.epoch2date new Date Date.now()
+puts helper.epoch2utc new Date Date.now()
+puts helper.epoch2jst new Date Date.now()
+###
 
 
 ###
