@@ -18,3 +18,5 @@ oauth.txt
 
 strage
 *.rdb
+
+package-lock.json
