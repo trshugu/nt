@@ -108,6 +108,97 @@ console.log test.toString('base64')
 puts crypto.publicDecrypt publicKey, test
 ###
 
+
+
+
+###
+r = require "rethinkdb"
+conn = null
+
+
+r.connect()
+.then (v)->
+  conn = v
+  
+  conn.addListener "error", (e)-> console.log "err:", e
+  conn.addListener "close", -> console.log "close"
+  
+  
+  # console.log await r.dbCreate("testdb0c").run conn
+  
+  console.log await r.dbList().run conn
+  dl = await r.dbList().run conn
+  conn.use dl[1]
+  
+  # console.log await r.db("test").tableCreate("oo02").run conn
+  
+  console.log await r.db("test").tableList().run conn
+  
+  console.log await r.table("pp").indexList().run conn
+  
+  
+  obj = 
+    _id : helper.getHash()
+    name : "neeemu"
+  
+  console.log await r.table("pp").insert(obj).run conn
+  
+  # console.log await r.table("pp").get("6a48b5b6-90f7-4ade-90ff-ede80d61c4d4").run conn
+  # console.log await r.table("pp").orderBy("_id").limit(3).run conn
+  
+  # cur = await r.table("pp").getAll("id").run conn
+  
+  q = 
+    name : "namae"
+  
+  # cur = await r.table("pp").filter(q).limit(3).run conn
+  # console.log await cur.next()
+  # cur.each (e,d)-> console.log e,d
+  
+  console.log await r.table("pp").count().run conn
+  console.log await r.table("pp")("name").count("namae").run conn
+  
+  
+  
+  
+  
+  conn.close()
+.catch (e)->
+  console.log e
+  conn.close()
+###
+
+
+
+###
+r = require "rethinkdb"
+
+r.connect()
+.then (v)->
+  # console.log v
+  
+  
+  
+  r.dbList().run v
+  .then (q)->
+    console.log "q", q
+    
+    v.close()
+    
+  
+  
+  # r.dbCreate("testdb04").run v
+  # .then (p)->
+    # console.log p
+  #   r.dbList().run v
+  #   .then (q)->
+  #     console.log "q", q
+      
+  
+.catch (e)-> console.log e
+###
+
+
 ###
 convert_base32 = (i)->
   switch i
