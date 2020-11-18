@@ -8,6 +8,51 @@ helper = require "./helper"
 
 
 
+
+
+
+###
+pool.getConnection()
+.then (conn)->
+  pool.on "close", (a,b,c)-> 
+    console.log("cll", a,b,c)
+    
+  pool.on "end",  (a,b,c)->
+    console.log("enn", a,b,c)
+    
+  
+  conn.query("SELECT * from test")
+    .then (rows)->
+      console.log "rows",rows
+      conn.end -> console.log "ennn"
+      pool.end -> console.log "ennn"
+      puts 1
+.catch (e)->
+  console.log "e",e
+  pool.end -> console.log "ennn"
+  puts 2
+###
+
+
+
+###
+pool.getConnection()
+.then (conn)->
+  conn.query("SELECT 1 as val")
+  .then (rows)->
+    console.log(rows); #[ {val: 1}, meta: ... ]
+    conn.query("INSERT INTO test value (?, ?)", [1, "mariadb"]);
+  .then (res)->
+    console.log(res); # { affectedRows: 1, insertId: 1, warningStatus: 0 }
+    conn.end()
+.catch (e)->
+  console.log "e",e
+  conn.end()
+###
+
+
+
+
 ###
 puts helper.epoch2date new Date Date.now()
 puts helper.epoch2utc new Date Date.now()
