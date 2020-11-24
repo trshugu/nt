@@ -6,9 +6,148 @@ helper = require "./helper"
 
 
 
+###
+bip39 = require "bip39"
+bip32 = require "bip32"
+bs58 = require "bs58"
+nacl = require "tweetnacl"
+
+# sollet
+mnemonic = ""
+seed = bip39.mnemonicToSeedSync mnemonic
+fromseed = bip32.fromSeed seed
+
+sollet = fromseed.derivePath("m/501'/0'/0/0")
+solletkp = nacl.sign.keyPair.fromSeed(sollet.privateKey)
+puts "solletpk", bs58.encode Buffer.from solletkp.publicKey
+puts "solletsk", bs58.encode Buffer.from solletkp.secretKey
+puts "solletsk16", Buffer.from(solletkp.secretKey).toString("hex")
+puts "solletskRow", solletkp.secretKey
+puts "========================"
+
+# Math由来のpriしかない場合
+mathw = Buffer.from "", "hex"
+mathkp = nacl.sign.keyPair.fromSecretKey mathw
+puts "mathpk", bs58.encode Buffer.from mathkp.publicKey
+puts "mathsk", bs58.encode Buffer.from mathkp.secretKey
+puts "mathsk16", Buffer.from(mathkp.secretKey).toString("hex")
+puts "mathkRow", mathkp.secretKey
+puts "========================"
+
+# Rawしかない場合(solflare)
+arr = []
+puts "arr", Buffer.from arr
+puts "arr", bs58.encode Buffer.from arr
+# puts bip32.fromPrivateKey Buffer.from arr
+
+fromsk =  nacl.sign.keyPair.fromSecretKey Buffer.from arr
+puts "pk", bs58.encode Buffer.from fromsk.publicKey
+puts "sk16", Buffer.from(fromsk.secretKey).toString("hex")
+puts "sk58", bs58.encode Buffer.from fromsk.secretKey
+###
 
 
 
+###
+bip39 = require "bip39"
+bip32 = require "bip32"
+bs58 = require "bs58"
+nacl = require "tweetnacl"
+
+mnemonic = ""
+seed = bip39.mnemonicToSeedSync mnemonic
+puts "seed:", seed
+puts "se16:", seed.toString("hex")
+
+puts "se58:", bs58.encode seed
+
+fromseed = bip32.fromSeed seed
+
+puts "========================"
+
+puts "pri:", fromseed.privateKey
+puts "pri:", bs58.encode fromseed.privateKey
+puts "pub:", fromseed.publicKey
+puts "pub:", bs58.encode fromseed.publicKey
+
+puts "b58:", fromseed.toBase58()
+puts "wif:", fromseed.toWIF()
+
+kpse = nacl.sign.keyPair.fromSeed(fromseed.privateKey)
+puts "pk", bs58.encode Buffer.from kpse.publicKey
+puts "sk", bs58.encode Buffer.from kpse.secretKey
+puts "sk16", Buffer.from(kpse.secretKey).toString("hex")
+
+puts "========================"
+
+dp00 = fromseed.derivePath("m/501'/0'/0/0")
+puts "pri:", dp00.privateKey
+puts "pri:", bs58.encode dp00.privateKey
+puts "pub:", dp00.publicKey
+puts "pub:", bs58.encode dp00.publicKey
+
+puts "b58:", dp00.toBase58()
+puts "wif:", dp00.toWIF()
+
+kp00 = nacl.sign.keyPair.fromSeed(dp00.privateKey)
+puts "pk", bs58.encode Buffer.from kp00.publicKey
+puts "sk", bs58.encode Buffer.from kp00.secretKey
+puts "sk16", Buffer.from(kp00.secretKey).toString("hex")
+
+puts "========================"
+
+
+dp01 = fromseed.derivePath("m/10016'/0")
+puts "pri:", dp01.privateKey
+puts "pri:", bs58.encode dp01.privateKey
+puts "pub:", dp01.publicKey
+puts "pub:", bs58.encode dp01.publicKey
+
+puts "b58:", dp01.toBase58()
+puts "wif:", dp01.toWIF()
+
+kp01 = nacl.sign.keyPair.fromSeed(dp01.privateKey)
+puts "pk", bs58.encode Buffer.from kp01.publicKey
+puts "sk", bs58.encode Buffer.from kp01.secretKey
+puts "sk16", Buffer.from(kp01.secretKey).toString("hex")
+
+puts "========================"
+
+# puts "sk", bs58.encode Buffer.from kp00.secretKey
+# puts "sk", kp00.secretKey
+puts "sk", Buffer.from kp00.secretKey
+
+# keyからpubとsec
+arr = []
+puts "arr", Buffer.from arr
+puts "arr", bs58.encode Buffer.from arr
+# puts bip32.fromPrivateKey Buffer.from arr
+
+fromsk =  nacl.sign.keyPair.fromSecretKey Buffer.from arr
+puts "pk", bs58.encode Buffer.from fromsk.publicKey
+puts "sk16", Buffer.from(fromsk.secretKey).toString("hex")
+puts "sk58", bs58.encode Buffer.from fromsk.secretKey
+
+arr2 = []
+puts "arr2", Buffer.from arr2
+puts "arr2", bs58.encode Buffer.from arr2
+# puts bip32.fromPrivateKey Buffer.from arr2
+
+fromsk2 =  nacl.sign.keyPair.fromSecretKey Buffer.from arr2
+puts "pk", bs58.encode Buffer.from fromsk2.publicKey
+puts "sk16", Buffer.from(fromsk2.secretKey).toString("hex")
+puts "sk58", bs58.encode Buffer.from fromsk2.secretKey
+###
+
+
+
+###
+# puts "pk", kp00.publicKey
+# puts "pk", Buffer.from kp00.publicKey
+# puts "pk", Buffer.from(kp00.publicKey).toString("hex")
+# puts "pk", kp00.publicKey.toString("hex")
+# puts "sk", kp00.secretKey
+###
 
 
 ###
