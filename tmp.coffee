@@ -12,6 +12,306 @@ bip32 = require "bip32"
 bs58 = require "bs58"
 nacl = require "tweetnacl"
 
+# 同じニーモニックから出たseedでもcliやMathは半分になる
+mnemonic = ""
+raw = []
+
+seed = bip39.mnemonicToSeedSync mnemonic
+halfseed = Buffer.from(nacl.sign.keyPair.fromSeed(seed[0..31]).secretKey)
+
+puts "seed:", seed.toString("hex")
+puts "half:", halfseed.toString("hex")
+puts "raw :", Buffer.from(raw,"hex").toString("hex")
+
+# fromseedの中身は使わずdrivePathを使う(solletio)
+
+puts "==sollet=="
+sollet = bip32.fromSeed(seed).derivePath("m/501'/0'/0/0")
+solletkp = nacl.sign.keyPair.fromSeed(sollet.privateKey)
+puts "pub", bs58.encode Buffer.from solletkp.publicKey
+puts "pri58", bs58.encode Buffer.from(solletkp.secretKey)
+puts "pri", Buffer.from(solletkp.secretKey).toString("hex")
+
+puts "==CLI=="
+clikp =  nacl.sign.keyPair.fromSecretKey halfseed
+puts "pub", bs58.encode Buffer.from clikp.publicKey
+puts "pri58", bs58.encode Buffer.from(clikp.secretKey)
+puts "pri", Buffer.from(clikp.secretKey).toString("hex")
+###
+
+###
+puts "==CLI(raw)=="
+rawclikp =  nacl.sign.keyPair.fromSecretKey Buffer.from(raw,"hex")
+puts "pub", bs58.encode Buffer.from rawclikp.publicKey
+puts "pri58", bs58.encode Buffer.from(rawclikp.secretKey)
+puts "pri", Buffer.from(rawclikp.secretKey).toString("hex")
+###
+
+
+
+
+
+
+
+
+###
+bip39 = require "bip39"
+bip32 = require "bip32"
+bs58 = require "bs58"
+nacl = require "tweetnacl"
+
+mnemonic = ""
+seed = bip39.mnemonicToSeedSync mnemonic, ""
+puts "seed:", seed
+puts "se16:", seed.toString("hex")
+
+puts "se58:", bs58.encode seed
+
+fromseed = bip32.fromSeed seed
+
+puts "========================"
+
+puts "pri:", fromseed.privateKey
+puts "pri:", bs58.encode fromseed.privateKey
+puts "pub:", fromseed.publicKey
+puts "pub:", bs58.encode fromseed.publicKey
+
+puts "b58:", fromseed.toBase58()
+puts "wif:", fromseed.toWIF()
+
+kpse = nacl.sign.keyPair.fromSeed(fromseed.privateKey)
+puts "pk", bs58.encode Buffer.from kpse.publicKey
+puts "sk", bs58.encode Buffer.from kpse.secretKey
+puts "sk16", Buffer.from(kpse.secretKey).toString("hex")
+
+puts "========================"
+
+dp00 = fromseed.derivePath("m/501'/0'/0/0")
+puts "pri:", dp00.privateKey
+puts "pri:", bs58.encode dp00.privateKey
+puts "pub:", dp00.publicKey
+puts "pub:", bs58.encode dp00.publicKey
+
+puts "b58:", dp00.toBase58()
+puts "wif:", dp00.toWIF()
+
+kp00 = nacl.sign.keyPair.fromSeed(dp00.privateKey)
+puts "pk", bs58.encode Buffer.from kp00.publicKey
+puts "sk", bs58.encode Buffer.from kp00.secretKey
+puts "sk16", Buffer.from(kp00.secretKey).toString("hex")
+
+puts "========================"
+
+
+dp01 = fromseed.derivePath("m/44'/501'/0'/0/0")
+puts "pri:", dp01.privateKey
+puts "pri:", bs58.encode dp01.privateKey
+puts "pub:", dp01.publicKey
+puts "pub:", bs58.encode dp01.publicKey
+
+puts "b58:", dp01.toBase58()
+puts "wif:", dp01.toWIF()
+
+kp01 = nacl.sign.keyPair.fromSeed(dp01.privateKey)
+puts "pk", bs58.encode Buffer.from kp01.publicKey
+puts "sk", bs58.encode Buffer.from kp01.secretKey
+puts "sk16", Buffer.from(kp01.secretKey).toString("hex")
+
+puts "========================"
+
+puts bs58.encode fromseed.deriveHardened(501).privateKey
+puts bs58.encode fromseed.deriveHardened(501).publicKey
+puts bs58.encode fromseed.deriveHardened(501).deriveHardened(0).privateKey
+puts bs58.encode fromseed.deriveHardened(501).deriveHardened(0).publicKey
+puts bs58.encode fromseed.deriveHardened(501).deriveHardened(0).deriveHardened(0).privateKey
+puts bs58.encode fromseed.deriveHardened(501).deriveHardened(0).deriveHardened(0).publicKey
+puts fromseed.deriveHardened(501).deriveHardened(0).deriveHardened(0).neutered()
+puts bs58.encode fromseed.deriveHardened(501).deriveHardened(0).deriveHardened(0).neutered().publicKey
+
+puts "========================"
+
+puts bs58.encode fromseed.derivePath("m/44'").privateKey
+puts bs58.encode fromseed.deriveHardened(44).privateKey
+
+puts bs58.encode fromseed.derivePath("m/501'").privateKey
+puts bs58.encode fromseed.deriveHardened(501).privateKey
+
+dp00 = fromseed.derivePath("m/501'/0'/0/0")
+puts "*pri:", bs58.encode dp00.privateKey
+puts "pub:", bs58.encode dp00.publicKey
+
+kp00 = nacl.sign.keyPair.fromSeed(dp00.privateKey)
+puts "pk", bs58.encode Buffer.from kp00.publicKey
+puts "sk", bs58.encode Buffer.from kp00.secretKey
+
+
+puts "========================"
+pcon = (path)->
+  puts "path:", path
+  pri = fromseed.derivePath(path).privateKey
+  # puts "pri", bs58.encode pri
+  puts "pub", bs58.encode fromseed.derivePath(path).publicKey
+  kp00 = nacl.sign.keyPair.fromSeed(pri)
+  puts "pk", bs58.encode Buffer.from kp00.publicKey
+  # puts "sk", bs58.encode Buffer.from kp00.secretKey
+
+pcon "m/501'/0'/0/0"
+pcon "m/501"
+pcon "m/501'"
+pcon "m/501'/0"
+pcon "m/501'/0'"
+pcon "m/501'/0/0"
+pcon "m/501'/0'/0"
+pcon "m/501'/0'/0'"
+pcon "m/501'/0'/0/0"
+pcon "m/501'/0'/0'/0"
+pcon "m/44'/501'/0'"
+
+pcon "m/44'/501'/0'/0/0"
+pcon "m/501'/0'/0/0"
+pcon "m/501'/0'/0/1"
+pcon "m/10016'/0"
+pcon "m/10016/0"
+pcon "m/10016'/0/0/0"
+pcon "m/10016'/0'/0/0"
+pcon "m/10016'/0/0/0"
+pcon "m/10016/0'/0/0"
+
+pcon "m/44'/501'/0'/0'"
+pcon "m/44'/501'/0'/0'/0"
+pcon "m/44'/501'/0'/0'/0/0"
+
+pcon "m/44'/501'/0"
+pcon "m/44'/501'/0'"
+pcon "m/44'/501'/0/0"
+pcon "m/44'/501'/0'/0"
+pcon "m/44'/501'/0'/0'"
+pcon "m/44'/501'/0'/0/0"
+pcon "m/44'/501'/0'/0'/0"
+
+pcon "m/44'/501'/1'"
+pcon "m/44'/501'/1'/2'"
+
+pcon "0"
+pcon "0'"
+pcon "0/0"
+pcon "0'/0"
+pcon "0/0'"
+pcon "0'/0'"
+
+pcon "m/0"
+pcon "m/0'"
+pcon "m/0/0"
+pcon "m/0'/0"
+pcon "m/0/0'"
+pcon "m/0'/0'"
+
+
+# puts bip32.fromPrivateKey Buffer.from(fromsk.secretKey)
+arr = []
+# puts "arr", Buffer.from(arr,"hex")
+puts "arr", Buffer.from(arr,"hex").toString("hex")
+puts "arr", bs58.encode Buffer.from arr
+
+# puts "sk16", Buffer.from(fromsk.secretKey).toString("hex")
+# puts "sk58", bs58.encode Buffer.from fromsk.secretKey
+
+#  puts bip32.fromSeed(seed).privateKey.toString("hex")
+
+puts "========================"
+puts "secret", Buffer.from(arr,"hex").toString("hex")
+puts "seed::", seed.toString("hex")
+puts "conv::", Buffer.from(nacl.sign.keyPair.fromSeed(seed[0..31]).secretKey).toString("hex")
+
+
+halfseed =  nacl.sign.keyPair.fromSecretKey Buffer.from Buffer.from(nacl.sign.keyPair.fromSeed(seed[0..31]).secretKey)
+puts "pk", bs58.encode Buffer.from halfseed.publicKey
+fromsk =  nacl.sign.keyPair.fromSecretKey Buffer.from arr
+puts "pk", bs58.encode Buffer.from fromsk.publicKey
+###
+
+
+###
+a = bip32.fromSeed seed
+b = bip32.fromSeed Buffer.from(arr)
+
+puts "apub", bs58.encode a.publicKey
+puts "apri", a.privateKey.toString("hex")
+puts "bpub", bs58.encode b.publicKey
+puts "bpri", b.privateKey.toString("hex")
+
+akp = nacl.sign.keyPair.fromSeed(a.privateKey)
+bkp = nacl.sign.keyPair.fromSeed(b.privateKey)
+
+puts "akp", bs58.encode Buffer.from akp.publicKey
+puts "bkp", bs58.encode Buffer.from bkp.publicKey
+
+puts "akpsec", Buffer.from(akp.secretKey).toString("hex")
+puts "bkpsec", Buffer.from(bkp.secretKey).toString("hex")
+
+c = bip32.fromSeed Buffer.from(akp.secretKey)
+d = bip32.fromSeed Buffer.from(bkp.secretKey)
+puts "cpub", bs58.encode c.publicKey
+puts "cpri", c.privateKey.toString("hex")
+puts "dpub", bs58.encode d.publicKey
+puts "dpri", d.privateKey.toString("hex")
+
+
+fromsk =  nacl.sign.keyPair.fromSecretKey Buffer.from arr
+puts "pk", bs58.encode Buffer.from fromsk.publicKey
+###
+
+###
+fromsk =  nacl.sign.keyPair.fromSecretKey Buffer.from arr
+puts "pk", bs58.encode Buffer.from fromsk.publicKey
+
+
+ed = nacl.sign.keyPair.fromSeed fromseed.privateKey
+puts "pk", bs58.encode Buffer.from ed.publicKey
+puts "sk16", Buffer.from(ed.secretKey).toString("hex")
+puts "sk58", bs58.encode Buffer.from ed.secretKey
+
+ed = nacl.sign.keyPair.fromSecretKey seed
+puts "pk", bs58.encode Buffer.from ed.publicKey
+puts "sk16", Buffer.from(ed.secretKey).toString("hex")
+puts "sk58", bs58.encode Buffer.from ed.secretKey
+###
+
+
+
+
+
+###
+puts bs58.encode fromseed.derivePath("m/501'/0'").privateKey
+puts bs58.encode fromseed.deriveHardened(501).deriveHardened(0).privateKey
+puts bs58.encode fromseed.derivePath("m/501'/0'/0'").privateKey
+puts bs58.encode fromseed.derivePath("m/501'/0'/0").privateKey
+puts bs58.encode fromseed.deriveHardened(501).deriveHardened(0).deriveHardened(0).privateKey
+
+puts bs58.encode fromseed.derivePath("m/44'/501'/0'").privateKey
+puts bs58.encode fromseed.deriveHardened(44).deriveHardened(501).deriveHardened(0).privateKey
+
+puts "===="
+# BIP44の標準とは外れているとのこと
+# 44'/501'/0'/
+puts bs58.encode fromseed.derivePath("m/44'/501'/0'/0/0").privateKey
+puts bs58.encode fromseed.derivePath("m/501'/0'/0/0").privateKey
+puts bs58.encode fromseed.derivePath("m/501'/0'/0/1").privateKey
+puts bs58.encode fromseed.derivePath("m/10016'/0").privateKey
+puts bs58.encode fromseed.derivePath("m/10016/0").privateKey
+puts bs58.encode fromseed.derivePath("m/10016'/0/0/0").privateKey
+puts bs58.encode fromseed.derivePath("m/10016'/0'/0/0").privateKey
+puts bs58.encode fromseed.derivePath("m/10016'/0/0/0").privateKey
+puts bs58.encode fromseed.derivePath("m/10016/0'/0/0").privateKey
+###
+
+
+###
+bip39 = require "bip39"
+bip32 = require "bip32"
+bs58 = require "bs58"
+nacl = require "tweetnacl"
+
 # sollet
 mnemonic = ""
 seed = bip39.mnemonicToSeedSync mnemonic
