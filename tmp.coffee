@@ -6,6 +6,30 @@ helper = require "./helper"
 
 
 
+
+
+###
+bi = require "big-integer"
+sqrt = (x)->
+  a = x
+  [0..100].forEach ->
+    x = x.minus(x.multiply(x).minus(a).divide(bi(2).multiply(x)))
+  x.minus(1)
+
+console.log bi(2).pow bi(256)
+console.log sqrt bi(2).pow bi(256)
+
+
+bisqrt = (x)->
+  a = x
+  [0..100].forEach -> x = x - ( (x*x-a)/(2n*x) )
+  x - 1n
+
+console.log 2n**256n
+console.log bisqrt 2n**256n
+###
+
+
 ###
 bip39 = require "bip39"
 bip32 = require "bip32"
