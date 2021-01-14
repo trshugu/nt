@@ -7,6 +7,49 @@ helper = require "./helper"
 
 
 
+###
+# ec署名
+value = "yamaya"
+
+# secretkey = helper.getHash()
+secretkey = helper.createHash("sec")
+# secretkey = helper.dec2hex helper.gen_rand(128).toString()
+puts "secretkey", secretkey
+
+secp256k1 = new require('elliptic').ec('secp256k1')
+kp = secp256k1.keyFromPrivate secretkey # 秘密鍵からKeyPair
+
+# 送信用公開鍵生成
+pub = kp.getPublic()
+pubkey = {}
+pubkey.x =  ("00" + (helper.dec2hex(pub.x.toString()))).slice(-64)
+pubkey.y =  ("00" + (helper.dec2hex(pub.y.toString()))).slice(-64)
+puts "pubkey", pubkey
+
+# 無圧縮：0x04 偶数：0x02 奇数：0x03
+compressPub = "0x" + (if require("big-integer")(helper.hex2dec(pubkey.y)).mod(2).eq(0) then "02" else "03") + pubkey.x
+puts "compressPub", compressPub
+
+# 署名側
+sig = kp.sign value # 一時的な公開鍵のx座標Rとハッシュと鍵と一時的な秘密鍵で計算したSを計算
+
+# 署名はhexにする
+lsig = {}
+lsig.r = sig.r.toString("hex")
+lsig.s = sig.s.toString("hex")
+puts "lsig", lsig
+
+# compressPubとssigを送る
+
+# 検証側
+lpub = {}
+lpub.x = compressPub.substr(4)
+lpub.y = helper.ccvuncompress compressPub.substr(4),compressPub.substr(2,2) == "02"
+puts "lpub", lpub
+
+puts "ライブラリでライブラリ署名の検証", secp256k1.keyFromPublic(lpub).verify value, lsig
+###
+
 
 ###
 bi = require "big-integer"
