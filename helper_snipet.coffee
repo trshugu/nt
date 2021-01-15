@@ -4,9 +4,6 @@ fs = require "fs"
 zlib =  require "zlib"
 crypto = require "crypto"
 
-# bi:nが導入されるまでの間利用
-bi = require "big-integer"
-
 module.exports.getHash = -> 
   cry = crypto.createHash 'SHA256'
   cry.update uuid.v4(), "utf8"
