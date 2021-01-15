@@ -140,76 +140,76 @@ module.exports.unlock = (cry, pass)-> new Promise (f,r)->
 hex2decsub = (req, res, ind)->
   s = req.pop()
   if s?
-    i = bi(parseInt(s, 16))
-    res = res.plus( i.multiply( bi(1).multiply(bi(16).pow(ind)) ) )
-    hex2decsub req, res, ind.plus(1)
+    i = BigInt(parseInt(s, 16))
+    res = res + i * 1n * 16n ** ind
+    hex2decsub req, res, ind + 1n
   else
     res.toString()
 
-module.exports.hex2dec = (str)-> hex2decsub str.split(""), bi.zero, bi.zero
-
+module.exports.hex2dec = (str)-> hex2decsub str.split(""), 0n, 0n
 
 # 10進数文字を16進数文字に変換
 dec2hexsub = (req, res)->
-  m = req.mod(16)
-  if req.eq m
+  m = req % 16n
+  if req == m
     return m.toString(16) + res
   else
     res = m.toString(16) + res
-    dec2hexsub req.divide(16), res
+    dec2hexsub req / 16n, res
 
 module.exports.dec2hex = (str)-> 
-  bis = bi(str)
-  if bis.sign
-    bis = dec2hexsub bis.abs(), ""
+  bis = BigInt(str)
+  
+  if bis < 0n
+    bis = bis * -1n
+    bis = dec2hexsub bis, ""
     "-" + bis
   else
-    dec2hexsub bis.abs(), ""
-
+    dec2hexsub bis, ""
 
 # 高速指数演算
 module.exports.modular_exp = (a, b, n)->
-  res = bi.one
-  while b.neq(0)
-    if b.and(1).neq(0)
-      res = res.multiply(a).mod(n)
+  res = 1n
+  while b != 0n
+    if (b & 1n) != 0n
+      res = (res * a) % n
     
-    a = a.multiply(a).mod(n)
-    b = b.shiftRight(1)
+    a = (a ** 2n) % n
+    b = b >> 1n
   
   res
 
 # ランダムな素数生成
 module.exports.gen_rand = (bit_length)->
-  bits = [0...bit_length - 2].map -> bi.randBetween 0, 1
-  ret = bi(1)
+  bits = [0...bit_length - 2].map -> Math.floor(Math.random() * 2)
+  ret = 1n
   bits.forEach (b)->
-    ret = ret.multiply(2).plus(b)
+    ret = ret * 2n + BigInt(b)
   
-  ret.multiply(2).plus(1)
+  ret * 2n + 1n
 
 # 素数確認
 mr_primary_test = (n, k=100)->
-  return false if n.eq 1
-  return true if n.eq 2
-  return false if n.mod(2).eq(0)
+  return false if n == 1n
+  return true if n == 2n
+  return false if (n % 2n) == 0n
   
-  d = n.minus(1)
-  s = bi.zero
-  while d.mod(2).neq(0)
-    d = d.divide(2)
-    s = s.plus(1)
+  d = n - 1n
+  s = 0n
+  while (d % 2n) != 0n
+    d = d / 2n
+    s = s + 1n
   
-  r = [0...k].map -> bi.randBetween 1, n.minus(1)
+  # nのビット数
+  nb = n.toString(2).length
+  r = [0...k].map -> gen_rand nb-1
   res = r.some (a)->
-    if helper.modular_exp(a, d, n).neq(1)
-      pl = [0...s].map (rr)-> 
-        bi(2).pow(rr).multiply(d)
-      
+    if helper.modular_exp(a, d, n) != 1n
+      pl = [0...s].map (rr)->  (2n ** rr) * d
       flg = true
       
       pl.forEach (p)->
-        if helper.modular_exp(a, p, n).eq(1)
+        if helper.modular_exp(a, p, n) == 1n
           flg = false
           return
       
@@ -227,85 +227,83 @@ module.exports.gen_prime = (bit)->
   
   return ret
 
-
 # 楕円曲線計算
 # 2倍(2G=G+G)
 doublePt = (g,p)->
   res = {}
-  if g.y.eq(bi.zero)
-    res.x = 0
-    res.y = 0
+  if g.y == 0n
+    res.x = 0n
+    res.y = 0n
     return res
   else
-    nu = bi(3).multiply( helper.modular_exp(g.x,bi(2),p) ).multiply(  helper.modular_exp( bi(2).multiply(g.y), p.minus(bi(2)), p ))
-    x3 = helper.modular_exp(nu, bi(2), p).minus(bi(2).multiply(g.x))
-    y3 = nu.multiply( g.x.minus(x3) ).minus(g.y)
-    res.x = x3.mod(p)
-    res.y = y3.mod(p)
+    nu = 3n * helper.modular_exp(g.x, 2n, p) * helper.modular_exp(2n * g.y, p - 2n, p)
+    x3 = helper.modular_exp(nu, 2n, p) - (2n * g.x)
+    y3 = (nu * (g.x - x3)) - g.y
+    res.x = x3 % p
+    res.y = y3 % p
     return res
 
 # たし算(G+G)
 addPt = (g1,g2,p)->
   res = {}
   
-  return g2 if g1.x.eq(0) && g1.y.eq(0)
-  return g1 if g2.x.eq(0) && g2.y.eq(0)
+  return g2 if g1.x == 0n && g1.y == 0n
+  return g1 if g2.x == 0n && g2.y == 0n
   
-  if g1.x.eq(g2.x)
-    if (g1.y.plus(g2.y)).mod(p).eq(0)
-      res.x = bi(0)
-      res.y = bi(0)
+  if g1.x == g2.x
+    if (g1.y + g2.y) % p == 0n
+      res.x = 0n
+      res.y = 0n
       return res
     else
       return doublePt(g1,p)
   
   # lm = (g1y-g2y) * ( (g1x-g2x)**p-2 % p )
-  lm = (g1.y.minus(g2.y)).multiply( helper.modular_exp(g1.x.minus(g2.x), p.minus(bi(2)), p) )
+  lm = (g1.y-g2.y) * ( helper.modular_exp((g1.x-g2.x), p-2n, p) )
   
   # x3 = (lm**2%p) - (g1x+g2x)
-  x3 = helper.modular_exp(lm,bi(2),p).minus(g1.x.plus(g2.x))
+  x3 = helper.modular_exp(lm,2n,p) - (g1.x+g2.x)
   
   # y3 = lm*(g1x-x3)-g1y
-  y3 = lm.multiply(g1.x.minus(x3)).minus(g1.y)
+  y3 = lm * (g1.x-x3) - g1.y
   
-  res.x = x3.mod(p)
-  res.y = y3.mod(p)
+  res.x = x3 % p
+  res.y = y3 % p
   return res
 
 # スカラーかけ算(n-1G)
 scalarmult = (g,e,p)->
   res = {}
-  if e.eq(0)
-    res.x = bi(0)
-    res.y = bi(0)
+  if e == 0n
+    res.x = 0n
+    res.y = 0n
     return res
   
-  res = scalarmult(g, e.divide(2),p)
+  res = scalarmult(g, e/2n, p)
   res = addPt(res, res, p)
-  res = addPt(res, g, p) if e.and(1).eq(1)
+  res = addPt(res, g, p) if (e & 1n) == 1n
   
   return res
-
 
 ccv = (g,e,p)->
   res = scalarmult g, e, p
   
   # biライブラリがBIGNUM化されて符号(sign)が消えたので書き直し
-  res.x = res.x.plus(p) if res.x.lt(0)
-  res.y = res.y.plus(p) if res.y.lt(0)
+  res.x = res.x + p if res.x < 0n
+  res.y = res.y + p if res.y < 0n
   
   res
 
 module.exports.keyFromPrivate = (pri)->
-  e = bi helper.hex2dec pri
+  e = BigInt helper.hex2dec pri
   
   # ポイントG(x,y)
   g = {}
-  g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
-  g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+  g.x = BigInt helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  g.y = BigInt helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
   
   # 素数 p(modする)
-  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  p = BigInt helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
   
   res = ccv g, e, p
   res.x = ("00" + (helper.dec2hex(res.x.toString()))).slice(-64)
@@ -315,23 +313,23 @@ module.exports.keyFromPrivate = (pri)->
 module.exports.sign = (value, pri)->
   res = {}
   BN = require "BN.js"
-  dech = bi new BN(value, 16).toString()
+  dech = BigInt new BN(value, 16).toString()
   
   # ポイントG(x,y)
   g = {}
-  g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
-  g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+  g.x = BigInt helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  g.y = BigInt helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
   
   # 素数 p(modする)
-  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  p = BigInt helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
   
   # 著名用
-  n = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+  n = BigInt helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
   
   # nonce = helper.gen_rand(64)
-  nonce = bi(4)
-  r = ccv(g,nonce,p).x.mod(n)
-  s = helper.modular_exp(nonce, n.minus(2), n).multiply( bi(dech).plus(r.multiply(bi(helper.hex2dec(pri)))) ).mod(n)
+  nonce = 4n
+  r = ccv(g,nonce,p).x % n
+  s = helper.modular_exp(nonce, n-2n, n) * ( dech + r * BigInt(helper.hex2dec(pri)) ) % n
   
   res.r = ("00" + (helper.dec2hex(r.toString()))).slice(-64)
   res.s = ("00" + (helper.dec2hex(s.toString()))).slice(-64)
@@ -340,45 +338,45 @@ module.exports.sign = (value, pri)->
 
 module.exports.verify = (value, sig, pub)->
   BN = require "BN.js"
-  dech = bi new BN(value, 16).toString()
+  dech = BigInt new BN(value, 16).toString()
   
   # 公開鍵も署名もhexでくるのでキャストが必要だった
   bipub = {}
-  bipub.x = bi helper.hex2dec pub.x
-  bipub.y = bi helper.hex2dec pub.y
+  bipub.x = BigInt helper.hex2dec pub.x
+  bipub.y = BigInt helper.hex2dec pub.y
   
-  bir = bi helper.hex2dec sig.r.toString()
-  bis = bi helper.hex2dec sig.s.toString()
+  bir = BigInt helper.hex2dec sig.r.toString()
+  bis = BigInt helper.hex2dec sig.s.toString()
   
   # ポイントG(x,y)
   g = {}
-  g.x = bi helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
-  g.y = bi helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+  g.x = BigInt helper.hex2dec "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  g.y = BigInt helper.hex2dec "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
   
   # 素数 p(modする)
-  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  p = BigInt helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
   
   # 著名用
-  n = bi helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
+  n = BigInt helper.hex2dec "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141"
   
-  si = helper.modular_exp(bis, n.minus(2), n)
-  u1 = dech.multiply(si).mod(n)
-  u2 = bir.multiply(si).mod(n)
+  si = helper.modular_exp(bis, n-2n, n)
+  u1 = (dech * si) % n
+  u2 = bir * si % n
   p1 = scalarmult(g, u1, p)
   p2 = scalarmult(bipub, u2, p)
   v = addPt(p1, p2, p)
-  v.x = v.x.plus(p) if v.x.lt(0)
-  v.y = v.y.plus(p) if v.y.lt(0)
-  v.x.minus(bir).mod(n).eq(0)
+  v.x = (v.x + p) if v.x < 0n
+  v.y = (v.y + p) if v.y < 0n
+  (v.x - bir) % n == 0n
 
 # compress形式からyを算出
 module.exports.ccvuncompress = (val, bleo)-> 
-  p = bi helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
-  x = bi helper.hex2dec(val)
-  a = helper.modular_exp(x, bi(3), p).plus(7).mod(p)
-  y = helper.modular_exp(a, p.plus(1).divide(4), p)
+  p = BigInt helper.hex2dec "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+  x = BigInt helper.hex2dec(val)
+  a = (helper.modular_exp(x, 3n, p) + 7n) % p
+  y = helper.modular_exp(a, (p+1n)/4n, p)
   # y座標プレフィックスの偶奇を判断
-  y = y.multiply(-1).plus(p) if y.mod(2).eq(0) != bleo
+  y = (y * -1n + p) if ((y % 2n) == 0n) != bleo
   ("00" + (helper.dec2hex(y))).slice(-64)
 
 
