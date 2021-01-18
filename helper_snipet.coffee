@@ -3,6 +3,8 @@ uuid = require "uuid"
 fs = require "fs"
 zlib =  require "zlib"
 crypto = require "crypto"
+request = require("request")
+cheerio = require("cheerio")
 
 module.exports.getHash = -> 
   cry = crypto.createHash 'SHA256'
@@ -24,31 +26,6 @@ module.exports.createHash64 = (src)->
   cry = crypto.createHash 'SHA512'
   cry.update src, "utf8"
   cry.digest 'hex'
-
-module.exports.epoch2date = (d)->
-  d.getFullYear() + "/" \
-   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
-   + ("0" + d.getDate()).slice(-2) + " " \
-   + ("0" + d.getHours()).slice(-2) + ":" \
-   + ("0" + d.getMinutes()).slice(-2)  + ":" \
-   + ("0" + d.getSeconds()).slice(-2)
-
-module.exports.epoch2utc = (d)->
-  d.getUTCFullYear() + "/" \
-   + ("0" + (d.getUTCMonth() + 1)).slice(-2) + "/" \
-   + ("0" + d.getUTCDate()).slice(-2) + " " \
-   + ("0" + d.getUTCHours()).slice(-2) + ":" \
-   + ("0" + d.getUTCMinutes()).slice(-2)  + ":" \
-   + ("0" + d.getUTCSeconds()).slice(-2)
-
-module.exports.epoch2jst = (d)->
-  d = new Date(d.getTime() + (1000 * 60 * 60 * 9))
-  d.getUTCFullYear() + "/" \
-   + ("0" + (d.getUTCMonth() + 1)).slice(-2) + "/" \
-   + ("0" + d.getUTCDate()).slice(-2) + " " \
-   + ("0" + d.getUTCHours()).slice(-2) + ":" \
-   + ("0" + d.getUTCMinutes()).slice(-2)  + ":" \
-   + ("0" + d.getUTCSeconds()).slice(-2)
 
 module.exports.makeDir = (path)-> new Promise (f, r)->
   path = path[0...-1] if path.match("/$")
@@ -87,7 +64,47 @@ module.exports.appendCsv = (filename, val)-> new Promise (f,r)->
     else
       f()
 
+# limelight IPs
+module.exports.llnw = (uri)-> new Promise (f,r)->
+  helper.wget uri
+  .then (v)->
+    xml = cheerio.load v.raw,{ignoreWhitespace: true, xmlMode: true}
+    content = cheerio.load xml("channel>item").children()[1].children[0].data
+    ips = JSON.parse(content("pre").text())
+    f ips
+  .catch (e)-> r e
+
+# ======================================
+# epoch変換
+# ======================================
+module.exports.epoch2date = (d)->
+  d.getFullYear() + "/" \
+   + ("0" + (d.getMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getDate()).slice(-2) + " " \
+   + ("0" + d.getHours()).slice(-2) + ":" \
+   + ("0" + d.getMinutes()).slice(-2)  + ":" \
+   + ("0" + d.getSeconds()).slice(-2)
+
+module.exports.epoch2utc = (d)->
+  d.getUTCFullYear() + "/" \
+   + ("0" + (d.getUTCMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getUTCDate()).slice(-2) + " " \
+   + ("0" + d.getUTCHours()).slice(-2) + ":" \
+   + ("0" + d.getUTCMinutes()).slice(-2)  + ":" \
+   + ("0" + d.getUTCSeconds()).slice(-2)
+
+module.exports.epoch2jst = (d)->
+  d = new Date(d.getTime() + (1000 * 60 * 60 * 9))
+  d.getUTCFullYear() + "/" \
+   + ("0" + (d.getUTCMonth() + 1)).slice(-2) + "/" \
+   + ("0" + d.getUTCDate()).slice(-2) + " " \
+   + ("0" + d.getUTCHours()).slice(-2) + ":" \
+   + ("0" + d.getUTCMinutes()).slice(-2)  + ":" \
+   + ("0" + d.getUTCSeconds()).slice(-2)
+
+# ======================================
 # 圧縮、解凍
+# ======================================
 module.exports.deflate = (pt)-> new Promise (f,r)->
   zlib.deflate pt, (e,d)->
     if e?
@@ -96,14 +113,16 @@ module.exports.deflate = (pt)-> new Promise (f,r)->
       f d.toString("hex")
 
 module.exports.inflate = (comp)-> new Promise (f,r)->
-  zlib.inflate new Buffer(comp, "hex"), (e,d)->
+  zlib.inflate Buffer.from(comp, "hex"), (e,d)->
     if e?
       r e
     else
       f d.toString()
 
 
+# ======================================
 # 暗号化
+# ======================================
 createKeyHash = (pass)->
   hash = crypto.createHash 'sha256'
   hash.update pass
@@ -115,7 +134,7 @@ createIV = (pass)->
   hash.digest().toString("hex").substr(32,16)
 
 module.exports.lock = (val, pass)-> new Promise (f,r)->
-  deflate val
+  helper.deflate val
   .then (comp)->
     cipher = crypto.createCipheriv 'aes-256-cbc', createKeyHash(pass), createIV(pass)
     crypted = cipher.update comp, 'utf-8', 'hex'
@@ -127,12 +146,14 @@ module.exports.unlock = (cry, pass)-> new Promise (f,r)->
   decipher = crypto.createDecipheriv 'aes-256-cbc', createKeyHash(pass), createIV(pass)
   decode = decipher.update cry, 'hex', 'utf-8'
   decode += decipher.final "utf-8"
-  inflate decode
+  helper.inflate decode
   .then (pt)->
     f pt
   .catch (e)-> r e
 
-
+# ======================================
+# HEX<->DEC
+# ======================================
 # 16進数文字を10進数に変換
 hex2decsub = (req, res, ind)->
   s = req.pop()
@@ -164,6 +185,9 @@ module.exports.dec2hex = (str)->
   else
     dec2hexsub bis, ""
 
+# ======================================
+# 公開鍵暗号計算
+# ======================================
 # 高速指数演算
 module.exports.modular_exp = (a, b, n)->
   res = 1n
@@ -185,7 +209,7 @@ module.exports.gen_rand = (bit_length)->
   
   ret * 2n + 1n
 
-# 素数確認
+# 素数判定
 mr_primary_test = (n, k=100)->
   return false if n == 1n
   return true if n == 2n
@@ -224,7 +248,9 @@ module.exports.gen_prime = (bit)->
   
   return ret
 
+# ======================================
 # 楕円曲線計算
+# ======================================
 # 2倍(2G=G+G)
 doublePt = (g,p)->
   res = {}
@@ -375,5 +401,33 @@ module.exports.ccvuncompress = (val, bleo)->
   # y座標プレフィックスの偶奇を判断
   y = (y * -1n + p) if ((y % 2n) == 0n) != bleo
   ("00" + (helper.dec2hex(y))).slice(-64)
+
+# wget
+module.exports.wget = (url)-> new Promise (f,re)->
+  request
+    url: url
+    headers:
+      'User-Agent': 'request'
+      'Accept': 'text/html'
+  , (e,r,b)->
+    if e?
+      re e
+    else
+      res = {}
+      res.headers = r.headers
+      res.body = cheerio.load b
+      res.raw = b
+      f res
+
+
+# ======================================
+# SQUFOF v1.0
+# ======================================
+
+# 平方根を求める
+# 数字文字列を返す
+# 拡張ユークリッド互除法
+# 鍵生成
+
 
 

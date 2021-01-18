@@ -9,9 +9,15 @@ helper = require "./helper"
 
 
 
-
-
-
+###
+# new Bufferが使われてたのとlockが使えなかったので修正
+helper.lock "val", "pass"
+.then (v)->
+  puts v
+  helper.unlock v, "pass"
+  .then (v)->
+    puts v
+###
 
 
 
