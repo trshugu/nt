@@ -9,7 +9,10 @@ helper = require "./helper"
 
 
 ###
-setInterval  (-> console.log require("child_process").execSync("solana epoch-info | grep Completed").toString()), 1000 * 5
+setInterval  ->
+  try
+    console.log require("child_process").execSync("solana epoch-info | grep Completed").toString()
+, 1000 * 5
 ###
 
 
