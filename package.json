@@ -5,6 +5,7 @@
   "main": "tmp.coffee",
   "dependencies": {
     "@azure/service-bus": "^1.1.10",
+    "@solana/web3.js": "^0.94.2",
     "azure": "^2.3.1-preview",
     "base32": "0.0.6",
     "base32-decode": "^1.0.0",

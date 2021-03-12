@@ -8,6 +8,11 @@ helper = require "./helper"
 
 
 
+###
+setInterval  (-> console.log require("child_process").execSync("solana epoch-info | grep Completed").toString()), 1000 * 5
+###
+
+
 
 ###
 # new Bufferが使われてたのとlockが使えなかったので修正
