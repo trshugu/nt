@@ -4,9 +4,7 @@
   "description": "nt\r ==",
   "main": "tmp.coffee",
   "dependencies": {
-    "@azure/service-bus": "^1.1.10",
     "@solana/web3.js": "^0.94.2",
-    "azure": "^2.3.1-preview",
     "base32": "0.0.6",
     "base32-decode": "^1.0.0",
     "base32-encode": "^1.1.1",
@@ -60,10 +58,9 @@
     "socket.io": "^2.2.0",
     "through2": "^3.0.0",
     "tweetnacl": "^1.0.3",
-    "uuid": "^3.3.2",
+    "uuid": "^3.4.0",
     "ws": "^7.3.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
